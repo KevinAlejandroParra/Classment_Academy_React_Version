@@ -1,48 +1,61 @@
-import React, { Component } from 'react';
+import { NextUIProvider } from "@nextui-org/react";
+import { Navbar as NextUINavbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button } from "@nextui-org/react";
 
-function Navbar() {
-    return (
+function CustomNavbar() {
+  return (
     <>
-    <script src="https://cdn.jsdelivr.net/npm/theme-change@2.0.2/index.js" />
-    <div className="navbar bg-transparent py-4 backdrop-blur-md bg-opacity-50 fixed top-0 left-0 right-0 z-50 shadow-lg">
-      <div className="navbar-start">
-        <div className="dropdown">
-          <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h16M4 18h7" />
-            </svg>
-          </div>
-          <ul
-            tabIndex={0}
-            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
-            <li><a>Homepage</a></li>
-            <li><a>Portfolio</a></li>
-            <li><a>About</a></li>
-          </ul>
-        </div>
-      </div>
-      <div className="navbar-center">
-        <img src="../public/images/logo.png" alt="" className="w-10 h-10" />
-        <a className="btn btn-ghost text-xl">Classment Academy</a>
-      </div>
-      <div className="navbar-end">
-        <button className="btn btn-ghost btn-circle">
-         
-        </button>
-        <button data-toggle-theme="dark,light" data-act-class="ACTIVECLASS"></button>
-      </div>
-    </div>
+      <NextUINavbar
+        classNames={{
+          item: [
+            "flex",
+            "relative",
+            "h-full",
+            "items-center",
+            "data-[active=true]:after:content-['']",
+            "data-[active=true]:after:absolute",
+            "data-[active=true]:after:bottom-0",
+            "data-[active=true]:after:left-0",
+            "data-[active=true]:after:right-0",
+            "data-[active=true]:after:h-[2px]",
+            "data-[active=true]:after:rounded-[2px]",
+            "data-[active=true]:after:bg-primary",
+          ],
+        }}
+      >
+        <NavbarBrand>
+          <img src="../../public/images/logo.png" alt="logo"className="h-8 pr-2" />
+          <p className="font-bold text-inherit">Classment Academy</p>
+        </NavbarBrand>
+        <NavbarContent className="hidden sm:flex gap-4" justify="center">
+          <NavbarItem>
+            <Link color="foreground" href="#">
+              Inicio
+            </Link>
+          </NavbarItem>
+          <NavbarItem isActive>
+            <Link href="#" aria-current="page">
+              Escuelas
+            </Link>
+          </NavbarItem>
+          <NavbarItem>
+            <Link color="foreground" href="#">
+              Entrenadores
+            </Link>
+          </NavbarItem>
+        </NavbarContent>
+        <NavbarContent justify="end">
+          <NavbarItem className="hidden lg:flex">
+            <Link href="#">Entrar</Link>
+          </NavbarItem>
+          <NavbarItem>
+            <Button as={Link} color="primary" href="#" variant="flat">
+              Registrarme
+            </Button>
+          </NavbarItem>
+        </NavbarContent>
+      </NextUINavbar>
     </>
-    );
+  );
 }
-export default Navbar;
 
+export default CustomNavbar;

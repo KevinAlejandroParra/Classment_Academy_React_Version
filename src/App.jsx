@@ -1,15 +1,11 @@
-import React from 'react';
-import Navbar from './components/Navbar';
-import './App.css';
-import Hero from './components/Hero';
+import CustomNavbar from "./components/Navbar.jsx";
+
 function App() {
   return (
-    <div className="App">
-      <Navbar />
-
-    </div>
+    <>
+      <CustomNavbar />
+    </>
   );
 }
 
 export default App;
-

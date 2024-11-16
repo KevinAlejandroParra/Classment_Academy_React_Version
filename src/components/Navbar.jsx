@@ -1,7 +1,25 @@
 import { NextUIProvider } from "@nextui-org/react";
 import { Navbar as NextUINavbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button } from "@nextui-org/react";
+import { use } from "framer-motion/client";
+import {useEffect, useState} from "react";
+
 
 function CustomNavbar() {
+  const [theme, setTheme] = useState("light");
+
+useEffect(() => {
+  if (theme === "dark") {
+    document.querySelector("html").classList.add("dark")
+  } else {
+    document.querySelector("html").classList.remove("dark")
+  }
+  
+},[theme])
+const handleChangeTheme = () => {
+  setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+};
+
+
   return (
     <>
       <NextUINavbar
@@ -52,6 +70,10 @@ function CustomNavbar() {
               Registrarme
             </Button>
           </NavbarItem>
+            <Button className=" bg-slate-200 hover:bg-slate-200 dark:bg-neutral-900"
+              onClick={handleChangeTheme}>
+              cambiar de tema
+            </Button>
         </NavbarContent>
       </NextUINavbar>
     </>

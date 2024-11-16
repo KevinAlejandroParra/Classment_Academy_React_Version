@@ -18,7 +18,7 @@ function CustomNavbar() {
             "data-[active=true]:after:right-0",
             "data-[active=true]:after:h-[2px]",
             "data-[active=true]:after:rounded-[2px]",
-            "data-[active=true]:after:bg-primary",
+            "data-[active=true]:after:bg-[#f47a1f]",
           ],
         }}
       >
@@ -33,7 +33,7 @@ function CustomNavbar() {
             </Link>
           </NavbarItem>
           <NavbarItem isActive>
-            <Link href="#" aria-current="page">
+            <Link color="foreground" href="#" aria-current="page">
               Escuelas
             </Link>
           </NavbarItem>
@@ -45,10 +45,10 @@ function CustomNavbar() {
         </NavbarContent>
         <NavbarContent justify="end">
           <NavbarItem className="hidden lg:flex">
-            <Link href="#">Entrar</Link>
+            <Link color="foreground" href="#">Entrar</Link>
           </NavbarItem>
           <NavbarItem>
-            <Button as={Link} color="primary" href="#" variant="flat">
+            <Button as={Link} color="warning" href="#" variant="flat">
               Registrarme
             </Button>
           </NavbarItem>

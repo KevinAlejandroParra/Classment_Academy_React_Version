@@ -19,10 +19,13 @@ const handleChangeTheme = () => {
   setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
 };
 
-
   return (
     <>
       <NextUINavbar
+        style={{
+          backgroundColor: "rgba(255,255,255,0.1)",
+          backdropFilter: "blur(1px)",
+        }}
         classNames={{
           item: [
             "flex",
@@ -81,3 +84,4 @@ const handleChangeTheme = () => {
 }
 
 export default CustomNavbar;
+

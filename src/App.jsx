@@ -1,3 +1,4 @@
+import "./App.css";
 import CustomNavbar from "./components/Navbar.jsx";
 import { Banner } from "./components/Banner.jsx";
 import { AccessibilityWidget } from "sena-accessibility";

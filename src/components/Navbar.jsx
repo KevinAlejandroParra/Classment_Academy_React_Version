@@ -5,20 +5,20 @@ import {useEffect, useState} from "react";
 
 
 function CustomNavbar() {
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState("dark");
 
-useEffect(() => {
-  if (theme === "dark") {
-    document.querySelector("html").classList.add("dark")
-  } else {
-    document.querySelector("html").classList.remove("dark")
-  }
+  useEffect(() => {
+    if (theme === "dark") {
+      document.querySelector("html").classList.add("dark");
+    } else {
+      document.querySelector("html").classList.remove("dark");
+    }
+  }, [theme]);
+
+  const handleChangeTheme = () => {
+    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+  };
   
-},[theme])
-const handleChangeTheme = () => {
-  setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
-};
-
   return (
     <>
       <NextUINavbar
@@ -44,7 +44,7 @@ const handleChangeTheme = () => {
         }}
       >
         <NavbarBrand>
-          <img src="../../public/images/logo.png" alt="logo"className="h-8 pr-2" />
+          <img src="../public/images/logo.png" alt="logo" className="h-8 pr-2" />
           <p className="font-bold text-inherit">Classment Academy</p>
         </NavbarBrand>
         <NavbarContent className="hidden sm:flex gap-4" justify="center">

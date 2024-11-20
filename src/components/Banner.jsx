@@ -1,20 +1,41 @@
 export const Banner = () => {
   return (
-    <section className="bg-[#061E2D] h-screen flex flex-col justify-center" id="home">
-      <div className="container mx-auto p-4">
-        <div className="flex flex-col md:flex-row items-center">
-          <div className="md:w-1/2">
-            <h2 className="text-[#F86D31] text-xl font-bold">Classment Academy</h2>
-            <h1 className="text-6xl font-bold">Forjando Grandes <span className="text-gradient">deportistas</span> desde cualquier lugar!</h1>
-            <p className="text-xl">Desarrolla tu potencial deportivo con nuestra plataforma de entrenamiento personalizado y acondicionamiento fisico. En Classment Academy, nos preocupamos por tus objetivos y te ayudamos a alcanzarlos.</p>
-            <button className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full" onClick={() => console.log('connect')}>Conectar con nosotros
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
+    
+    <section className="dark:bg-[#061E2D] light:bg-[#d8693e] min-h-screen flex items-center" id="home">
+      <div className="container mx-auto px-4">
+  <div className="fixed w-56 h-56 bg-white bottom-32 left-1/3 rounded-full filter blur-[100px] opacity-30 animate-blob animation-delay-4000"></div>
+        <div className="flex flex-col lg:flex-row items-center justify-between">
+          <div className="lg:w-1/2 lg:pr-12 space-y-6">
+            <h2 className="text-[#F86D31] text-xl font-bold">
+              Classment Academy
+            </h2>
+            <h1 className="text-5xl md:text-6xl font-bold leading-tight">
+              Forjando Grandes{" "}
+              <span className="text-5xl text-gradient">deportistas</span>{" "}
+              desde cualquier lugar!
+            </h1>
+            <p className="text-base leading-relaxed max-w-lg">
+              Desarrolla tu potencial deportivo con nuestra plataforma de 
+              entrenamiento personalizado y acondicionamiento físico.
+            </p>
+            <button 
+              className="bg-[#F86D31] hover:bg-[#071822] text-white font-bold py-3 px-6 rounded-full transition-colors duration-300"
+              onClick={() => console.log('connect')}
+            >
+              Conectar con nosotros
+              <span className="text-sm pl-2">🚀</span>
             </button>
+          </div>
+
+          <div className="lg:w-1/2 mt-8 lg:mt-0">
+            <img 
+              src="/images/basquetbolista.png" 
+              alt="Basquetbolista"
+              className="w-full max-w-2xl mx-auto"
+            />
           </div>
         </div>
       </div>
     </section>
-    )
+  )
 }

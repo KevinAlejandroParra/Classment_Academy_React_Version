@@ -1,6 +1,3 @@
-import { NextUIProvider } from "@nextui-org/react";
-import { Navbar as NextUINavbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button } from "@nextui-org/react";
-import { use } from "framer-motion/client";
 import {useEffect, useState} from "react";
 
 
@@ -20,66 +17,48 @@ function CustomNavbar() {
   };
   
   return (
-    <>
-      <NextUINavbar
-        style={{
-          backgroundColor: "rgba(255,255,255,0.1)",
-          backdropFilter: "blur(1px)",
-        }}
-        classNames={{
-          item: [
-            "flex",
-            "relative",
-            "h-full",
-            "items-center",
-            "data-[active=true]:after:content-['']",
-            "data-[active=true]:after:absolute",
-            "data-[active=true]:after:bottom-0",
-            "data-[active=true]:after:left-0",
-            "data-[active=true]:after:right-0",
-            "data-[active=true]:after:h-[2px]",
-            "data-[active=true]:after:rounded-[2px]",
-            "data-[active=true]:after:bg-[#f47a1f]",
-          ],
-        }}
-      >
-        <NavbarBrand>
-          <img src="../public/images/logo.png" alt="logo" className="h-8 pr-2" />
-          <p className="font-bold text-inherit">Classment Academy</p>
-        </NavbarBrand>
-        <NavbarContent className="hidden sm:flex gap-4" justify="center">
-          <NavbarItem>
-            <Link color="foreground" href="#">
-              Inicio
-            </Link>
-          </NavbarItem>
-          <NavbarItem isActive>
-            <Link color="foreground" href="#" aria-current="page">
-              Escuelas
-            </Link>
-          </NavbarItem>
-          <NavbarItem>
-            <Link color="foreground" href="#">
-              Entrenadores
-            </Link>
-          </NavbarItem>
-        </NavbarContent>
-        <NavbarContent justify="end">
-          <NavbarItem className="hidden lg:flex">
-            <Link color="foreground" href="#">Entrar</Link>
-          </NavbarItem>
-          <NavbarItem>
-            <Button as={Link} color="warning" href="#" variant="flat">
-              Registrarme
-            </Button>
-          </NavbarItem>
-            <Button className=" bg-slate-200 hover:bg-slate-200 dark:bg-neutral-900"
+<>
+<div className="navbar bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-md sticky top-0 z-10">
+  <div className="navbar-start">
+    <div className="dropdown">
+      <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M4 6h16M4 12h16M4 18h7" />
+        </svg>
+      </div>
+      <ul
+        tabIndex={0}
+        className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
+        <li><a>Homepage</a></li>
+        <li><a>Portfolio</a></li>
+        <li><a>About</a></li>
+      </ul>
+    </div>
+  </div>
+  <div className="navbar-center">
+  <img className= "size-10" src="../public/images/logo.png"></img>
+  <h1 className="font-bold pl-4 dark:text-white text-black">Classment Academy</h1>
+
+  </div>
+  <div className="navbar-end flex space-x-8">
+  <button className="btn btn-ghost dark:text-white text-black">Unirme
+    </button>
+    <button className="btn btn-ghost  dark:text-white text-black"
               onClick={handleChangeTheme}>
-              cambiar de tema
-            </Button>
-        </NavbarContent>
-      </NextUINavbar>
-    </>
+      Cambiar tema
+    </button>
+  </div>
+</div>
+</>
   );
 }
 

@@ -8,15 +8,14 @@ export const Banner = () => {
             <p className="text-[#F86D31] text-3xl font-bold">
             Classment Academy
             </p>
-            <h1 className="text-7xl md:text-6xl font-bold leading-tight">
+            <h1 className="dark:text-white text-gray-800 text-7xl md:text-6xl font-bold leading-tight">
             <div className="fixed w-56 h-56 dark:bg-white bg-[#f0ae333e] inset-x-96 top-90 h-16  rounded-full filter blur-[100px] dark:opacity-30  animate-blob animation-delay-4000"></div>
-
               Forjando Grandes{" "}
               <br></br>
               <span className="text-7xl text-gradient">deportistas</span>{" "}
               desde <br></br>cualquier lugar!
             </h1>
-            <p className="text-base text-xl leading-relaxed max-w-lg">
+            <p className="dark:text-white text-gray-600 text-xl leading-relaxed max-w-lg">
               Desarrolla tu potencial deportivo con nuestra plataforma de 
               entrenamiento personalizado y acondicionamiento físico.
             </p>

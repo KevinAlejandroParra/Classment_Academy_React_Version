@@ -45,7 +45,7 @@ function CustomNavbar() {
     </div>
   </div>
   <div className="navbar-center">
-  <img className= "size-10" src="../public/images/logo.png"></img>
+  <img className= "size-10" src="../public/Img/design/logo.png"></img>
   <h1 className="font-bold pl-4 dark:text-white text-black">Classment Academy</h1>
 
   </div>

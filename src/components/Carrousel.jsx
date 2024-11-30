@@ -28,9 +28,12 @@ return (
 <div className="grid grid-cols-3 gap-4">
   {cursos.map((curso) => (
     <div key={curso.curso_id} className="border p-4">
+      <img src={curso.curso_imagen_url} alt={curso.curso_nombre} />
       <h2>{curso.curso_nombre}</h2>
       <p>{curso.curso_descripcion}</p>
-    </div>
+      <p>Precio: {curso.curso_precio}</p>
+      <p>Escuela: {curso.escuela_nombre}</p>
+      </div>
   ))}
 </div>
 </div>

@@ -25,10 +25,12 @@ DB.connect((err) => {
 
 //Creamos una ruta para la peticion get
 app.get("/api/cursos", (req, res) => {
-    const SQL_QUERY = "SELECT * FROM cursos"
+    const SQL_QUERY = "SELECT c.curso_id, c.curso_nombre, c.curso_descripcion, c.curso_imagen_url, c.curso_precio, e.escuela_nombre, e.escuela_id FROM cursos c INNER JOIN escuelas e ON c.escuela_id = e.escuela_id WHERE c.curso_estado = 'activo'";
+    
     DB.query(SQL_QUERY, (err, result) => {
         if (err) {
-            throw err;
+            console.error("Error en la consulta:", err);
+            return res.status(500).json({ error: "Error al obtener los cursos" });
         }
         res.json(result);
     });

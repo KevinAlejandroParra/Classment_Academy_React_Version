@@ -39,7 +39,7 @@ export const Banner = () => {
 
           <div className="lg:w-1/2 mt-8 lg:mt-0 dark:drop-shadow-[0_0_8px_#FFFFFF] drop-shadow-[0_0_8px_#F86D31] ">
             <img 
-              src="/IMG/design/basquetbolista.png" 
+              src="/Img/design/basquetbolista.png" 
               alt="Basquetbolista"
               className="w-full max-w-2xl mx-auto"
             />

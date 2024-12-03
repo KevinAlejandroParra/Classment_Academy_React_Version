@@ -1,8 +1,10 @@
-import {useEffect, useState} from "react";
-
+import React, { useEffect, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMoon, faSun, faBars } from "@fortawesome/free-solid-svg-icons";
 
 function CustomNavbar() {
   const [theme, setTheme] = useState("dark");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     if (theme === "dark") {
@@ -15,52 +17,83 @@ function CustomNavbar() {
   const handleChangeTheme = () => {
     setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
   };
-  
-  return (
-<>
-<div className="navbar bg-gray-800 bg-opacity-50 backdrop-filter backdrop-blur-md sticky top-0 z-10">
-  <div className="navbar-start">
-    <div className="dropdown">
-      <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M4 6h16M4 12h16M4 18h7" />
-        </svg>
-      </div>
-      <ul
-        tabIndex={0}
-        className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
-        <li><a>Homepage</a></li>
-        <li><a>Portfolio</a></li>
-        <li><a>About</a></li>
-      </ul>
-    </div>
-  </div>
-  <div className="navbar-center">
-  <img className= "size-10" src="../public/Img/design/logo.png"></img>
-  <h1 className="font-bold pl-4 dark:text-white text-black">Classment Academy</h1>
 
-  </div>
-  <div className="navbar-end flex space-x-8">
-  <button className="btn btn-ghost dark:text-white text-black">Unirme
-    </button>
-    <button className="btn btn-ghost  dark:text-white text-black"
-              onClick={handleChangeTheme}>
-      Cambiar tema
-    </button>
-  </div>
-</div>
-</>
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  return (
+    <div className="px-4 sm:px-6 lg:px-8">
+      <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[90%] max-w-5xl z-50 bg-white/30 dark:bg-gray-900/30 backdrop-blur-md rounded-2xl shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="flex items-center justify-between h-16">
+            {/* Menú Hamburguesa */}
+            <div className="relative">
+              <button 
+                onClick={toggleMenu}
+                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                <FontAwesomeIcon 
+                  icon={faBars} 
+                  className="h-6 w-6 text-gray-600 dark:text-gray-300" 
+                />
+              </button>
+              
+              {isMenuOpen && (
+                <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+                  <ul className="py-2">
+                    <li>
+                      <a className="block px-4 py-2 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+                        Inicio
+                      </a>
+                    </li>
+                    <li>
+                      <a className="block px-4 py-2 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+                        Portafolio
+                      </a>
+                    </li>
+                    <li>
+                      <a className="block px-4 py-2 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+                        Sobre Nosotros
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            {/* Logo y Título */}
+            <div className="flex items-center">
+              <img 
+                className="h-10 w-10 rounded-full" 
+                src="../public/Img/design/logo.png" 
+                alt="Logo"
+              />
+              <h1 className="font-bold pl-4 text-gray-900 dark:text-white">
+                Classment Academy
+              </h1>
+            </div>
+
+            {/* Botones */}
+            <div className="flex items-center space-x-4">
+              <button className="px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                Unirme
+              </button>
+              <button 
+                onClick={handleChangeTheme} 
+                className="px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              >
+                <FontAwesomeIcon 
+                  icon={theme === 'dark' ? faSun : faMoon} 
+                  className="h-5 w-5 text-gray-600 dark:text-gray-300"
+                />
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </div>
   );
 }
 
 export default CustomNavbar;
-

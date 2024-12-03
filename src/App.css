@@ -1,3 +1,22 @@
+/* Establecer el color de fondo en el modo claro (light mode) */
+html {
+    
+    background-color: white; /* Fondo claro */
+    color: black; /* Color de texto oscuro */
+  }
+  
+  /* Estilo para el modo oscuro (dark mode) */
+  html.dark {
+    background-color: #061E2D; /* Fondo oscuro */
+    color: white; /* Color de texto claro */
+  }
+  
+
+.text-gradient {
+    background-image: linear-gradient(to right, #F86D31, #fc7e07,  #F86D30);
+    -webkit-background-clip: text;
+    color: transparent;
+}
 .text-gradient {
     background-image: linear-gradient(to right, #F86D31, #fc7e07,  #F86D30);
     -webkit-background-clip: text;

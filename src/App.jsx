@@ -2,8 +2,8 @@ import "./App.css";
 import { useState, useEffect } from "react";
 import CustomNavbar from "./components/Navbar.jsx";
 import { Banner } from "./components/Banner.jsx";
-import Carrousel from "./components/Carrousel.jsx";
 import { AccessibilityWidget } from "sena-accessibility";
+import SwiperCarousel from "./components/Carrousel.jsx";
 
 function App() {
  
@@ -13,8 +13,7 @@ function App() {
       <CustomNavbar />
       <Banner />
       <AccessibilityWidget theme="light" />
-      <Carrousel />
-
+      <SwiperCarousel />
     </>
   );
 }

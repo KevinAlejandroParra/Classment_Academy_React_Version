@@ -1,16 +1,15 @@
 import { nextui } from "@nextui-org/react";
-
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   content: [
-    "./index.html",
+    "./index.html", // Incluye el archivo HTML principal
     "./src/**/*.{js,ts,jsx,tsx}",
     "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
+
   ],
-  darkMode: "class", 
+  darkMode: "class",
   theme: {
     extend: {},
   },
-  plugins: 
-  [],
+  plugins: [],
 };

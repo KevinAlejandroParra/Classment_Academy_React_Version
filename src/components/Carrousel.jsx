@@ -1,10 +1,20 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { EffectCoverflow, Pagination, Autoplay } from 'swiper/modules';
+import { Swiper as SwiperType } from 'swiper';
 
-function Carrousel() {
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/effect-coverflow';
+import 'swiper/css/pagination';
+
+// You might need to adjust the path to your CSS file
+import './styles.css';
+
+function SwiperCarousel() {
   const [cursos, setCursos] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const carouselRef = useRef(null);
-  const autoAdvanceIntervalRef = useRef(null);
+  const [isAutoplayPaused, setIsAutoplayPaused] = useState(false);
+  const swiperRef = useRef<SwiperType | null>(null);
 
   const fetchCursos = async () => {
     try {
@@ -19,61 +29,27 @@ function Carrousel() {
     }
   };
 
-  const nextSlide = useCallback(() => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % cursos.length);
-  }, [cursos.length]);
-
-  const prevSlide = useCallback(() => {
-    setCurrentIndex((prevIndex) => 
-      (prevIndex - 1 + cursos.length) % cursos.length
-    );
-  }, [cursos.length]);
-
   useEffect(() => {
     fetchCursos();
   }, []);
 
-  useEffect(() => {
-    if (cursos.length > 0) {
-      // Iniciar auto-avance
-      autoAdvanceIntervalRef.current = setInterval(nextSlide, 5000);
-
-      // Limpiar intervalo al desmontar
-      return () => {
-        if (autoAdvanceIntervalRef.current) {
-          clearInterval(autoAdvanceIntervalRef.current);
-        }
-      };
+  const handleMouseEnter = useCallback(() => {
+    if (swiperRef.current && swiperRef.current.autoplay) {
+      swiperRef.current.autoplay.stop();
+      setIsAutoplayPaused(true);
     }
-  }, [cursos, nextSlide]);
+  }, []);
 
-  const getAdjacentCourses = () => {
-    const totalCourses = cursos.length;
-    const prevIndex = (currentIndex - 1 + totalCourses) % totalCourses;
-    const nextIndex = (currentIndex + 1) % totalCourses;
-
-    return {
-      prevCourse: cursos[prevIndex],
-      currentCourse: cursos[currentIndex],
-      nextCourse: cursos[nextIndex]
-    };
-  };
-
-  const handleMouseEnter = () => {
-    if (autoAdvanceIntervalRef.current) {
-      clearInterval(autoAdvanceIntervalRef.current);
+  const handleMouseLeave = useCallback(() => {
+    if (swiperRef.current && swiperRef.current.autoplay) {
+      swiperRef.current.autoplay.start();
+      setIsAutoplayPaused(false);
     }
-  };
-
-  const handleMouseLeave = () => {
-    autoAdvanceIntervalRef.current = setInterval(nextSlide, 5000);
-  };
+  }, []);
 
   if (cursos.length === 0) {
     return <div>Cargando cursos...</div>;
   }
-
-  const { prevCourse, currentCourse, nextCourse } = getAdjacentCourses();
 
   return (
     <div 
@@ -83,96 +59,73 @@ function Carrousel() {
       onMouseLeave={handleMouseLeave}
     >
       <div className="container mx-auto px-4 space-y-5 max-w-6xl w-full">
-        <h2 className="text-4xl font-extrabold text-center capitalize">Cursos destacados</h2>
+        <h2 className="text-4xl font-extrabold text-center capitalize mb-8">Cursos destacados</h2>
         
-        <div 
-          ref={carouselRef}
-          className="carousel w-full relative overflow-hidden flex justify-center items-center"
+        <Swiper
+          effect={'coverflow'}
+          grabCursor={true}
+          centeredSlides={true}
+          slidesPerView={3}
+          coverflowEffect={{
+            rotate: 50,
+            stretch: 0,
+            depth: 100,
+            modifier: 1,
+            slideShadows: true,
+          }}
+          pagination={true}
+          modules={[EffectCoverflow, Pagination, Autoplay]}
+          className="mySwiper"
+          autoplay={{
+            delay: 5000,
+            disableOnInteraction: false,
+            pauseOnMouseEnter: true,
+          }}
+          onSwiper={(swiper) => {
+            swiperRef.current = swiper;
+          }}
         >
-          <div className="flex transition-transform duration-300 ease-in-out justify-center items-center">
-            <div className="flex space-x-8 items-center justify-center ">
-              {/* Curso anterior */}
-              <div className="card w-64 bg-base-100 shadow-xl opacity-50 transform scale-90 transition-all duration-300 rounded-lg">
+          {cursos.map((curso, index) => (
+            <SwiperSlide key={curso.curso_id}>
+              <div className={`card bg-base-100 rounded-lg ${index === 1 ? 'w-80 z-10' : 'w-64 opacity-50 scale-90'}`}>
                 <figure>
                   <img 
-                    src={prevCourse.curso_imagen_url} 
-                    alt="Curso anterior" 
-                    className="w-full h-32 object-cover rounded-t-lg" 
+                    src={curso.curso_imagen_url} 
+                    alt={curso.curso_nombre} 
+                    className={`w-full object-cover rounded-t-lg ${index === 1 ? 'h-48' : 'h-32'}`}
                   />
                 </figure>
                 <div className="card-body p-4">
-                  <h3 className="text-xl font-bold">{prevCourse.curso_nombre}</h3>
+                  <h2 className={`card-title ${index === 1 ? 'text-orange-400' : 'text-sm'}`}>{curso.curso_nombre}</h2>
+                  {index === 1 && (
+                    <>
+                      <p className="text-sm">
+                        {curso.curso_descripcion.length > 100 
+                          ? `${curso.curso_descripcion.substring(0, 100)}...` 
+                          : curso.curso_descripcion}
+                      </p>
+                      <p className="text-xs">Escuela: {curso.escuela_nombre}</p>
+                      <p className="text-lg font-bold">
+                        ${curso.curso_precio.toFixed(2)}
+                      </p>
+                      <div className="card-actions justify-end">
+                        <a 
+                          href={`../APP/Views/Crud/curso_detalle.php?id=${curso.curso_id}`} 
+                          className="btn btn-sm btn-primary bg-orange-400 hover:bg-orange-500 border-none rounded-lg"
+                        >
+                          Ver Curso
+                        </a>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
-
-              {/* Curso actual */}
-              <div className="card w-80 bg-base-100 rounded-lg z-10">
-                <figure>
-                  <img 
-                    src={currentCourse.curso_imagen_url} 
-                    alt={currentCourse.curso_nombre} 
-                    className="w-full h-48 object-cover rounded-t-lg" 
-                  />
-                </figure>
-                <div className="card-body">
-                  <h2 className="card-title text-orange-400">{currentCourse.curso_nombre}</h2>
-                  <p className="text-sm">
-                    {currentCourse.curso_descripcion.length > 100 
-                      ? `${currentCourse.curso_descripcion.substring(0, 100)}...` 
-                      : currentCourse.curso_descripcion}
-                  </p>
-                  <p className="text-xs">Escuela: {currentCourse.escuela_nombre}</p>
-                  <p className="text-lg font-bold">
-                    ${currentCourse.curso_precio.toFixed(2)}
-                  </p>
-                  <div className="card-actions justify-end">
-                    <a 
-                      href={`../APP/Views/Crud/curso_detalle.php?id=${currentCourse.curso_id}`} 
-                      className="btn btn-sm btn-primary bg-orange-400 hover:bg-orange-500 border-none rounded-lg"
-                    >
-                      Ver Curso
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-              {/* Curso siguiente */}
-              <div className="card w-64 bg-base-100 shadow-xl opacity-50 transform scale-90 transition-all duration-300 rounded-lg">
-                <figure>
-                  <img 
-                    src={nextCourse.curso_imagen_url} 
-                    alt="Curso siguiente" 
-                    className="w-full h-32 object-cover rounded-t-lg" 
-                  />
-                </figure>
-                <div className="card-body p-4">
-                  <h3 className="card-title text-sm">{nextCourse.curso_nombre}</h3>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Controles del carrusel */}
-          <div className="absolute inset-y-0 left-0 flex items-center">
-            <button 
-              onClick={prevSlide}
-              className="btn btn-circle bg-orange-400 hover:bg-orange-500 border-none ml-2 rounded-lg"
-            >
-              ❮
-            </button>
-          </div>
-          <div className="absolute inset-y-0 right-0 flex items-center">
-            <button 
-              onClick={nextSlide}
-              className="btn btn-circle bg-orange-400 hover:bg-orange-500 border-none mr-2 rounded-lg"
-            >
-              ❯
-            </button>
-          </div>
-        </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
       </div>
     </div>
   );
 }
 
-export default Carrousel;
+export default SwiperCarousel;

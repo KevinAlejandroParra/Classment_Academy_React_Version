@@ -55,7 +55,7 @@ function SwiperCarousel() {
       onMouseLeave={handleMouseLeave}
     >
       <div className="container mx-auto px-4 space-y-5 max-w-7xl w-full">
-        <h2 className="text-4xl font-extrabold text-center capitalize mb-8 dark:text-white">Cursos destacados</h2>
+        <h2 className="font-athletic text-4xl font-extrabold text-center capitalize mb-8 dark:text-white">Cursos destacados</h2>
         
         <Swiper
           effect={'coverflow'}

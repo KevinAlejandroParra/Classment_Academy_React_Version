@@ -64,12 +64,8 @@ function CustomNavbar() {
 
             {/* Logo y Título */}
             <div className="flex items-center">
-              <img 
-                className="h-10 w-10 rounded-full" 
-                src="../public/Img/design/logo.png" 
-                alt="Logo"
-              />
-              <h1 className="font-bold pl-4 text-gray-900 dark:text-white">
+
+              <h1 className="font-athletic text-4xl font-extrabold pl-4 text-gray-900 dark:text-white">
                 Classment Academy
               </h1>
             </div>

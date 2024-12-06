@@ -9,7 +9,11 @@ export default {
   ],
   darkMode: "class",
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        athletic: ['FTY Old Sport Athletic', 'sans-serif'],
+      },
+    },
   },
-  plugins: [],
+  plugins: [],
 };

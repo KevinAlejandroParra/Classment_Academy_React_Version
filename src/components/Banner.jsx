@@ -5,8 +5,8 @@ export const Banner = () => {
       <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-row items-center justify-between">
           <div className="lg:w-1/2 lg:pr-12 space-y-6">
-            <p className="text-[#F86D31] text-3xl font-bold">
-            Classment Academy
+            <p className="text-[#F86D31] font-athletic text-3xl font-bold">
+            Academia de Deportistas
             </p>
             <h1 className="dark:text-white text-gray-800 text-7xl md:text-6xl font-bold leading-tight">
             <div className="fixed w-56 h-56 dark:bg-white bg-[#f0ae333e] inset-x-96 top-90 h-16  rounded-full filter blur-[100px] dark:opacity-30  animate-blob animation-delay-4000"></div>
@@ -21,7 +21,7 @@ export const Banner = () => {
             </p>
             <div className="flex space-x-4">
             <button 
-              className="bg-[#F86D31] hover:bg-[#071822] text-white font-bold py-3 px-6 rounded-full transition-colors duration-300"
+              className="bg-[#F86D31] hover:bg-[#071822] text-white text-2xl font-bold py-3 px-6 rounded-full transition-colors duration-300"
               onClick={() => console.log('connect')}
             >
               Conectar con nosotros

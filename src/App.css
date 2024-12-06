@@ -23,3 +23,9 @@ html {
     color: transparent;
 }
 
+@font-face {
+  font-family: 'FTY Old Sport Athletic';
+  src: url('/src/fonts/OldSport02AthleticNcv-E0gj.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}

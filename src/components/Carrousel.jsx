@@ -55,7 +55,7 @@ function SwiperCarousel() {
       onMouseLeave={handleMouseLeave}
     >
       <div className="container mx-auto px-4 space-y-5 max-w-7xl w-full">
-        <h2 className="font-athletic text-4xl font-extrabold text-center capitalize mb-8 dark:text-white">Cursos destacados</h2>
+        <h2 className="text-4xl font-extrabold text-center capitalize mb-8 dark:text-white">Cursos destacados</h2>
         
         <Swiper
           effect={'coverflow'}
@@ -84,8 +84,8 @@ function SwiperCarousel() {
           }}
         >
           {cursos.map((curso) => (
-            <SwiperSlide key={curso.curso_id} className="bg-center bg-cover w-[300px] sm:w-[350px] md:w-[400px] lg:w-[450px] dark:drop-shadow-[0_0_8px_#FFFFFF] drop-shadow-[0_0_8px_#F86D31]">
-              <div className="card bg-white rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 dark:bg-gray-800">
+            <SwiperSlide key={curso.curso_id} className="bg-center bg-cover w-[300px] sm:w-[350px] md:w-[400px] lg:w-[450px] dark:drop-shadow-[0_0_8px_#FBBF24] drop-shadow-[0_0_8px_#FBBF24]">
+              <div className="card bg-white rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 dark:bg-black">
                 <figure className="relative">
                   <img 
                     src={curso.curso_imagen_url} 
@@ -106,7 +106,9 @@ function SwiperCarousel() {
                   <div className="card-actions justify-end pt-2 pb-2">
                     <a 
                       href={`../APP/Views/Crud/curso_detalle.php?id=${curso.curso_id}`} 
-                      className="btn rounded-lg px-4 py-2 bg-orange-400 hover:bg-orange-500 text-white font-semibold dark:bg-orange-600 dark:hover:bg-orange-700 dark:text-gray-100 transition duration-300 ease-in-out">
+                      className="btn rounded-lg px-4 py-2 group border-2 dark:bg-yellow-400 bg-yellow-600 border-yellow-400 
+                        text-sm font-semibold text-white dark:text-black  dark:hover:bg-yellow-500 dark:hover:text-white hover:bg-yellow-700
+                         hover:bg-yellow-700 dark:text-gray-100 transition duration-300 ease-in-out">
                       Ver Curso
                     </a>
                   </div>

@@ -24,7 +24,7 @@ function CustomNavbar() {
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
-      <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[90%] max-w-5xl z-50 bg-white/30 dark:bg-gray-900/30 backdrop-blur-md rounded-2xl shadow-sm">
+      <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[90%] max-w-5xl z-50 bg-yellow/30 dark:bg- backdrop-blur-md rounded-2xl shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="flex items-center justify-between h-16">
             {/* Menú Hamburguesa */}
@@ -65,7 +65,7 @@ function CustomNavbar() {
             {/* Logo y Título */}
             <div className="flex items-center">
 
-              <h1 className="font-athletic text-4xl font-extrabold pl-4 text-gray-900 dark:text-white">
+              <h1 className="text-4xl font-semibold pl-4 dark:text-white text-light-primary">
                 Classment Academy
               </h1>
             </div>

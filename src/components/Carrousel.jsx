@@ -29,6 +29,7 @@ function SwiperCarousel() {
     fetchCursos();
   }, []);
 
+
   const handleMouseEnter = useCallback(() => {
     if (swiperRef.current && swiperRef.current.autoplay) {
       swiperRef.current.autoplay.stop();
@@ -47,6 +48,23 @@ function SwiperCarousel() {
     return <div className="text-center py-8">Cargando cursos...</div>;
   }
 
+  const fetchEscuelas = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/escuelas');
+      if (!response.ok) {
+        throw new Error('Error al obtener las escuelas');
+      }
+      const data = await response.json();
+      setEscuelas(data);
+    } catch (error) {
+      console.error('Error al obtener las escuelas:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchEscuelas();
+  }, []);
+  
   return (
     <div 
       className="relative overflow-hidden py-16 bg-ghost flex justify-center items-center " 
@@ -119,9 +137,16 @@ function SwiperCarousel() {
         </Swiper>
       </div>
     </div>
+    
   );
 }
-
+<div>
+{fetchEscuelas.map((escuela) => (
+<h1>escuela_nombre: {escuela.escuela_nombre}</h1>
+     )
+    )
+  }
+</div>
 export default SwiperCarousel;
 
 

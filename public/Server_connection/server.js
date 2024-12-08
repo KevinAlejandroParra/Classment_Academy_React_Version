@@ -39,17 +39,19 @@ app.get("/api/cursos", (req, res) => {
 
 
 app.get("/api/escuelas", (req, res) => {
-    const SQL_QUERY_ESCUELAS = "SELECT * FROM escuelas";
+    const adminExcluir = 4;
+    const SQL_QUERY_ESCUELAS = "SELECT escuela_id, escuela_nombre, escuela_imagen_url, escuela_descripcion, escuela_direccion, escuela_telefono, escuela_correo FROM escuelas WHERE escuela_id <> ? AND escuela_estado = ?";
     
-    
-    DB.query(SQL_QUERY_ESCUELAS, (err, result) => {
+    DB.query(SQL_QUERY_ESCUELAS, [adminExcluir, 'activo'], (err, result) => {
         if (err) {
             console.error("Error en la consulta:", err);
-            return res.status(500).json({ error: "Error al obtener los cursos" });
+            return res.status(500).json({ error: "Error al obtener los datos de las escuelas" });
         }
         res.json(result);
     });
 });
+
+
 
 //consumimos el servidor en el puerto 3306
 app.listen(PORT, () => {

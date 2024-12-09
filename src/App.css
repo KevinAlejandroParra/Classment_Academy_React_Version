@@ -1,17 +1,26 @@
 /* Establecer el color de fondo en el modo claro (light mode) */
 html {
     
+<<<<<<< HEAD
     background-color: #F7F9FC; /* Fondo claro */
+=======
+    background-color: white; /* Fondo claro */
+>>>>>>> 0446885 (fix: register and login operation)
     color: black; /* Color de texto oscuro */
   }
   
   /* Estilo para el modo oscuro (dark mode) */
   html.dark {
+<<<<<<< HEAD
     background-color: #000000; /* Fondo oscuro */
+=======
+    background-color: #061E2D; /* Fondo oscuro */
+>>>>>>> 0446885 (fix: register and login operation)
     color: white; /* Color de texto claro */
   }
   
 
+<<<<<<< HEAD
   @keyframes spin-slow {
     from {
       transform: rotate(0deg);
@@ -37,4 +46,16 @@ html {
   }
   
 
+=======
+.text-gradient {
+    background-image: linear-gradient(to right, #F86D31, #fc7e07,  #F86D30);
+    -webkit-background-clip: text;
+    color: transparent;
+}
+.text-gradient {
+    background-image: linear-gradient(to right, #F86D31, #fc7e07,  #F86D30);
+    -webkit-background-clip: text;
+    color: transparent;
+}
+>>>>>>> 0446885 (fix: register and login operation)
 

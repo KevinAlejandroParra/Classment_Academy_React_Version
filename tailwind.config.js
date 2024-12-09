@@ -1,11 +1,15 @@
 import { nextui } from "@nextui-org/react";
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0446885 (fix: register and login operation)
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
     "./index.html", // Incluye el archivo HTML principal
     "./src/**/*.{js,ts,jsx,tsx}",
     "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
+<<<<<<< HEAD
   ],
   darkMode: "class", // Activar modo oscuro con la clase "dark"
   theme: {
@@ -43,3 +47,13 @@ export default {
   },
   plugins: [nextui()], // Plugin de NextUI para integración
 };
+=======
+
+  ],
+  darkMode: "class",
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};
+>>>>>>> 0446885 (fix: register and login operation)

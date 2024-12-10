@@ -83,14 +83,11 @@ function CustomNavbar() {
                 />
               </button>
               {/*Botón de register*/}
-              <Link to="/register"  
-              className="px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-              Registrarme
-              </Link>
+
               {/*Botón de login*/}
               <Link to="/login"  
               className="px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-              Iniciar sesión 
+              Autenticarme
               </Link>
             </div>
           </div>

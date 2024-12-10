@@ -15,7 +15,7 @@ export default {
         light: {
           background: '#F7F9FC', // Fondo claro suave
           text: '#1C1E26', // Texto gris oscuro para buena legibilidad
-          primary: '#0056D6', // Azul vibrante
+          primary: '#', // Azul vibrante
           secondary: '#E63946', // Rojo intenso para acentos
           accent: '#FFD166', // Amarillo brillante (para botones, detalles)
           success: '#06D6A0', // Verde neón suave

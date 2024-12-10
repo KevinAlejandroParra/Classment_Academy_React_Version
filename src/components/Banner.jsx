@@ -1,14 +1,30 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBasketballBall, faVolleyball, faDumbbell } from "@fortawesome/free-solid-svg-icons";
+
 export const Banner = () => {
   return (
     <div className="relative bg-transparent min-h-screen flex items-center overflow-hidden" id="home">
       {/* Decorative Elements */}
 
-      <div className="absolute top-20 left-10 w-24 h-24 opacity-10">
-        <i className="fas fa-basketball-ball text-yellow-400 text-6xl animate-spin-slow"></i>
+      <div className="absolute top-24 left-14 w-24 h-24">
+        <FontAwesomeIcon 
+          icon={faBasketballBall} 
+          className="text-yellow-400  text-7xl"
+        />
       </div>
-      <div className="absolute bottom-20 right-40 w-32 h-32 opacity-10">
-        <i className="fas fa-basketball-ball text-yellow-400 text-7xl animate-bounce-slow"></i>
+      <div className="absolute top-40 right-5 w-32 h-32 ">
+        <FontAwesomeIcon 
+          icon={faDumbbell} 
+          className="text-yellow-400 text-7xl "
+        />
       </div>
+      <div className="absolute bottom-32 left-1/2 w-32 h-32">
+        <FontAwesomeIcon 
+          icon={faVolleyball} 
+          className="text-yellow-400 text-7xl "
+        />
+      </div>
+
       
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
@@ -37,7 +53,7 @@ export const Banner = () => {
               desde <br />cualquier lugar!
             </h1>
             
-            <p className="text-light-secondary dark:text-gray-300 text-xl leading-relaxed max-w-lg
+            <p className="text-gray-800 dark:text-gray-300 text-xl leading-relaxed max-w-lg
                         pl-4 border-l-4 border-yellow-400">
               Desarrolla tu potencial deportivo con nuestra plataforma de 
               entrenamiento personalizado y acondicionamiento físico.
@@ -55,7 +71,7 @@ export const Banner = () => {
               </button>
               
               <button 
-                className="group bg-transparent hover:bg-yellow-400/10 text-white font-bold py-4 px-8 
+                className="group bg-transparent hover:bg-yellow-400/10 text-black dark:text-dark-text font-bold py-4 px-8 
                          rounded-full transition-all duration-300 border-2 border-yellow-400 
                          hover:border-yellow-300 flex items-center"
                 onClick={() => console.log('connect')}
@@ -66,19 +82,16 @@ export const Banner = () => {
             </div>
           </div>
 
-          <div className="lg:w-1/2 mt-8 lg:mt-0 relative">
-            {/* Decorative circles */}
-            <div className="absolute -top-10 -left-10 w-40 h-40 bg-yellow-400/10 rounded-full blur-xl"></div>
-            <div className="absolute -bottom-10 -right-10 w-60 h-60 bg-yellow-400/5 rounded-full blur-xl"></div>
-            
+
             <img 
               src="/Img/design/basquetbolista.png" 
               alt="Basquetbolista"
               className="w-full max-w-2xl mx-auto relative z-10 
                        transition-all duration-500 hover:scale-105
-                       dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+                       drop-shadow-[0_0_65px_rgba(202,138,4,0.4)]
+                       dark:drop-shadow-[0_0_20px_rgba(255,255,255,0.4)]"
+
             />
-          </div>
         </div>
       </div>
     </div>

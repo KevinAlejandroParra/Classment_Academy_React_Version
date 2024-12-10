@@ -84,6 +84,12 @@ return (
         className="w-full bg-[#F86D31] hover:bg-[#071822] text-white font-bold py-3 px-6 rounded-full transition-colors duration-300">
         Iniciar Sesion
         </button>
+        <p className="text-center mt-4">
+          Aun no tienes cuenta? {' '}
+          <Link to="/register" className="text-blue-500 hover:underline">
+            Crear una ahora
+          </Link>
+        </p>
         {error && <p>{error}</p>}
     </form>
 

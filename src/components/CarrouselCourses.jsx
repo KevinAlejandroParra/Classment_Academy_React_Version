@@ -7,7 +7,7 @@ import 'swiper/css';
 import 'swiper/css/effect-coverflow';
 import 'swiper/css/pagination';
 
-function SwiperCarousel() {
+function CoursesCarousel() {
   const [cursos, setCursos] = useState([]);
   const [isAutoplayPaused, setIsAutoplayPaused] = useState(false);
   const swiperRef = useRef(null);
@@ -122,5 +122,5 @@ function SwiperCarousel() {
   );
 }
 
-export default SwiperCarousel;
+export default CoursesCarousel;
 

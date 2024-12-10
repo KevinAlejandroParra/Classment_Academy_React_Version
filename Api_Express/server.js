@@ -26,10 +26,7 @@ DB.connect((err) => {
 //Creamos una ruta para la peticion get
 app.get("/api/cursos", (req, res) => {
     const SQL_QUERY = "SELECT c.curso_id, c.curso_nombre, c.curso_descripcion, c.curso_imagen_url, c.curso_precio, e.escuela_nombre, e.escuela_id FROM cursos c INNER JOIN escuelas e ON c.escuela_id = e.escuela_id WHERE c.curso_estado = 'activo'";
-<<<<<<< HEAD
 
-=======
->>>>>>> 0446885 (fix: register and login operation)
     
     DB.query(SQL_QUERY, (err, result) => {
         if (err) {
@@ -40,7 +37,6 @@ app.get("/api/cursos", (req, res) => {
     });
 });
 
-<<<<<<< HEAD
 
 app.get("/api/escuelas", (req, res) => {
     const adminExcluir = 4;
@@ -57,8 +53,6 @@ app.get("/api/escuelas", (req, res) => {
 
 
 
-=======
->>>>>>> 0446885 (fix: register and login operation)
 //consumimos el servidor en el puerto 3306
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en el puerto ${PORT}`);

@@ -15,32 +15,18 @@
     "@fortawesome/fontawesome-svg-core": "^6.7.1",
     "@fortawesome/free-solid-svg-icons": "^6.7.1",
     "@fortawesome/react-fontawesome": "^0.2.2",
-<<<<<<< HEAD
-=======
-    "@mui/icons-material": "^6.1.9",
-    "@mui/material": "^6.1.9",
->>>>>>> 0446885 (fix: register and login operation)
     "@mui/styled-engine-sc": "^6.1.9",
     "@nextui-org/card": "^2.0.34",
     "@nextui-org/navbar": "^2.0.37",
     "@nextui-org/react": "^2.4.8",
     "@nextui-org/system": "^2.2.6",
     "@nextui-org/theme": "^2.2.11",
-<<<<<<< HEAD
-=======
     "@radix-ui/react-select": "^2.1.2",
->>>>>>> 0446885 (fix: register and login operation)
     "express": "^4.21.1",
     "framer-motion": "^11.11.17",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-<<<<<<< HEAD
     "sena-accessibility": "^1.1.0",
-=======
-    "react-router-dom": "^7.0.2",
-    "sena-accessibility": "^1.1.0",
-    "sql": "^0.78.0",
->>>>>>> 0446885 (fix: register and login operation)
     "styled-components": "^6.1.13",
     "swiper": "^11.1.15"
   },

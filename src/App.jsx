@@ -1,31 +1,13 @@
 import "./App.css";
-<<<<<<< HEAD
-=======
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
->>>>>>> 0446885 (fix: register and login operation)
 import { useState, useEffect } from "react";
 import CustomNavbar from "./components/Navbar.jsx";
 import { Banner } from "./components/Banner.jsx";
 import { AccessibilityWidget } from "sena-accessibility";
-<<<<<<< HEAD
-import SwiperCarousel from "./components/CarrouselCourses.jsx";
-import SchoolsCarousel from "./components/CarrouselSchools.jsx";
-
-function App() {
- 
-
-  return (
-    <>
-      <CustomNavbar />
-      <Banner />
-      <AccessibilityWidget theme="light" />
-      <SwiperCarousel />
-      <SchoolsCarousel />
-    </>
-=======
-import SwiperCarousel from "./components/Carrousel.jsx";
 import Register from "./pages/Register.jsx";
 import Login from "./pages/login.jsx";
+import SchoolsCarousel from "./components/CarrouselSchools.jsx";
+import CoursesCarousel from "./components/CarrouselCourses.jsx";
 
 
 function App() {
@@ -36,7 +18,8 @@ function App() {
           <>
                 <CustomNavbar />
             <Banner />
-            <SwiperCarousel />
+            <CoursesCarousel />
+            <SchoolsCarousel />
           </>
         } />
         <Route path="/login" element={<Login />} />
@@ -44,7 +27,6 @@ function App() {
       </Routes>
       <AccessibilityWidget theme="light" />
     </Router>
->>>>>>> 0446885 (fix: register and login operation)
   );
 }
 

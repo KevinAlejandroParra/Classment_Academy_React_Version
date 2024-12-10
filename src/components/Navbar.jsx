@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMoon, faSun, faBars } from "@fortawesome/free-solid-svg-icons";
-<<<<<<< HEAD
-=======
 import { Link } from "react-router-dom";
->>>>>>> 0446885 (fix: register and login operation)
 
 function CustomNavbar() {
   const [theme, setTheme] = useState("dark");
@@ -28,11 +25,7 @@ function CustomNavbar() {
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
-<<<<<<< HEAD
-      <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[90%] max-w-5xl z-50 bg-yellow/30 dark:bg- backdrop-blur-md rounded-2xl shadow-sm">
-=======
       <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[90%] max-w-5xl z-50 bg-white/30 dark:bg-gray-900/30 backdrop-blur-md rounded-2xl shadow-sm">
->>>>>>> 0446885 (fix: register and login operation)
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="flex items-center justify-between h-16">
             {/* Menú Hamburguesa */}
@@ -72,26 +65,14 @@ function CustomNavbar() {
 
             {/* Logo y Título */}
             <div className="flex items-center">
-<<<<<<< HEAD
 
-              <h1 className="text-4xl font-semibold pl-4 dark:text-white text-light-primary">
-=======
-              <img 
-                className="h-10 w-10 rounded-full" 
-                src="../public/Img/design/logo.png" 
-                alt="Logo"
-              />
-              <h1 className="font-bold pl-4 text-gray-900 dark:text-white">
->>>>>>> 0446885 (fix: register and login operation)
+              <h1 className="font-bold text-2xl pl-32 text-gray-900 dark:text-white">
                 Classment Academy
               </h1>
             </div>
 
             {/* Botones */}
-            <div className="flex items-center space-x-4">
-              <button className="px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                Unirme
-              </button>
+            <div className="flex items-center space-x-2">
               <button 
                 onClick={handleChangeTheme} 
                 className="px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -101,8 +82,6 @@ function CustomNavbar() {
                   className="h-5 w-5 text-gray-600 dark:text-gray-300"
                 />
               </button>
-<<<<<<< HEAD
-=======
               {/*Botón de register*/}
               <Link to="/register"  
               className="px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
@@ -113,7 +92,6 @@ function CustomNavbar() {
               className="px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
               Iniciar sesión 
               </Link>
->>>>>>> 0446885 (fix: register and login operation)
             </div>
           </div>
         </div>

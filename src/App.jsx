@@ -6,6 +6,7 @@ import { Banner } from "./components/Banner.jsx";
 import { AccessibilityWidget } from "sena-accessibility";
 import Register from "./pages/Register.jsx";
 import Login from "./pages/Login.jsx";
+import Profile from "./pages/Profile.jsx";
 import SchoolsCarousel from "./components/CarrouselSchools.jsx";
 import CoursesCarousel from "./components/CarrouselCourses.jsx";
 
@@ -23,6 +24,7 @@ function App() {
             
           </>
         } />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Routes>

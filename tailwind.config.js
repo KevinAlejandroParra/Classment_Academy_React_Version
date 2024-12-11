@@ -15,9 +15,9 @@ export default {
         light: {
           background: '#F7F9FC', // Fondo claro suave
           text: '#1C1E26', // Texto gris oscuro para buena legibilidad
-          primary: '#', // Azul vibrante
-          secondary: '#E63946', // Rojo intenso para acentos
-          accent: '#FFD166', // Amarillo brillante (para botones, detalles)
+          primary: '#F6C23E', // Amarillo oscuro (color yellow-600)
+          secondary: '#000000', // Negro intenso para acentos
+          accent: '#000000', // Negro brillante (para botones, detalles)
           success: '#06D6A0', // Verde neón suave
           warning: '#FFAD4D', // Naranja pastel
           error: '#EF476F', // Rojo rosado brillante
@@ -28,8 +28,8 @@ export default {
         dark: {
           background: '#0D0D0D', // Negro profundo para el fondo
           text: '#F1F1F1', // Texto claro
-          primary: '#3A86FF', // Azul neón
-          secondary: '#FF006E', // Rosa neón llamativo
+          primary: '#F7DC6F', // Amarillo neón
+          secondary: '#FFFFFF', // Blanco intenso
           accent: '#FFD166', // Amarillo brillante
           success: '#06D6A0', // Verde neón
           warning: '#FFBE0B', // Amarillo neón cálido

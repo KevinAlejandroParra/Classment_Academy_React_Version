@@ -8,6 +8,7 @@ import Register from "./pages/Register.jsx";
 import Login from "./pages/Login.jsx";
 import SchoolsCarousel from "./components/CarrouselSchools.jsx";
 import CoursesCarousel from "./components/CarrouselCourses.jsx";
+import CourseDetail from './components/CourseDetail.jsx';
 
 
 function App() {
@@ -16,15 +17,21 @@ function App() {
       <Routes>
         <Route path="/" element={
           <>
-                <CustomNavbar />
+            <CustomNavbar />
             <Banner />
             <CoursesCarousel />
             <SchoolsCarousel />
-            
           </>
         } />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/curso/:id" element={
+          <>
+            <CustomNavbar />
+            <CourseDetail />
+
+          </>
+        } />
       </Routes>
       <AccessibilityWidget theme="light" />
     </Router>
@@ -32,3 +39,4 @@ function App() {
 }
 
 export default App;
+

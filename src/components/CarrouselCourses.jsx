@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectCoverflow, Pagination, Autoplay } from 'swiper/modules';
+import { Link } from 'react-router-dom';
 
 // Importar solo los estilos necesarios de Swiper
 import 'swiper/css';
@@ -104,14 +105,15 @@ function CoursesCarousel() {
                     ${curso.curso_precio}
                   </p>
                   <div className="card-actions justify-end pt-2 pb-2">
-                    <a 
-                      href={`../APP/Views/Crud/curso_detalle.php?id=${curso.curso_id}`} 
-                      className="btn rounded-lg px-4 py-2 group border-2 dark:bg-yellow-400 bg-yellow-600 border-yellow-400 
-                        text-sm font-semibold text-white dark:text-black  dark:hover:bg-yellow-500 dark:hover:text-white hover:bg-yellow-700
-                         hover:bg-yellow-700 dark:text-gray-100 transition duration-300 ease-in-out">
-                      Ver Curso
-                    </a>
-                  </div>
+                  <Link 
+                    to={`/curso/${curso.curso_id}`}
+                    className="btn rounded-lg px-4 py-2 group border-2 dark:bg-yellow-400 bg-yellow-600 border-yellow-400 
+                      text-sm font-semibold text-white dark:text-black dark:hover:bg-yellow-500 dark:hover:text-white hover:bg-yellow-700
+                      hover:bg-yellow-700 dark:text-gray-100 transition duration-300 ease-in-out"
+                  >
+                    Ver Curso
+                  </Link>
+                </div>
                 </div>
               </div>
             </SwiperSlide>

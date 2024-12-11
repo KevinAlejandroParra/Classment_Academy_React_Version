@@ -44,7 +44,7 @@ function CustomNavbar() {
                 <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
                   <ul className="py-2">
                     <li>
-                      <a className="block px-4 py-2 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700">
+                      <a className="block px-4 py-2 text-gray-800 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700" href="http://localhost:5173/">
                         Inicio
                       </a>
                     </li>

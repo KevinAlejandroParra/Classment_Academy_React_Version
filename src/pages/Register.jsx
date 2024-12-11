@@ -1,5 +1,15 @@
-import { useState } from "react";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectPortal } from "@radix-ui/react-select";
+import React, { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { 
+  faUser, 
+  faIdCard, 
+  faEnvelope, 
+  faLock, 
+  faPhone, 
+  faMapMarkerAlt, 
+  faCalendar,
+  faHome 
+} from "@fortawesome/free-solid-svg-icons";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -7,7 +17,7 @@ export default function Register() {
     usuario_tipo_documento: "",
     usuario_nombre: "",
     usuario_apellido: "",
-    usuario_correo : "",
+    usuario_correo: "",
     usuario_password: "",
     usuario_telefono: "",
     usuario_direccion: "",
@@ -24,7 +34,7 @@ export default function Register() {
       [name]: value,
     }));
   };
-//Válidar form
+
   const validateForm = () => {
     const newErrors = {};
     if (!formData.usuario_documento) newErrors.usuario_documento = "Número de documento es obligatorio.";
@@ -36,7 +46,7 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-//Carga de datos con API y mensajes de exito o error
+
     setIsLoading(true);
     try {
       const response = await fetch("http://127.0.0.1:8000/api/auth/register", {
@@ -59,158 +69,171 @@ export default function Register() {
     }
   };
 
-  //Formulario
-  return(
-<div className="relative p-6 max-w-lg mx-auto bg-white shadow-md rounded-md">
-<h1 className="text-2xl dark:text-white text-black font-bold mb-6 text-center">Formulario de Registro</h1>
-      <form onSubmit={handleSubmit} className='space-y-4'>
-        
-{/* Campo de Tipo de Documento */}
+  // Elementos de fondo relacionados con deportes
+  const SportBackgroundElements = () => (
+    <div className="absolute inset-0 overflow-hidden opacity-10 z-[-1]">
+      <div className="absolute top-10 left-10 w-32 h-32 bg-yellow-600/20 rounded-full rotate-45"></div>
+      <div className="absolute bottom-20 right-20 w-48 h-48 bg-green-600/20 rounded-full -rotate-45"></div>
+      <div className="absolute top-1/3 left-1/2 w-24 h-24 bg-red-600/20 rounded-full"></div>
+      <div className="absolute bottom-10 left-1/3 w-40 h-40 bg-blue-600/20 rounded-full rotate-12"></div>
+    </div>
+  );
 
-  <div className="mb-4">
-  <label htmlFor="usuario_tipo_documento" className="block text-gray-700 font-medium mb-2">
-    Tipo de Documento:
-  </label>
-  <select
-    name="usuario_tipo_documento"
-    value={formData.usuario_tipo_documento}
-    onChange={(e) =>
-      setFormData((prevState) => ({
-        ...prevState,
-        usuario_tipo_documento: e.target.value,
-      }))
-    }
-    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F86D31] transition-colors"
-  >
-    <option value="">Seleccione un Tipo de Documento</option>
-    <option value="CC">C.C</option>
-    <option value="CE">C.E</option>
-    <option value="TI">T.I</option>
-    <option value="PPN">PPN</option>
-    <option value="NIT">NIT</option>
-    <option value="SSN">SSN</option>
-    <option value="EIN">EIN</option>
-  </select>
-</div>
+  return (
+    <div className="relative min-h-screen bg-[#F7F9FC] dark:bg-[#0D0D0D] flex items-center justify-center p-6">
+      <SportBackgroundElements />
+      
+      <a 
+        href="http://localhost:5173/" 
+        className="absolute top-6 left-6 bg-yellow-400 dark:bg-yellow-500 text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform"
+      >
+        <FontAwesomeIcon icon={faHome} />
+      </a>
 
-        <div>
-          <label htmlfor="usuario_documento"></label>
+      <div className="relative w-full max-w-md bg-white dark:bg-[#0B0B0B] shadow-2xl rounded-2xl p-8 border border-[#D1D9E6] dark:border-[#181818]">
+        <h1 className="text-3xl font-bold text-center mb-6 text-[#1C1E26] dark:text-[#F1F1F1]">
+          Registro de Usuario
+        </h1>
 
-          <input
-            type="text"
-            id="usuario_documento"
-            name="usuario_documento"
-            placeholder="Número de Documento"
-            value={formData.usuario_documento}
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F86D31] transition-colors"
-            onChange={(e) => handleChange(e)}>
-            
-          </input>
-        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="relative">
+            <select
+              name="usuario_tipo_documento"
+              value={formData.usuario_tipo_documento}
+              onChange={(e) =>
+                setFormData((prevState) => ({
+                  ...prevState,
+                  usuario_tipo_documento: e.target.value,
+                }))
+              }
+              className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-[#F6C23E] dark:focus:ring-[#F7DC6F] transition-colors"
+            >
+              <option value="">Tipo de Documento</option>
+              <option value="CC">C.C</option>
+              <option value="CE">C.E</option>
+              <option value="TI">T.I</option>
+              <option value="PPN">PPN</option>
+              <option value="NIT">NIT</option>
+              <option value="SSN">SSN</option>
+              <option value="EIN">EIN</option>
+            </select>
+            <FontAwesomeIcon icon={faIdCard} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#1C1E26]/50 dark:text-[#F1F1F1]/50" />
+          </div>
 
-        <div>
-          <label htmlfor="usuario_nombre"></label>
+          {/* Campos de entrada con sus respectivos iconos */}
+          <div className="relative">
+            <input
+              type="text"
+              id="usuario_documento"
+              name="usuario_documento"
+              placeholder="Número de Documento"
+              value={formData.usuario_documento}
+              className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-[#F6C23E] dark:focus:ring-[#F7DC6F] transition-colors"
+              onChange={handleChange}
+            />
+            <FontAwesomeIcon icon={faUser} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#1C1E26]/50 dark:text-[#F1F1F1]/50" />
+          </div>
 
-          <input
-            type="text"
-            id="usuario_nombre"
-            name="usuario_nombre"
-            placeholder="Nombres"
-            value={formData.usuario_nombre}
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F86D31] transition-colors"
-            onChange={(e) => handleChange(e)}>
-          </input>
-        </div> 
+          {/* Los demás campos seguirán el mismo patrón, usando FontAwesomeIcon */}
+          <div className="relative">
+            <input
+              type="text"
+              id="usuario_nombre"
+              name="usuario_nombre"
+              placeholder="Nombres"
+              value={formData.usuario_nombre}
+              className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-[#F6C23E] dark:focus:ring-[#F7DC6F] transition-colors"
+              onChange={handleChange}
+            />
+            <FontAwesomeIcon icon={faUser} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#1C1E26]/50 dark:text-[#F1F1F1]/50" />
+          </div>
 
-        <div>
-          <label htmlfor="usuario_apellido"></label>
+          <div className="relative">
+            <input
+              type="text"
+              id="usuario_apellido"
+              name="usuario_apellido"
+              placeholder="Apellidos"
+              value={formData.usuario_apellido}
+              className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-[#F6C23E] dark:focus:ring-[#F7DC6F] transition-colors"
+              onChange={handleChange}
+            />
+            <FontAwesomeIcon icon={faUser} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#1C1E26]/50 dark:text-[#F1F1F1]/50" />
+          </div>
 
-          <input 
-          type="text"
-          id="usuario_apellido"
-          name="usuario_apellido"
-          placeholder="Apellidos"
-          value={formData.usuario_apellido}
-          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F86D31] transition-colors"
-          onChange={(e) => handleChange(e)}>
-          </input>
-        </div>
+          <div className="relative">
+            <input
+              type="email"
+              id="usuario_correo"
+              name="usuario_correo"
+              placeholder="Correo Electrónico"
+              value={formData.usuario_correo}
+              className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-[#F6C23E] dark:focus:ring-[#F7DC6F] transition-colors"
+              onChange={handleChange}
+            />
+            <FontAwesomeIcon icon={faEnvelope} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#1C1E26]/50 dark:text-[#F1F1F1]/50" />
+          </div>
 
-        <div>
-          <label htmlfor="usuario_correo"></label>
+          <div className="relative">
+            <input
+              type="password"
+              id="usuario_password"
+              name="usuario_password"
+              placeholder="Contraseña"
+              value={formData.usuario_password}
+              className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-[#F6C23E] dark:focus:ring-[#F7DC6F] transition-colors"
+              onChange={handleChange}
+            />
+            <FontAwesomeIcon icon={faLock} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#1C1E26]/50 dark:text-[#F1F1F1]/50" />
+          </div>
 
-          <input type="email" 
-          id="usuario_correo"
-          name="usuario_correo"
-          placeholder="Correo Electrónico"
-          value={formData.usuario_correo}
-          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F86D31] transition-colors"
-          onChange={(e) => handleChange(e)}>
-          </input>
-        </div>
+          <div className="relative">
+            <input
+              type="tel"
+              id="usuario_telefono"
+              name="usuario_telefono"
+              placeholder="Número de Teléfono"
+              value={formData.usuario_telefono}
+              className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-[#F6C23E] dark:focus:ring-[#F7DC6F] transition-colors"
+              onChange={handleChange}
+            />
+            <FontAwesomeIcon icon={faPhone} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#1C1E26]/50 dark:text-[#F1F1F1]/50" />
+          </div>
 
-        <div>
-          <label htmlfor="usuario_password"></label>
+          <div className="relative">
+            <input
+              type="text"
+              id="usuario_direccion"
+              name="usuario_direccion"
+              placeholder="Dirección"
+              value={formData.usuario_direccion}
+              className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-[#F6C23E] dark:focus:ring-[#F7DC6F] transition-colors"
+              onChange={handleChange}
+            />
+            <FontAwesomeIcon icon={faMapMarkerAlt} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#1C1E26]/50 dark:text-[#F1F1F1]/50" />
+          </div>
 
-          <input 
-          type="password" 
-          id="usuario_password"
-          name="usuario_password"
-          placeholder="Contraseña"
-          value={formData.usuario_password}
-          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F86D31] transition-colors"
-          onChange={(e) => handleChange(e)}>
-          </input>
-        </div>
+          <div className="relative">
+            <input
+              type="date"
+              id="usuario_nacimiento"
+              name="usuario_nacimiento"
+              value={formData.usuario_nacimiento}
+              className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-[#F6C23E] dark:focus:ring-[#F7DC6F] transition-colors"
+              onChange={handleChange}
+            />
+            <FontAwesomeIcon icon={faCalendar} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#1C1E26]/50 dark:text-[#F1F1F1]/50" />
+          </div>
 
-        <div>
-          <label htmlfor="usuario_telefono"></label>
-
-          <input 
-          type="tel"  
-          id="usuario_telefono"
-          name="usuario_telefono"
-          placeholder="Número de Telefono"
-          value={formData.usuario_telefono}
-          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F86D31] transition-colors"
-          onChange={(e) => handleChange(e)}>
-          </input>
-        </div>
-
-        <div>
-          <label htmlfor="usuario_direccion"></label>
-
-          <input type="text" 
-          id="usuario_direccion"
-          name="usuario_direccion"
-          placeholder="Dirección"
-          value={formData.usuario_direccion}
-          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F86D31] transition-colors"
-          onChange={(e) => handleChange(e)}>
-          </input>
-        </div>
-
-        <div>
-          <label htmlfor="usuario_nacimiento"></label>
-
-          <input type="date" 
-          id="usuario_nacimiento"
-          name="usuario_nacimiento"
-          value={formData.usuario_nacimiento}
-          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F86D31] transition-colors"
-          onChange={(e) => handleChange(e)}>
-          </input>
-        </div>
-
-        <button 
-         type="submit" 
-         className="w-full bg-[#F86D31] hover:bg-[#071822] text-white font-bold py-3 px-6 rounded-full transition-colors duration-300" 
-         disabled={isLoading} > {isLoading ? 'Registrando...' : 'Registrarse'}
-        </button>
-
-    </form>
-</div>
+          <button 
+            type="submit" 
+            className="w-full bg-[#F6C23E] dark:bg-yellow-500 text-white font-bold py-3 rounded-full hover:opacity-90 transition-all"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Registrando...' : 'Registrarse'}
+          </button>
+        </form>
+      </div>
+    </div>
   );
 }
-
-

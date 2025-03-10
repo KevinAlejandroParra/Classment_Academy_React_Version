@@ -42,14 +42,27 @@ use Illuminate\Http\Request;
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function login()
+    public function login(Request $request)
     {
-        $credentials = request(['usuario_correo', 'usuario_password']);
-          if (! $token = auth()->attempt(['usuario_correo' => $credentials['usuario_correo'], 'password' => $credentials['usuario_password']])) {
-            return $this->sendError('Unauthorised.', ['error'=>'Error al Iniciar sesión']);
+        $validator = Validator::make($request->all(), [
+            'usuario_correo' => 'required|email',
+            'usuario_password' => 'required|string|min:8',
+        ]);
+        
+        if($validator->fails()){
+        return $this->sendError('Error al Iniciar sesión.', $validator->errors());
+    }
+        $credentials = [
+            'usuario_correo' => $request->usuario_correo,
+            'password' => $request->usuario_password
+        ];
+            
+        if (! $token = auth()->attempt($credentials)) {
+            return $this->sendError('Unauthorised.', ['error' => 'Error al Iniciar sesión']);
         }
-          $success = $this->respondWithToken($token);
-           return $this->sendResponse($success, 'Inicio de sesión Exitoso.');
+            
+        $success = $this->respondWithToken($token);
+        return $this->sendResponse($success, 'Inicio de sesión Exitoso.');
     }
       /**
      * Get the authenticated User.

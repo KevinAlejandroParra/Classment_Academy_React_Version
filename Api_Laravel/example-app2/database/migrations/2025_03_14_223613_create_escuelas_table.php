@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('escuelas', function (Blueprint $table) {
             $table->String('escuela_id', 20)->primary();
             $table->String('escuela_nombre', 100);
-            $table->String('escuela_nit');
-            $table->String('escuela_descripcion');
+            $table->String('escuela_nit', 15);
+            $table->text('escuela_descripcion');
             $table->String('escuela_telefono', 20);
-            $table->String('escuela_direccion');
+            $table->String('escuela_direccion', 150);
             $table->String('escuela_correo', 100);
             $table->String('escuela_password', 255);
             $table->String('escuela_imagen_url', 255)->default('../../PUBLIC/Img/escuelas/nf.jpg');

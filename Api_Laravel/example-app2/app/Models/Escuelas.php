@@ -34,4 +34,8 @@ class Escuelas extends Model
     ];
 
     public $timestamps = true;
+
+    public function admin_escuela(){
+        return $this->belongsTo(User::class, 'escuela_correo', 'usuario_correo');
+    }
 }

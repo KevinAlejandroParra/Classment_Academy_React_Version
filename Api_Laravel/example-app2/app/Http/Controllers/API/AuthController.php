@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
      *
      * @return \Illuminate\Http\JsonResponse
      */
+
+     //registro
     public function register(Request $request) {
         $validator = Validator::make($request->all(), [
             'usuario_documento' => 'required|string|max:20',
@@ -20,6 +22,7 @@ use Illuminate\Http\Request;
             'usuario_apellido' => 'required|string|max:100',
             'usuario_correo' => 'required|email|max:100',
             'usuario_password' => 'required|string|min:6|max:100',
+            'rol' => 'required|in:Estudiante, Admin_Escuela, Developer',
             'usuario_telefono' => 'nullable|string|max:20',
             'usuario_direccion' => 'nullable|string',
             'usuario_nacimiento' => 'required|date',
@@ -32,16 +35,20 @@ use Illuminate\Http\Request;
             return $this->sendError('Validation Error.', $validator->errors());       
         }
              $input = $request->all();
-        $input['usuario_password'] = bcrypt($input['usuario_password']);
-        $user = User::create($input);
-        $success['user'] =  $user;
+            $input['usuario_password'] = bcrypt($input['usuario_password']);
+             $user = User::create($input);
+            $success['user'] =  $user;
            return $this->sendResponse($success, 'Registro Exitoso.');
+
+           
     }
         /**
      * Get a JWT via given credentials.
      *
      * @return \Illuminate\Http\JsonResponse
      */
+
+     //iniciar sesión
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -69,16 +76,31 @@ use Illuminate\Http\Request;
      *
      * @return \Illuminate\Http\JsonResponse
      */
+    //obtener perfil
     public function profile()
     {
-        $success = auth()->user();
-           return $this->sendResponse($success, 'retorno exitoso');
+        $user = auth()->user();
+
+        if (!$user){
+            return $this->sendError('usuario no encontrado.', [], 404);
+        }
+
+        $success['user'] = $user;
+
+        if ('rol' === 'Admin_Escuela') {
+            $escuela = \App\Models\Escuelas::where('escuela_correo', $user->usuario_correo)->first();
+            $success['escuelas'] = $escuela;
+        }
+
+        return $this->sendResponse($success, 'Perfil obtenido con exito.');
     }
       /**
      * Log the user out (Invalidate the token).
      *
      * @return \Illuminate\Http\JsonResponse
      */
+
+     //cerrar sesión
     public function logout()
     {
         auth()->logout();
@@ -89,6 +111,8 @@ use Illuminate\Http\Request;
      *
      * @return \Illuminate\Http\JsonResponse
      */
+
+     //Refrescar token
     public function refresh()
     {
         $success = $this->respondWithToken(auth()->refresh());
@@ -101,6 +125,8 @@ use Illuminate\Http\Request;
      *
      * @return \Illuminate\Http\JsonResponse
      */
+
+     //Funcion para obtener el token
     protected function respondWithToken($token)
     {
         return [
@@ -109,7 +135,8 @@ use Illuminate\Http\Request;
             'expires_in' => auth()->factory()->getTTL() * 60
         ];
     } 
-
+    
+    //Actualizar perfil
     public function updateProfile(Request $request)
     {
         try {
@@ -159,7 +186,8 @@ use Illuminate\Http\Request;
             ], 500);
         }
     }
-
+    
+    //Eliminar perfil
     public function deleteProfile()
 {
     try {

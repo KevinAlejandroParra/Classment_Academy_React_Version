@@ -19,11 +19,13 @@ return new class extends Migration
             $table->string('usuario_correo', 100)->unique();
             $table->string('usuario_password', 255);
             $table->string('usuario_telefono', 20)->nullable();
+            $table->enum('rol', ['Estudiante', 'Admin_Escuela', 'Developer'])->default('Estudiante');
             $table->text('usuario_direccion')->nullable();
             $table->date('usuario_nacimiento');
             $table->string('usuario_imagen_url', 255)->default('../../PUBLIC/Img/usuarios/nf.jpg');
             $table->timestamp('usuario_fecha_creacion')->useCurrent();
-            $table->timestamp('usuario_ultima_actualizacion')->useCurrent()->onUpdate(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('usuario_ultima_actualizacion')->useCurrent()->useCurrentOnUpdate();
+            $table->timestamp('usuario_ultima_actualizacion')->useCurrent()->useCurrentOnUpdate();
             $table->enum('usuario_estado', ['activo', 'inactivo'])->default('activo');
 
         });

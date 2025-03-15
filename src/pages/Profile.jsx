@@ -82,10 +82,11 @@ const Profile = () => {
                     }
                 }
             );
-            if (response.data && response.data.data) {
+            if (response.data) {
                 setUserInfo(response.data.data);
                 setMessage({ type: 'success', content: 'Perfil actualizado con éxito' });
                 setIsEditModalOpen(false);
+                fetchUserProfile();
             } else {
                 console.error("Estructura de datos inesperada:", response.data); 
                 throw new Error("La respuesta no contiene los datos esperados");

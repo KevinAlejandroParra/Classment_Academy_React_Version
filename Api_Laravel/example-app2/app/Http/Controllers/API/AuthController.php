@@ -35,10 +35,11 @@ use Illuminate\Http\Request;
             return $this->sendError('Validation Error.', $validator->errors());       
         }
              $input = $request->all();
-            $input['usuario_password'] = bcrypt($input['usuario_password']);
+             $input['usuario_password'] = bcrypt($input['usuario_password']);
              $user = User::create($input);
-            $success['user'] =  $user;
-           return $this->sendResponse($success, 'Registro Exitoso.');
+             $success['user'] =  $user;
+             
+             return $this->sendResponse($success, 'Registro Exitoso.');
 
            
     }
@@ -78,22 +79,23 @@ use Illuminate\Http\Request;
      */
     //obtener perfil
     public function profile()
-    {
-        $user = auth()->user();
+{
+    $user = auth()->user();
 
-        if (!$user){
-            return $this->sendError('usuario no encontrado.', [], 404);
-        }
-
-        $success['user'] = $user;
-
-        if ('rol' === 'Admin_Escuela') {
-            $escuela = \App\Models\Escuelas::where('escuela_correo', $user->usuario_correo)->first();
-            $success['escuelas'] = $escuela;
-        }
-
-        return $this->sendResponse($success, 'Perfil obtenido con exito.');
+    if (!$user) {
+        return $this->sendError('Usuario no encontrado.', [], 404);
     }
+
+    $success['user'] = $user;
+
+    if ($user->rol === 'Admin_Escuela') {
+        $escuela = \App\Models\Escuelas::where('escuela_correo', $user->usuario_correo)->first();
+        $success['escuelas'] = $escuela;
+    }
+
+    return $this->sendResponse($success, 'Perfil obtenido con éxito.');
+}
+
       /**
      * Log the user out (Invalidate the token).
      *
@@ -129,11 +131,11 @@ use Illuminate\Http\Request;
      //Funcion para obtener el token
     protected function respondWithToken($token)
     {
-        return [
+        return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60
-        ];
+        ]);
     } 
     
     //Actualizar perfil
@@ -156,7 +158,14 @@ use Illuminate\Http\Request;
                 'usuario_telefono' => 'string|max:20|nullable',
                 'usuario_direccion' => 'string|nullable',
                 'usuario_nacimiento' => 'date',
-                'usuario_estado' => 'in:activo,inactivo'
+                'usuario_estado' => 'in:activo,inactivo',
+
+                //Actualizar los datos de la escuela
+                'escuela_nombre' => 'String|max:100|nullable',
+                'escuela_direccion' => 'String|max:100|nullable',
+                'escuela_telefono' => 'String|max:20|nullable',
+                'escuela_correo' => 'String|email|max:100|nullable',
+                'escuela_imagen_url' => 'String|nillable',
             ]);
 
             $usuario->fill($request->only([
@@ -174,6 +183,17 @@ use Illuminate\Http\Request;
             }
 
             $usuario->save();
+
+            //Actualizar los datos de la escuela
+            if($usuario->rol === 'Admin_Escuela' && $usuario->escuelas) {
+                $usuario->escuelas->update($request->only([
+                    'escuela_nombre',
+                    'escuela_direccion',
+                    'escuela_telefono',
+                    'escuela_correo',
+                    'escuela_imagen_url'
+                ]));
+            }
 
             return response()->json([
                 'message' => 'Usuario actualizado exitosamente.',
@@ -201,6 +221,11 @@ use Illuminate\Http\Request;
             ], 404);
         }
 
+        //eliminar datos escuela
+
+        if($usuario->rol === 'Admin_Escuela') {
+            $usuario->escuelas()->delete();
+        }
         $usuario->delete();
 
         return response()->json([

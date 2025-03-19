@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -10,19 +9,13 @@ use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     public $timestamps = false;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-
     protected $table = 'usuarios';
-
+    protected $primaryKey = 'usuario_documento';
+    
     protected $fillable = [
         'usuario_documento',
         'usuario_tipo_documento',
@@ -38,50 +31,47 @@ class User extends Authenticatable implements JWTSubject
         'usuario_ultima_actualizacion',
         'usuario_estado',
     ];
-    
-    protected $primaryKey = 'usuario_documento';
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'usuario_password',
         'remember_token',
     ];
 
-    public function getAuthPassword(){
-
+    //devolver el campo correcto de contraseña
+    public function getAuthPassword()
+    {
         return $this->usuario_password;
     }
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    public function getAuthIdentifier()
     {
-        return [
-            'usuario_nacimiento' => 'date',
-            'usuario_fecha_creacion' => 'datetime',
-            'usuario_ultima_actualizacion' => 'datetime',
-            'usuario_password' => 'hashed',
-        ];
+        return $this->{$this->getAuthIdentifierName()};
     }
 
-    public function getJWTIdentifier(){
+    public function getAuthIdentifierName()
+    {
+        return 'usuario_correo';
+    }
+
+    // Corrección en los casts
+    protected $casts = [
+        'usuario_nacimiento' => 'date',
+        'usuario_fecha_creacion' => 'datetime',
+        'usuario_ultima_actualizacion' => 'datetime',
+    ];
+
+    public function getJWTIdentifier()
+    {
         return $this->getKey();
     }
 
-    public function getJWTCustomClaims(){
+    public function getJWTCustomClaims()
+    {
         return [];
     }
 
-    public function escuela (){
-        return $this->hasOne((Escuelas::class), 'escuela_correo', 'usuario_correo');
+    public function escuela()
+    {
+        return $this->hasOne(Escuelas::class, 'escuela_correo', 'usuario_correo');
     }
 }
-
-

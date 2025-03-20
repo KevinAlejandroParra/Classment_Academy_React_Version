@@ -5,6 +5,9 @@ use App\Http\Controllers\API\BaseController as BaseController;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Facades\JWTFactory;
+
   class AuthController extends BaseController
 {
      /**
@@ -48,30 +51,34 @@ use Illuminate\Http\Request;
      *
      * @return \Illuminate\Http\JsonResponse
      */
-
-     //iniciar sesión
-    public function login(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'usuario_correo' => 'required|email',
-            'usuario_password' => 'required|string|min:8',
-        ]);
-        
-        if($validator->fails()){
-        return $this->sendError('Error al Iniciar sesión.', $validator->errors());
-    }
-        $credentials = [
-            'usuario_correo' => $request->usuario_correo,
-            'password' => $request->usuario_password
-        ];
-            
-        if (! $token = auth()->attempt($credentials)) {
-            return $this->sendError('Unauthorised.', ['error' => 'Error al Iniciar sesión']);
-        }
-            
-        $success = $this->respondWithToken($token);
-        return $this->sendResponse($success, 'Inicio de sesión Exitoso.');
-    }
+     
+     public function login(Request $request)
+     {
+         $validator = Validator::make($request->all(), [
+             'usuario_correo' => 'required|email',
+             'usuario_password' => 'required|string|min:8',
+         ]);
+     
+         if ($validator->fails()) {
+             return response()->json(['error' => $validator->errors()], 400);
+         }
+     
+         // Verificar autenticación
+         if (!$token = JWTAuth::attempt
+         (['usuario_correo' => $request->usuario_correo, 
+         'password' => $request->usuario_password])) 
+         
+         {   
+            return response()->json(['error' => 'No autorizado'], 401);
+         }
+     
+         return [
+             'access_token' => $token,
+             'token_type' => 'bearer',
+             'expires_in' => auth()->factory()->getTTL() * 60
+         ];
+     }
+     
       /**
      * Get the authenticated User.
      *
@@ -129,14 +136,19 @@ use Illuminate\Http\Request;
      */
 
      //Funcion para obtener el token
-    protected function respondWithToken($token)
-    {
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
-        ]);
-    } 
+     protected function respondWithToken($token)
+     {
+         return response()->json([
+             'success' => true,
+             'data' => [
+                 'access_token' => $token,
+                 'token_type' => 'bearer',
+                 'expires_in' => auth()->factory()->getTTL() * 60
+             ],
+             'message' => 'Inicio de sesión exitoso.'
+         ]);
+     }
+     
     
     //Actualizar perfil
     public function updateProfile(Request $request)

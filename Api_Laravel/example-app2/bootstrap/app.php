@@ -15,7 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'auth.jwt' => \Tymon\JWTAuth\Http\Middleware\Authenticate::class,
+            'auth.jwt' => \PHPOpenSourceSaver\JWTAuth\Http\Middleware\Authenticate::class,
+
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

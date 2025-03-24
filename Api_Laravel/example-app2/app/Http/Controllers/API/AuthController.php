@@ -5,8 +5,8 @@ use App\Http\Controllers\API\BaseController as BaseController;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
-use Tymon\JWTAuth\Facades\JWTAuth;
-use Tymon\JWTAuth\Facades\JWTFactory;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
+
 
   class AuthController extends BaseController
 {

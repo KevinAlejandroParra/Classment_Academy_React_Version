@@ -10,11 +10,13 @@ import Profile from "./pages/Profile.jsx";
 import SchoolsCarousel from "./components/CarrouselSchools.jsx";
 import CoursesCarousel from "./components/CarrouselCourses.jsx";
 import CourseDetail from './components/CourseDetail.jsx';
+import { AuthProvider } from "./controllers/AuthContext.jsx";
 
 
 function App() {
   return (
     <Router>
+      <AuthProvider>
       <Routes>
         <Route path="/" element={
           <>
@@ -35,6 +37,7 @@ function App() {
           </>
         } />
       </Routes>
+      </AuthProvider>
       <AccessibilityWidget theme="light" />
     </Router>
   );

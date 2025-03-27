@@ -15,11 +15,12 @@ const Login = () => {
             setError('Por favor, complete todos los espacios');
             return;
         }
+        //se envia el correo y la contraseña
         const data = {
             usuario_correo: email,
             usuario_password: password
         };
-
+        //se hace la peticion 
         try {
             const response = await fetch('http://localhost:8000/api/auth/login', {
                 method: 'POST',
@@ -30,25 +31,28 @@ const Login = () => {
                 body: JSON.stringify(data),
             });
 
-            if(!response.ok){
+            if (!response.ok) {
                 const result = await response.json();
-                throw new Error(result.message || 'Error al Validar usuario');
+                throw new Error(result.message || 'Error al validar usuario');
             }
-
+    //se recibe la respuesta
             const result = await response.json();
-            console.log('Respuesta de la API', result);
-            const accessToken = result?.data?.access_token || result?.access_token;
-            if (accessToken){
+            console.log('Respuesta de la API:', result);
+
+                //se recibe el token
+            const accessToken = result?.access_token;
+            if (accessToken) {
                 localStorage.setItem('token', accessToken);
-                console.log('Token recibido con éxito', accessToken);
+                console.log('Token recibido:', accessToken);
                 navigate('/Profile');
             } else {
-                throw new Error('No se recibió el token de Acceso'); 
+                throw new Error('No se recibió el token de acceso');
             }
         } catch (error) {
+            console.error('Error en login:', error);
             setError(error.message);
         }
-    }
+    };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-black relative overflow-hidden">

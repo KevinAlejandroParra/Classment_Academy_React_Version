@@ -23,7 +23,6 @@ class User extends Authenticatable implements JWTSubject
         'usuario_apellido',
         'usuario_correo',
         'usuario_password',
-        'rol',
         'usuario_telefono',
         'usuario_direccion',
         'usuario_nacimiento',
@@ -31,6 +30,7 @@ class User extends Authenticatable implements JWTSubject
         'usuario_fecha_creacion',
         'usuario_ultima_actualizacion',
         'usuario_estado',
+        'rol_id',
     ];
 
     protected $hidden = [
@@ -70,8 +70,8 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
-    public function escuela()
+    public function rol()
     {
-        return $this->hasOne(Escuelas::class, 'escuela_correo', 'usuario_correo');
+        return $this->belongsTo(Roles::class, 'rol_id', 'rol_id');
     }
 }

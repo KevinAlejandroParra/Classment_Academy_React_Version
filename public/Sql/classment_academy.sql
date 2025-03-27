@@ -1,7 +1,7 @@
 -- Se elimina la base de datos si existe y se crea una nueva
-DROP DATABASE IF EXISTS `classment-academy`;
-CREATE DATABASE `classment-academy`;
-USE `classment-academy`;
+DROP DATABASE IF EXISTS `classment_academy`;
+CREATE DATABASE `classment_academy`;
+USE `classment_academy`;
 
 -- Estructura de la tabla `roles`
 CREATE TABLE `roles` (

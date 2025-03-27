@@ -25,7 +25,6 @@ use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
             'usuario_apellido' => 'required|string|max:100',
             'usuario_correo' => 'required|email|max:100',
             'usuario_password' => 'required|string|min:6|max:100',
-            'rol' => 'required|in:Estudiante, Admin_Escuela, Developer',
             'usuario_telefono' => 'nullable|string|max:20',
             'usuario_direccion' => 'nullable|string',
             'usuario_nacimiento' => 'required|date',
@@ -33,6 +32,7 @@ use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
             'usuario_fecha_creacion' => 'nullable|date',
             'usuario_ultima_actualizacion' => 'nullable|date',
             'usuario_estado' => 'nullable|in:activo,inactivo',
+            'rol_id' => 'required|exists:roles,rol_id',
         ]);
              if($validator->fails()){
             return $this->sendError('Validation Error.', $validator->errors());       
@@ -71,7 +71,7 @@ use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
          {   
             return response()->json(['error' => 'No autorizado'], 401);
          }
-     
+         //si los datos son validos, envía el token
          return [
              'access_token' => $token,
              'token_type' => 'bearer',

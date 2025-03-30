@@ -11,6 +11,7 @@ import {
   faHome 
 } from "@fortawesome/free-solid-svg-icons";
 
+
 export default function Register() {
   const [formData, setFormData] = useState({
     usuario_documento: "",
@@ -120,7 +121,7 @@ export default function Register() {
             <FontAwesomeIcon icon={faIdCard} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#1C1E26]/50 dark:text-[#F1F1F1]/50" />
           </div>
 
-          {/* Campos de entrada con sus respectivos iconos */}
+          {/* Campos de entrada para los datos del usuario */}
           <div className="relative">
             <input
               type="text"
@@ -211,6 +212,28 @@ export default function Register() {
               onChange={handleChange}
             />
             <FontAwesomeIcon icon={faMapMarkerAlt} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#1C1E26]/50 dark:text-[#F1F1F1]/50" />
+          </div>
+
+          <div className="relative">
+              <select 
+                  name="rol_id" 
+                  value={formData.rol_id}
+                  onChange={(e) =>
+                    setFormData((prevState) => ({
+                      ...prevState,
+                      rol_id: parseInt(e.target.value, 10) || "", 
+                    }))
+                  }
+                  className="w-full p-3 pl-10 border rounded-lg focus:ring-2 focus:ring-[#F6C23E] dark:focus:ring-[#F7DC6F] transition-colors"
+              >
+              <option value="">Rol de Usuario</option>
+              <option value="1">Invitado</option>
+              <option value="2">Alumno</option>
+              <option value="3">Profesor</option>
+              <option value="4">Coordinador</option>
+              <option value="5">Administrador</option>
+              </select>
+              <FontAwesomeIcon icon={faIdCard} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#1C1E26]/50 dark:text-[#F1F1F1]/50" />
           </div>
 
           <div className="relative">

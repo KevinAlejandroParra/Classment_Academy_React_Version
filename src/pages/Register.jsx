@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   faUser, 
   faIdCard, 
@@ -255,6 +256,16 @@ export default function Register() {
           >
             {isLoading ? 'Registrando...' : 'Registrarse'}
           </button>
+                                              
+          <p className="text-white text-sm">
+            ¿Ya tienes cuenta?{" "}
+             <Link
+             to="/login"
+             className="text-yellow-500 hover:text-yellow-400 transition-colors"
+             >
+            Inicia Sesión
+            </Link>
+          </p>
         </form>
       </div>
     </div>

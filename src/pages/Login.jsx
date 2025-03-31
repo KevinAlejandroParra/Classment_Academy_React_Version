@@ -44,7 +44,7 @@ const Login = () => {
             if (accessToken) {
                 localStorage.setItem('token', accessToken);
                 console.log('Token recibido:', accessToken);
-                navigate('/Profile');
+                navigate('/');
             } else {
                 throw new Error('No se recibió el token de acceso');
             }

@@ -36,7 +36,7 @@ class EscuelasController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        $escuelas = Escuelas::crate([
+        $escuelas = Escuelas::create([
             'escuela_id' => $request->escuela_id,
             'escuela_nombre' => $request->escuela_nombre,
             'escuela_nit' => $request->escuela_nit,

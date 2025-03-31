@@ -95,11 +95,6 @@ use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 
     $success['user'] = $user;
 
-    if ($user->rol === 'Admin_Escuela') {
-        $escuela = \App\Models\Escuelas::where('escuela_correo', $user->usuario_correo)->first();
-        $success['escuelas'] = $escuela;
-    }
-
     return $this->sendResponse($success, 'Perfil obtenido con éxito.');
 }
 

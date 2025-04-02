@@ -1,11 +1,15 @@
-import { NavbarComponent } from "./components/navbar"
 import { Banner } from "./components/banner"
+import { Sidebar } from "./components/sidebar"
+import { Particles } from "./components/particles"
 
 export default function Home() {
   return (
     <main className="min-h-screen">
-      <NavbarComponent />
-      <Banner />
+      <Particles />
+      <Sidebar />
+      <div className="w-full">
+        <Banner />
+      </div>
     </main>
   )
 }

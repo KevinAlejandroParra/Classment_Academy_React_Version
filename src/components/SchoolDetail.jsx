@@ -41,7 +41,7 @@ const SchoolHeader = ({School}) => (
 
 const SchoolDetail = () => {
     const [school, setSchool] = useState(null);
-    const[loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const { id } = useParams();
 

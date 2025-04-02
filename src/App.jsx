@@ -10,6 +10,7 @@ import Profile from "./pages/Profile.jsx";
 import SchoolsCarousel from "./components/CarrouselSchools.jsx";
 import CoursesCarousel from "./components/CarrouselCourses.jsx";
 import CourseDetail from './components/CourseDetail.jsx';
+import SchoolDetail from "./components/SchoolDetail.jsx";
 import { AuthProvider } from "./controllers/AuthContext.jsx";
 
 
@@ -24,11 +25,14 @@ function App() {
             <Banner />
             <CoursesCarousel />
             <SchoolsCarousel />
+      
           </>
         } />
         <Route path="/profile" element={<Profile />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
+        {/* Rutas para los cursos */}
         <Route path="/curso/:id" element={
           <>
             <CustomNavbar />
@@ -36,6 +40,16 @@ function App() {
 
           </>
         } />
+
+        {/* Rutas para las escuelas */}
+        <Route path="/escuelas/:id" element={
+          <>          
+           <CustomNavbar />
+          <SchoolDetail />
+        
+        </>
+        }/>
+
       </Routes>
       </AuthProvider>
       <AccessibilityWidget theme="light" />

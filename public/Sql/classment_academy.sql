@@ -19,7 +19,7 @@ CREATE TABLE `escuelas` (
   `escuela_direccion` TEXT NOT NULL,
   `escuela_correo` VARCHAR (100)  NOT NULL,
   `escuela_password`  VARCHAR (255) NOT NULL,
-  `escuela_imagen_url` VARCHAR(255) DEFAULT '/PUBLIC/Img/escuelas/nf.jpg',
+  `escuela_imagen_url` VARCHAR(255) DEFAULT '/Img/escuelas/nf.jpg',
   `escuela_fecha_creacion` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `escuela_estado` ENUM('activo', 'inactivo') DEFAULT 'activo'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -35,7 +35,7 @@ CREATE TABLE `usuarios` (
   `usuario_telefono` VARCHAR(20),
   `usuario_direccion` TEXT,
   `usuario_nacimiento` DATE NOT NULL,
-  `usuario_imagen_url` VARCHAR(255) DEFAULT '../../PUBLIC/Img/usuarios/nf.jpg',
+  `usuario_imagen_url` VARCHAR(255) DEFAULT '/Img/usuarios/nf.jpg',
   `usuario_fecha_creacion` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `usuario_ultima_actualizacion` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `usuario_estado` ENUM('activo', 'inactivo') DEFAULT 'activo',
@@ -64,7 +64,7 @@ CREATE TABLE `cursos` (
   `curso_cupos` INT NOT NULL,
   `curso_capacidad_maxima` INT NOT NULL,
   `curso_edad_minima` INT NOT NULL DEFAULT 0,
-  `curso_imagen_url` VARCHAR(255) DEFAULT '/PUBLIC/Img/cursos/nf.jpg',
+  `curso_imagen_url` VARCHAR(255) DEFAULT '/Img/cursos/nf.jpg',
   -- PENDIENTE POR AGREGAR LA GALERIA DEL CURSO`
   `curso_fecha_inicio` DATE NOT NULL,
   `curso_fecha_fin` DATE NOT NULL,
@@ -188,36 +188,36 @@ CREATE INDEX idx_mensaje_destinatario ON `mensajes` (`destinatario_documento`, `
 
 -- Datos de prueba para la tabla `escuelas`
 INSERT INTO `escuelas` (`escuela_nombre`, `escuela_nit`, `escuela_descripcion`, `escuela_telefono`, `escuela_direccion`, `escuela_correo`, `escuela_password`, `escuela_fecha_creacion`, `escuela_estado`, `escuela_imagen_url`) VALUES
-('GO FIT', '123456789-1', 'Entrenamiento y acondicionamiento fisico', '1234567890', 'Calle 123, Bogota D.C.', 'danielbernalg.04@gmail.com', '$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C', '2020-01-01 00:00:00', 'activo', '/PUBLIC/Img/escuelas/gofit.jpeg'),
-('Soy Fitness', '987654321-1', 'Yoga, Pilates y mas', '9876543210', 'Avenida 456, primera de mayo con boyaca', 'soyfitness@gmail.com', '$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C', '2020-01-01 00:00:00', 'activo', '/PUBLIC/Img/escuelas/soyfitness.jpg'),
-('Taekwondo', '555555555-1', 'Cursos de taekwondo para todos los niveles', '5555555555', 'Plaza Principal, Carrera 10 con circunvalar', 'taekwondo@gmail.com', '$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C', '2020-01-01 00:00:00', 'activo', '/PUBLIC/Img/escuelas/taekwondo.jpg'),
-('Administrativo', '1234567891', 'Administracion classment academy', '1234567891', 'sena complejo sur, Bogota D.C.', 'classmentacademy@gmail.com', '$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C', '2020-01-01 00:00:00', 'activo', '/PUBLIC/Img/escuelas/administrativo.jpg');
+('GO FIT', '123456789-1', 'Entrenamiento y acondicionamiento fisico', '1234567890', 'Calle 123, Bogota D.C.', 'danielbernalg.04@gmail.com', '$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C', '2020-01-01 00:00:00', 'activo', '/Img/escuelas/gofit.jpeg'),
+('Soy Fitness', '987654321-1', 'Yoga, Pilates y mas', '9876543210', 'Avenida 456, primera de mayo con boyaca', 'soyfitness@gmail.com', '$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C', '2020-01-01 00:00:00', 'activo', '/Img/escuelas/soyfitness.jpg'),
+('Taekwondo', '555555555-1', 'Cursos de taekwondo para todos los niveles', '5555555555', 'Plaza Principal, Carrera 10 con circunvalar', 'taekwondo@gmail.com', '$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C', '2020-01-01 00:00:00', 'activo', '/Img/escuelas/taekwondo.jpg'),
+('Administrativo', '1234567891', 'Administracion classment academy', '1234567891', 'sena complejo sur, Bogota D.C.', 'classmentacademy@gmail.com', '$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C', '2020-01-01 00:00:00', 'activo', '/Img/escuelas/administrativo.jpg');
 
 -- Datos de prueba para la tabla `usuarios`
 INSERT INTO `usuarios` (`usuario_documento`, `usuario_tipo_documento`, `usuario_nombre`, `usuario_apellido`, `usuario_correo`, `usuario_password`, `usuario_telefono`, `usuario_direccion`, `usuario_nacimiento`, `usuario_imagen_url`, `rol_id`, `escuela_id`) VALUES
-('1025531531', 'CC', 'Kevin', 'Parra', 'luisparra5380@gmail.com', '$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C', '3001234567', 'Calle 789, tabogo', '1990-05-15', '/PUBLIC/Img/usuarios/1726301436_20240901_122208.jpg', 5, 4),
-('1002002002', 'CC', 'Chris ', 'Bumstead', 'cbum@email.com', '$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C', '3001234560', 'Avenida 012, Ciudad C USA', '1985-10-20', '/PUBLIC/Img/usuarios/1726022704_coach_1.png', 5, 2),
-('1003003003', 'CC', 'Carlos', 'Rodríguez', 'carlos.rodriguez@email.com', '$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C', '3005555555', 'Carrera 345, Ciudad C', '1988-03-25', '/PUBLIC/Img/usuarios/nf.jpg', 3, 3),
-('1004004004', 'CC', 'Ana', 'Martínez', 'ana.martinez@email.com', '$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C', '3007777777', 'Diagonal 678, Ciudad A', '1992-12-10', '/PUBLIC/Img/usuarios/nf.jpg', 4, 1),
-('1004004005', 'CC', 'Marco', 'Gonzalez', 'marco@email.com', '$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C', '3087777777', 'Diagonal 788, Ciudadela colsubsidio', '1999-12-10', '/PUBLIC/Img/usuarios/nf.jpg', 2, 1),
-('1025531522', 'CC', 'Daniel', 'Gomez', 'danielbernalg.04@gmail.com', '$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C', '3001234565', 'Calle 189, tayogo', '1991-05-15', '/PUBLIC/Img/usuarios/nf.jpg', 5, 1);
+('1025531531', 'CC', 'Kevin', 'Parra', 'luisparra5380@gmail.com', '$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C', '3001234567', 'Calle 789, tabogo', '1990-05-15', '/Img/usuarios/1726301436_20240901_122208.jpg', 5, 4),
+('1002002002', 'CC', 'Chris ', 'Bumstead', 'cbum@email.com', '$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C', '3001234560', 'Avenida 012, Ciudad C USA', '1985-10-20', '/Img/usuarios/1726022704_coach_1.png', 5, 2),
+('1003003003', 'CC', 'Carlos', 'Rodríguez', 'carlos.rodriguez@email.com', '$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C', '3005555555', 'Carrera 345, Ciudad C', '1988-03-25', '/Img/usuarios/nf.jpg', 3, 3),
+('1004004004', 'CC', 'Ana', 'Martínez', 'ana.martinez@email.com', '$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C', '3007777777', 'Diagonal 678, Ciudad A', '1992-12-10', '/Img/usuarios/nf.jpg', 4, 1),
+('1004004005', 'CC', 'Marco', 'Gonzalez', 'marco@email.com', '$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C', '3087777777', 'Diagonal 788, Ciudadela colsubsidio', '1999-12-10', '/Img/usuarios/nf.jpg', 2, 1),
+('1025531522', 'CC', 'Daniel', 'Gomez', 'danielbernalg.04@gmail.com', '$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C', '3001234565', 'Calle 189, tayogo', '1991-05-15', '/Img/usuarios/nf.jpg', 5, 1);
 
 
 -- Datos de prueba para la tabla `cursos`
 
 -- Cursos para GO FIT
 INSERT INTO `cursos` (`curso_nombre`, `curso_descripcion`, `curso_precio`, `curso_cupos`, `curso_capacidad_maxima`, `curso_edad_minima`, `curso_imagen_url`, `curso_fecha_inicio`, `curso_fecha_fin`, `escuela_id`, `curso_direccion`) VALUES
-('Entrenamiento personal', 'Asesorias de entrenamiento personal para lograr tus obejetivos', 500000, 15, 20, 16, '/PUBLIC/Img/cursos/entrenamiento.jpg', '2024-08-01', '2024-12-15', 1, 'GO FIT, Carrera 45b,diagonal 60 Sur'),
-('Entrenamiento Funcional', 'Clases de entrenamiento funcional para mejorar tu rendimiento físico', 600000, 20, 25, 16, '/PUBLIC/Img/cursos/entrenamiento-funcional.jpg', '2024-08-01', '2024-12-15', 1, 'GO FIT, Carrera 45b, diagonal 60 Sur'),
-('Defensa Personal', 'Programa de defensa personal para mejorar tu resistencia', 500000, 15, 20, 14, '/PUBLIC/Img/cursos/defensa_personal.jpg', '2024-09-01', '2025-01-15', 1, 'GO FIT, Carrera 45b, diagonal 60 Sur'),
+('Entrenamiento personal', 'Asesorias de entrenamiento personal para lograr tus obejetivos', 500000, 15, 20, 16, '/Img/cursos/entrenamiento.jpg', '2024-08-01', '2024-12-15', 1, 'GO FIT, Carrera 45b,diagonal 60 Sur'),
+('Entrenamiento Funcional', 'Clases de entrenamiento funcional para mejorar tu rendimiento físico', 600000, 20, 25, 16, '/Img/cursos/entrenamiento-funcional.jpg', '2024-08-01', '2024-12-15', 1, 'GO FIT, Carrera 45b, diagonal 60 Sur'),
+('Defensa Personal', 'Programa de defensa personal para mejorar tu resistencia', 500000, 15, 20, 14, '/Img/cursos/defensa_personal.jpg', '2024-09-01', '2025-01-15', 1, 'GO FIT, Carrera 45b, diagonal 60 Sur'),
 
 -- Cursos para Soy Fitness
-('Entrenamiento de Fuerza', 'Clases de entrenamiento de fuerza para tonificar el cuerpo', 650000, 15, 20, 18, '/PUBLIC/Img/cursos/entrenamiento_fuerza.jpeg', '2024-08-15', '2024-12-15', 2, 'Soy Fitness, Calle 45, Ciudad B'),
-('Zumba', 'Clases de Zumba para quemar calorías y divertirse', 400000, 20, 25, 16, '/PUBLIC/Img/cursos/zumba.jpg', '2024-09-01', '2025-02-28', 2, 'Soy Fitness, Calle 45, Ciudad B'),
+('Entrenamiento de Fuerza', 'Clases de entrenamiento de fuerza para tonificar el cuerpo', 650000, 15, 20, 18, '/Img/cursos/entrenamiento_fuerza.jpeg', '2024-08-15', '2024-12-15', 2, 'Soy Fitness, Calle 45, Ciudad B'),
+('Zumba', 'Clases de Zumba para quemar calorías y divertirse', 400000, 20, 25, 16, '/Img/cursos/zumba.jpg', '2024-09-01', '2025-02-28', 2, 'Soy Fitness, Calle 45, Ciudad B'),
 
 -- Cursos para Taekwondo
-('Taekwondo Básico', 'Curso de taekwondo para principiantes', 500000, 20, 25, 8, '/PUBLIC/Img/cursos/taekwondo_ninos.jpg', '2024-07-15', '2024-12-20', 3, 'Aula 203, Taekwondo'),
-('Taekwondo Avanzado', 'Curso avanzado de taekwondo para competidores', 700000, 15, 20, 10, '/PUBLIC/Img/cursos/2.jpg', '2024-08-01', '2025-01-15', 3, 'Aula 203, Taekwondo');
+('Taekwondo Básico', 'Curso de taekwondo para principiantes', 500000, 20, 25, 8, '/Img/cursos/taekwondo_ninos.jpg', '2024-07-15', '2024-12-20', 3, 'Aula 203, Taekwondo'),
+('Taekwondo Avanzado', 'Curso avanzado de taekwondo para competidores', 700000, 15, 20, 10, '/Img/cursos/2.jpg', '2024-08-01', '2025-01-15', 3, 'Aula 203, Taekwondo');
 
 -- Datos de prueba para la tabla `horarios`
 INSERT INTO `horarios` (`curso_id`, `horario_dia_semana`, `horario_hora_inicio`, `horario_hora_fin`) VALUES

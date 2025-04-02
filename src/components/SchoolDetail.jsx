@@ -13,7 +13,8 @@ import {
   faClock,
   faLocationDot,
   faChalkboardUser,
-  faUser
+  faUser,
+  faEnvelope
 } from '@fortawesome/free-solid-svg-icons';
 import CourseModel from '../models/CourseModel';
 
@@ -47,9 +48,9 @@ const SchoolDetail = () => {
     useEffect(() => {
         const fetchSchoolDetails = async () => {
             try {
-                const response = await fetch('http://localhost:3000/api/escuelas/${id}');
+                const response = await fetch(`http://localhost:3000/api/escuelas/${id}`);
                 const SchoolData = await response.json();
-                SetSchool(SchoolData);
+                setSchool(SchoolData);
             } catch(error){
                 setError('Error al cargar los detalles de la escuela. Por favor, intente más tarde.');
             } finally {
@@ -75,7 +76,7 @@ if(!school){
 return (
 
     <div className='"min-h-screen bg-light-background dark:bg-dark-background'>
-        <SchoolHeader School={school}/>
+        <SchoolHeader school={school}/>
 
         <main className='"container mx-auto px-4 max-w-6xl -mt-16 relative z-10'>
             <div className='bg-white dark:bg-dark-card rounded-3xl shadow-2xl shadow-light-shadow dark:shadow-dark-shadow overflow-hidden'>
@@ -100,7 +101,7 @@ return (
                                     </p>
                                     <button className='btn bg-light-success dark:bg-dark-success text-white hover:bg-opacity-90 rounded-full px-6 py-2'>
                                         <FontAwesomeIcon icon = {faUser} className='mr-2'/>
-                                        Incribirme
+                                        Inscribirme
                                     </button>
                                 </div>
                             </div>
@@ -118,13 +119,21 @@ return (
                             </p>
                         </section>
 
+                        {/*Escuela Correo*/}
 
+                        <section className='text-2xl font-semibold text-light-primary dark:text-dark-primary mb-4'>
+                                <h3 className='text-2xl font-semibold text-light-primary dark:text-dark-primary mb-4'>
+                                <FontAwesomeIcon icon = {faEnvelope} className='mr-3 text-light-warning dark:text-dark-warning'/>
+                                Correo de contacto
+                                </h3>
+                                <p className='text-light-text dark:text-dark-secondary'>
+                                    {school.escuela.correo || 'Correo no disponible por el momento'}
+                                </p>
+                        </section>
                 </div>
             </div>
         </main>
     </div>
-);
-
+    );
 };
-
 export default SchoolDetail;

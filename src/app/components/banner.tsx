@@ -8,7 +8,7 @@ import Image from "next/image"
 export function Banner() {
   return (
     <div className="relative bg-transparent min-h-screen flex items-center overflow-hidden" id="home">
-      {/* Decorative Elements */}
+
       <div className="absolute top-60 right-5 w-32 h-32">
         <FontAwesomeIcon icon={faDumbbell} className="text-primary text-6xl" />
       </div>
@@ -16,7 +16,7 @@ export function Banner() {
         <FontAwesomeIcon icon={faVolleyball} className="text-primary text-6xl" />
       </div>
 
-      {/* Background Pattern */}
+
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -68,7 +68,7 @@ export function Banner() {
             <div className="relative w-full max-w-xl mx-auto">
               <div className="w-full h-[500px] relative">
                 <Image
-                  src="/placeholder.svg?height=600&width=500"
+                  src="/public/Img/design/basquetbolista.png"
                   alt="Basquetbolista"
                   fill
                   className="object-contain transition-all duration-500 hover:scale-105

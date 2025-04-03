@@ -3,10 +3,7 @@ const mysql = require("mysql");
 const cors = require("cors");
 
 const app = express();
-const PORT = process.env.PORT || Math.floor(Math.random() * 1000) + 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
+const PORT = 3000;
 
 app.use(cors());
 app.use(express.json());
@@ -91,3 +88,6 @@ app.get("/api/escuelas", (req, res) => {
     });
 });
 
+app.listen(PORT, () => {
+    console.log(`Servidor corriendo en el puerto ${PORT}`);
+});

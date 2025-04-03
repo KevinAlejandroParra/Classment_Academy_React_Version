@@ -17,5 +17,8 @@
     ],
     "author": "Kevin Alejandro Parra Cifuentes",
     "license": "ISC",
-    "description": ""
+    "description": "",
+    "dependencies": {
+        "bcrypt": "^5.1.1"
+    }
 }

@@ -28,6 +28,11 @@ module.exports = {
                 type: Sequelize.STRING,
                 allowNull: false,
             },
+            
+            user_password: {
+                type: Sequelize.STRING,
+                allowNull: false,
+            },
             user_phone: {
                 type: Sequelize.DECIMAL,
                 allowNull: false,
@@ -46,6 +51,11 @@ module.exports = {
             },
             role_id: {
                 type: Sequelize.INTEGER,
+                allowNull: false,
+            },
+            user_state: {
+                type: Sequelize.ENUM("activo", "inactivo"),
+                defaultValue: "activo",
                 allowNull: false,
             },
             createdAt: {

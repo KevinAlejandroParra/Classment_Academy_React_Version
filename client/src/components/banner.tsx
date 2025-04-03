@@ -109,7 +109,7 @@ export function Banner() {
             <div className="relative w-full max-w-md mx-auto">
               <div className="w-full h-[300px] sm:h-[400px] md:h-[500px] relative">
                 <Image
-                  src="/Img/design/basquetbolista.png"
+                  src="/Images/resources/basquetbolista.png"
                   alt="Basquetbolista"
                   fill
                   className="object-contain transition-all duration-500 hover:scale-105

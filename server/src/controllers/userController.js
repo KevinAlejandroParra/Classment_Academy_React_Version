@@ -21,7 +21,7 @@ class UserController {
         } catch (error) {
             res.status(500).json({
                 success: false,
-                data: error,
+                data: error.message,
                 message: "Error al obtener los usuarios",
             });
         }
@@ -32,7 +32,12 @@ class UserController {
             const userId = req.params.id;
             const user = await User.findByPk(userId);
 
-            if (!user) throw new Error("Usuario no encontrado.");
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Usuario no encontrado",
+                });
+            }
 
             res.status(200).json({
                 success: true,
@@ -42,7 +47,7 @@ class UserController {
         } catch (error) {
             res.status(500).json({
                 success: false,
-                data: error,
+                data: error.message,
                 message: "Error al obtener el usuario",
             });
         }
@@ -51,18 +56,40 @@ class UserController {
     static async createUser(req, res) {
         try {
             const { user: userJSON } = req.body;
+            
+            // Validación adicional para la contraseña
+            if (userJSON.user_password && userJSON.user_password.length < 8) {
+                return res.status(400).json({
+                    success: false,
+                    message: "La contraseña debe tener al menos 8 caracteres",
+                });
+            }
 
             const user = await User.create(userJSON);
 
-            res.status(200).json({
+            // Eliminar la contraseña de la respuesta
+            const userResponse = user.toJSON();
+            delete userResponse.user_password;
+
+            res.status(201).json({
                 success: true,
-                data: user,
+                data: userResponse,
                 message: "Usuario creado correctamente",
             });
         } catch (error) {
+            // Manejo específico para errores de validación de Sequelize
+            if (error.name === 'SequelizeValidationError') {
+                const validationErrors = error.errors.map(err => err.message);
+                return res.status(400).json({
+                    success: false,
+                    data: validationErrors,
+                    message: "Error de validación",
+                });
+            }
+
             res.status(500).json({
                 success: false,
-                data: error,
+                data: error.message,
                 message: "Error al crear el usuario",
             });
         }
@@ -75,22 +102,77 @@ class UserController {
 
             const user = await User.findByPk(userId);
 
-            if (!user) throw new Error("Usuario no encontrado.");
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Usuario no encontrado",
+                });
+            }
+
+            // Validación adicional para la contraseña
+            if (userJSON.user_password && userJSON.user_password.length < 8) {
+                return res.status(400).json({
+                    success: false,
+                    message: "La contraseña debe tener al menos 8 caracteres",
+                });
+            }
 
             await user.update(userJSON);
 
+            // Eliminar la contraseña de la respuesta
+            const userResponse = user.toJSON();
+            delete userResponse.user_password;
+
             res.status(200).json({
                 success: true,
-                data: user,
+                data: userResponse,
                 message: "Usuario actualizado correctamente",
             });
         } catch (error) {
+            // Manejo específico para errores de validación de Sequelize
+            if (error.name === 'SequelizeValidationError') {
+                const validationErrors = error.errors.map(err => err.message);
+                return res.status(400).json({
+                    success: false,
+                    data: validationErrors,
+                    message: "Error de validación",
+                });
+            }
+
             res.status(500).json({
                 success: false,
-                data: error,
+                data: error.message,
                 message: "Error al actualizar el usuario",
             });
         }
     }
+
+    static async deleteUser(req, res) {
+        try {
+            const userId = req.params.id;
+            const user = await User.findByPk(userId);
+
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Usuario no encontrado",
+                });
+            }
+
+            await user.destroy();
+
+            res.status(200).json({
+                success: true,
+                message: "Usuario eliminado correctamente",
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                data: error.message,
+                message: "Error al eliminar el usuario",
+            });
+        }
+    }
 }
+
 module.exports = UserController;

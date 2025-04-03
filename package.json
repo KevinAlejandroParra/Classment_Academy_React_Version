@@ -1,49 +1,21 @@
 {
-  "name": "classment-academy-react-version",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@emotion/react": "^11.13.5",
-    "@emotion/styled": "^11.13.5",
-    "@fortawesome/fontawesome-svg-core": "^6.7.1",
-    "@fortawesome/free-solid-svg-icons": "^6.7.1",
-    "@fortawesome/react-fontawesome": "^0.2.2",
-    "@mui/styled-engine-sc": "^6.1.9",
-    "@nextui-org/card": "^2.0.34",
-    "@nextui-org/navbar": "^2.0.37",
-    "@nextui-org/react": "^2.6.8",
-    "@nextui-org/system": "^2.2.6",
-    "@nextui-org/theme": "^2.2.11",
-    "@radix-ui/react-alert-dialog": "^1.1.2",
-    "@radix-ui/react-select": "^2.1.2",
-    "axios": "^1.7.9",
-    "framer-motion": "^11.13.5",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.2",
-    "sena-accessibility": "^1.1.0",
-    "styled-components": "^6.1.13",
-    "swiper": "^11.1.15"
-  },
-  "devDependencies": {
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.1",
-    "autoprefixer": "^10.4.20",
-    "daisyui": "^4.12.14",
-    "eslint": "^8.57.0",
-    "eslint-plugin-react": "^7.34.3",
-    "eslint-plugin-react-hooks": "^4.6.2",
-    "eslint-plugin-react-refresh": "^0.4.7",
-    "postcss": "^8.4.47",
-    "tailwindcss": "^3.4.14",
-    "vite": "^5.3.4"
-  }
+    "name": "classment-academy",
+    "version": "1.0.0",
+    "scripts": {
+        "server": "npm run server --prefix server",
+        "client": "npm run dev --prefix client",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "download": "npm install --prefix server && npm install --prefix client",
+        "db:migrate": "npm run db:migrate --prefix server",
+        "db:migrate:undo": "npm run db:migrate:undo --prefix server",
+        "db:seed": "npm run db:seed --prefix server",
+        "db:seed:undo": "npm run db:seed:undo --prefix server"
+    },
+    "keywords": [
+        "schools",
+        "courses"
+    ],
+    "author": "Kevin Alejandro Parra Cifuentes",
+    "license": "ISC",
+    "description": ""
 }

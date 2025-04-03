@@ -1,0 +1,73 @@
+{
+    "users": [
+        {
+            "user_id": "550e8400-e29b-41d4-a716-446655440000",
+            "user_name": "Kevin Alejandro",
+            "user_lastname": "Parra Cifuentes",
+            "user_document_type": "CC",
+            "user_document": 1234567890,
+            "user_email": "luisparra5380@gmail.com",
+            "user_phone": 3209202177,
+            "user_image": "https://avatars.githubusercontent.com/u/165957584?v=4",
+            "user_birth": "2006-10-13",
+            "user_role": 2,
+            "role_id": 1,
+            "createdAt": "2025-04-03T12:00:00Z",
+            "updatedAt": "2025-04-03T12:00:00Z"
+        }
+    ],
+    "roles": [
+        {
+            "role_id": 1,
+            "role_name": "estudiante"
+        },
+        {
+            "role_id": 2,
+            "role_name": "profesor"
+        },
+        {
+            "role_id": 3,
+            "role_name": "administrador"
+        }
+    ],
+    "schools": [
+        {
+            "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            "teacher_id": "550e8400-e29b-41d4-a716-446655440000",
+            "school_name": "Smart Language Academy",
+            "school_description": "Academia especializada en la enseñanza de idiomas con un enfoque práctico e innovador.",
+            "school_phone": 3209876543,
+            "school_address": "Avenida Principal #12-34, Ciudad Ejemplo",
+            "school_image": "https://m.smart.edu.co/wp-content/uploads/2021/11/Smart-Logo-redes.jpg",
+            "school_email": "contacto@smartacademy.com",
+            "createdAt": "2025-04-03T12:00:00Z",
+            "updatedAt": "2025-04-03T12:00:00Z"
+        }
+    ],
+    "courses": [
+        {
+            "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+            "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            "course_name": "Inglés A1 a C1",
+            "course_description": "Curso de inglés para principiantes e intermedios con enfoque en conversación y gramática.",
+            "course_price": 150.0,
+            "course_places": 25,
+            "course_age": 15,
+            "course_image": "https://example.com/images/english-course.jpg",
+            "createdAt": "2025-04-03T12:00:00Z",
+            "updatedAt": "2025-04-03T12:00:00Z"
+        },
+        {
+            "course_id": "a123b456-c789-012d-345e-678f901g234h",
+            "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            "course_name": "Español A1 a C1",
+            "course_description": "Curso de español diseñado para extranjeros que desean mejorar su comunicación y comprensión del idioma.",
+            "course_price": 130.0,
+            "course_places": 20,
+            "course_age": 16,
+            "course_image": "https://example.com/images/spanish-course.jpg",
+            "createdAt": "2025-04-03T12:00:00Z",
+            "updatedAt": "2025-04-03T12:00:00Z"
+        }
+    ]
+}

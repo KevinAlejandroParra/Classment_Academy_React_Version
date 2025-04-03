@@ -1,0 +1,21 @@
+{
+    "name": "classment-academy",
+    "version": "1.0.0",
+    "scripts": {
+        "server": "npm run server --prefix server",
+        "client": "npm run dev --prefix client",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "download": "npm install --prefix server && npm install --prefix client",
+        "db:migrate": "npm run db:migrate --prefix server",
+        "db:migrate:undo": "npm run db:migrate:undo --prefix server",
+        "db:seed": "npm run db:seed --prefix server",
+        "db:seed:undo": "npm run db:seed:undo --prefix server"
+    },
+    "keywords": [
+        "schools",
+        "courses"
+    ],
+    "author": "Kevin Alejandro Parra Cifuentes",
+    "license": "ISC",
+    "description": ""
+}

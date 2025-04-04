@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
             return await bcrypt.compare(candidatePassword, this.user_password);
         }
     }
+    // Definimos el modelo
     User.init(
         {
             user_id: {
@@ -21,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
                 validate: {
                     isAlpha: {
-                        msg: "El nombre solo debe contener letras"
+                       // msg: "El nombre solo debe contener letras"
                     },
                     notEmpty: {
                         msg: "El nombre es requerido"

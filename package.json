@@ -9,7 +9,8 @@
         "db:migrate": "npm run db:migrate --prefix server",
         "db:migrate:undo": "npm run db:migrate:undo --prefix server",
         "db:seed": "npm run db:seed --prefix server",
-        "db:seed:undo": "npm run db:seed:undo --prefix server"
+        "db:seed:undo": "npm run db:seed:undo --prefix server",
+        "db:reset": "npm run db:reset --prefix server"
     },
     "keywords": [
         "schools",
@@ -17,8 +18,5 @@
     ],
     "author": "Kevin Alejandro Parra Cifuentes",
     "license": "ISC",
-    "description": "",
-    "dependencies": {
-        "bcrypt": "^5.1.1"
-    }
+    "description": ""
 }

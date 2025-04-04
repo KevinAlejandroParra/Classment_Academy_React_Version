@@ -7,17 +7,83 @@
             "user_document_type": "CC",
             "user_document": 1234567890,
             "user_email": "luisparra5380@gmail.com",
-            "user_password": "$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C",
+            "user_password": "$2a$10$zFS0MvbkAHNF1RMUjxHoJenSERwRPRcRwJxVaOwgAbdLb6QqFErB2",
             "user_phone": 3209202177,
             "user_image": "https://avatars.githubusercontent.com/u/165957584?v=4",
             "user_birth": "2006-10-13",
             "user_state": "activo",
-            "user_role": 2,
             "role_id": 1,
             "createdAt": "2025-04-03T12:00:00Z",
             "updatedAt": "2025-04-03T12:00:00Z"
-        }
-    ],
+        },
+      
+            {
+                "user_id": "550e8400-e29b-41d4-a716-446655440001",
+                "user_name": "Carlos",
+                "user_lastname": "Rodríguez",
+                "user_document_type": "CC",
+                "user_document": 1003003003,
+                "user_email": "carlos.rodriguez@email.com",
+                "user_password": "$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C",
+                "user_phone": 3005555555,
+                "user_image": "https://randomuser.me/api/portraits/men/1.jpg",
+                "user_birth": "1988-03-25",
+                "user_state": "activo",
+                "role_id": 3,
+                "createdAt": "2025-04-03T12:00:00Z",
+                "updatedAt": "2025-04-03T12:00:00Z"
+            },
+            {
+                "user_id": "550e8400-e29b-41d4-a716-446655440002",
+                "user_name": "Ana",
+                "user_lastname": "Martínez",
+                "user_document_type": "CC",
+                "user_document": 1004004004,
+                "user_email": "ana.martinez@email.com",
+                "user_password": "$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C",
+                "user_phone": 3007777777,
+                "user_image": "https://randomuser.me/api/portraits/women/2.jpg",
+                "user_birth": "1992-12-10",
+                "user_state": "activo",
+                "role_id": 4,
+                "createdAt": "2025-04-03T12:00:00Z",
+                "updatedAt": "2025-04-03T12:00:00Z"
+            },
+            {
+                "user_id": "550e8400-e29b-41d4-a716-446655440003",
+                "user_name": "Marco",
+                "user_lastname": "Gonzalez",
+                "user_document_type": "CC",
+                "user_document": 1004004005,
+                "user_email": "marco@email.com",
+                "user_password": "$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C",
+                "user_phone": 3087777777,
+                "user_image": "https://randomuser.me/api/portraits/men/3.jpg",
+                "user_birth": "1999-12-10",
+                "user_state": "activo",
+                "role_id": 2,
+                "createdAt": "2025-04-03T12:00:00Z",
+                "updatedAt": "2025-04-03T12:00:00Z"
+            },
+            {
+                "user_id": "550e8400-e29b-41d4-a716-446655440004",
+                "user_name": "Daniel",
+                "user_lastname": "Gomez",
+                "user_document_type": "CC",
+                "user_document": 1025531522,
+                "user_email": "danielbernalg.04@gmail.com",
+                "user_password": "$2y$10$GqH1TO3tF.2wu5qBzMR/0Oq2vZI4WqI34.3PIT.oxiSf.4OH3kL9C",
+                "user_phone": 3001234565,
+                "user_image": "https://randomuser.me/api/portraits/men/4.jpg",
+                "user_birth": "1991-05-15",
+                "user_state": "activo",
+                "role_id": 3,
+                "createdAt": "2025-04-03T12:00:00Z",
+                "updatedAt": "2025-04-03T12:00:00Z"
+            }
+        ],
+
+
     "roles": [
         {
             "role_id": 1,
@@ -30,7 +96,16 @@
         {
             "role_id": 3,
             "role_name": "administrador"
+        },
+        {
+            "role_id": 4,
+            "role_name": "coordinador"
+        },
+        {
+            "role_id": 5,
+            "role_name": "invitado"
         }
+
     ],
     "schools": [
         {

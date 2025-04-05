@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, ChangeEvent, FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -46,7 +46,7 @@ const Profile = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [editForm, setEditForm] = useState<Partial<UserInfo>>({});
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const fetchUserProfile = async () => {
     try {
@@ -123,7 +123,7 @@ const Profile = () => {
 
       localStorage.removeItem("token");
       setMessage({ type: "success", content: "Perfil eliminado con éxito" });
-      navigate("/login");
+      router.push("/login");
     } catch (error: any) {
       setMessage({ type: "error", content: `Error al eliminar el perfil: ${error.message}` });
     }
@@ -139,7 +139,7 @@ const Profile = () => {
       });
 
       localStorage.removeItem("token");
-      navigate("/login");
+      router.push("/login");
     } catch (error: any) {
       setMessage({ type: "error", content: `Error al cerrar sesión: ${error.message}` });
     }

@@ -1,12 +1,12 @@
 type Props = {
     isOpen: boolean;
-    onclose: ()=> void;
+    onClose: ()=> void;
     editForm: any;
     HandleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
     handleEdit: (e: React.FormEvent) => void;
 };
 
-const EditProfileModal = ({ isOpen, onclose, editForm, HandleInputChange, handleEdit }: Props) => {
+const EditProfileModal = ({ isOpen, onClose, editForm, HandleInputChange, handleEdit }: Props) => {
     if (!isOpen) return null;
     return(
 
@@ -20,7 +20,7 @@ const EditProfileModal = ({ isOpen, onclose, editForm, HandleInputChange, handle
                 <input type="text" name="user_phone" value={editForm.user_phone} onChange={HandleInputChange} placeholder="Telefono" />
 
                 <div className="flex justify-end mt-4">
-                    <button type="button" onClick={onclose} className="mr-2 bg-gray-500 text-white px-4 py-2 rounded">cancelar</button>
+                    <button type="button" onClick={onClose} className="mr-2 bg-gray-500 text-white px-4 py-2 rounded">cancelar</button>
                     <button type="submit"className="bg-blue-500 text-white px-4 py-2 rounded">Guardar Cambios</button>
                 </div>
             </form>

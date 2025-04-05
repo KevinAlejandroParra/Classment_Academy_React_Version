@@ -15,6 +15,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import EditProfileModal from "@/components/edit-profile";
 import ProfileItem from "@/components/profile-item";
+import DeleteProfileModal from "@/components/delete-profile";
 
 type UserInfo = {
   usuario_nombre: string;

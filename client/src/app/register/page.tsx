@@ -3,7 +3,7 @@ import React, { useState, ChangeEvent, FormEvent } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import  Link from "next/link" ;
 import { JSX } from "react";
-
+import { faHome } from '@fortawesome/free-solid-svg-icons';
 import {
   faUser,
   faIdCard,
@@ -12,7 +12,6 @@ import {
   faPhone,
   faMapMarkerAlt,
   faCalendar,
-  faHome,
 } from "@fortawesome/free-solid-svg-icons";
 
 interface FormData {

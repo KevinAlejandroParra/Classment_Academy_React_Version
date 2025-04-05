@@ -106,10 +106,6 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
                 defaultValue: 'activo'
             },
-            user_role: {
-                type: DataTypes.INTEGER,
-                allowNull: false,
-            },
             role_id: {
                 type: DataTypes.INTEGER,
                 allowNull: false,

@@ -85,7 +85,7 @@ export function Banner() {
               className="flex flex-wrap gap-4 pt-4 justify-center lg:justify-start"
             >
               <Link
-                href="/start"
+                href="/register"
                 className="inline-flex items-center justify-center rounded-full bg-[rgb(var(--primary-rgb))] text-black font-bold py-3 px-8 min-w-[160px] h-12 text-base transition-transform hover:scale-105 hover:shadow-lg"
               >
                 ¡Empieza ahora!

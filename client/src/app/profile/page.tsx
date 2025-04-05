@@ -13,7 +13,8 @@ import {
   faClock,
   faToggleOn,
 } from "@fortawesome/free-solid-svg-icons";
-
+import EditProfileModal from "@/components/edit-profile";
+import ProfileItem from "@/components/profile-item";
 
 type UserInfo = {
   usuario_nombre: string;

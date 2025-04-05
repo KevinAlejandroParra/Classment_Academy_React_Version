@@ -16,6 +16,7 @@ import {
 import EditProfileModal from "@/components/edit-profile";
 import ProfileItem from "@/components/profile-item";
 import DeleteProfileModal from "@/components/delete-profile";
+import LogoutModal from "@/components/logout-modal";    
 
 type UserInfo = {
   usuario_nombre: string;

@@ -127,8 +127,6 @@ class UserController {
                         message: "La contraseña debe tener al menos 8 caracteres",
                     });
                 }
-
-
             }
 
             await user.update(userJSON);
@@ -259,5 +257,44 @@ class UserController {
             });
         }
     }
+
+    static async validateToken(req, res) {
+        try {
+            console.log("Validando token...");
+            
+            // Verificar si el usuario existe en la base de datos
+            const user = await User.findOne({
+                where: {
+                    user_email: req.user.email
+                }
+            });
+            
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Usuario no encontrado"
+                });
+            }
+            
+            // Si el usuario existe, devolver información válida
+            return res.status(200).json({
+                success: true,
+                valid: true,
+                user: {
+                    id: user.id,
+                    email: user.user_email,
+                    role: user.user_rol
+                }
+            });
+        } catch (error) {
+            console.error("Error al validar token:", error);
+            return res.status(500).json({
+                success: false,
+                message: "Error al validar el token",
+                error: error.message
+            });
+        }
+    }
 }
+
 module.exports = UserController;

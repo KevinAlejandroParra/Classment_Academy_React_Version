@@ -1,24 +1,19 @@
 const { Router } = require("express");
 const UserController = require("../controllers/userController.js");
+const { verifyToken } = require("../middleware/auth.js"); 
 
 const userRoutes = Router();
 
-//obtener todos los usuarios
+// CRUD
 userRoutes.get("/users", UserController.getUsers);
-
-//filtrar por id
 userRoutes.get("/users/:id", UserController.getUser);
-
-//register
 userRoutes.post("/users", UserController.createUser);
-
-//update and delete
 userRoutes.put("/users/:id", UserController.updateUser);
 userRoutes.delete("/users/:id", UserController.deleteUser);
 
-//login
+// Login    
 userRoutes.post("/login", UserController.login);
 
-
-
+// Ruta para validar token
+userRoutes.get("/auth/me", verifyToken, UserController.validateToken);
 module.exports = userRoutes;

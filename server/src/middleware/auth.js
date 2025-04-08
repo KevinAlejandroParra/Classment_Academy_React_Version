@@ -1,32 +1,27 @@
 const jwt = require('jsonwebtoken');
 
-// Middleware para verificar JWT
 const verifyToken = (req, res, next) => {
-    // Obtenemos el token del header de autorización
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+  // Obtener el token del header de autorización
+  const authHeader = req.headers.authorization;
+  
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Token no proporcionado' });
+  }
+  
+  const token = authHeader.split(' ')[1];
+  
+  try {
+    // Verificar el token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
-    if (!token) {
-        return res.status(401).json({
-            success: false,
-            message: "Token no proporcionado"
-        });
-    }
+    // Añadir la información del usuario decodificada a la solicitud
+    req.user = decoded;
     
-    try {
-        // Verificamos el token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
-        // Agregamos la información del usuario al request
-        req.user = decoded;
-        
-        next();
-    } catch (error) {
-        return res.status(403).json({
-            success: false,
-            message: "Token inválido o expirado"
-        });
-    }
+    // Continuar con la siguiente función en la cadena
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: 'Token inválido o expirado' });
+  }
 };
 
 // Middleware para verificar roles

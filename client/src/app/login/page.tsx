@@ -3,11 +3,13 @@ import React, { useState, FormEvent } from "react";
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome } from '@fortawesome/free-solid-svg-icons';
+import { useRouter } from "next/navigation";
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
 
     const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -41,12 +43,36 @@ const Login: React.FC = () => {
             console.log('Respuesta de la API:', result);
 
             const accessToken = result?.access_token;
-            if (accessToken) {
+            const role = result?.user?.role;
+
+            if (accessToken && role) {
                 localStorage.setItem('token', accessToken);
+                localStorage.setItem('role', role);
                 console.log('Token recibido:', accessToken);
-                ('/');
+                console.log('Rol recibido:', role);
+
+                //diferentes paginas segun el rol
+                switch (role){
+
+                    //adiministrador (developers)
+                    case "administrador":
+                        router.push("/administrador");
+                        break;
+                    //estudiante
+                    case "estudiante":
+                        router.push("/estudiante");
+                        break;
+                    //Administrador de la academia
+                    case "coordinador":
+                        router.push("/coordinador");
+                        break;
+                    //vista por defecto
+                    default:
+                        router.push("/login");
+                        break;
+                }
             } else {
-                throw new Error('No se recibió el token de acceso');
+                throw new Error('No se recibió el token de acceso o el Rol del usuario');
             }
         } catch (error: unknown) {
             const err = error as Error;

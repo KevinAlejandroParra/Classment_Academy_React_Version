@@ -1,162 +1,325 @@
-'use client';
-import React, { useState, FormEvent } from "react";
-import Link from 'next/link';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome } from '@fortawesome/free-solid-svg-icons';
-import { useRouter } from "next/navigation";
+"use client"
+import { useState, type FormEvent } from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import Image from "next/image"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { Particles } from "@/components/particles"
+import {
+  faHome,
+  faUser,
+  faEnvelope,
+  faSignIn, 
+  faLock,
+} from "@fortawesome/free-solid-svg-icons"
+import { motion } from "framer-motion"
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2
+    }
+  }
+}
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+      damping: 10
+    }
+  }
+}
+
+const buttonHover = {
+  scale: 1.02,
+  transition: { type: "spring", stiffness: 400, damping: 10 }
+}
+
+const buttonTap = {
+  scale: 0.98
+}
 
 const Login: React.FC = () => {
-    const [email, setEmail] = useState<string>('');
-    const [password, setPassword] = useState<string>('');
-    const [error, setError] = useState<string | null>(null);
-    const router = useRouter();
+  const router = useRouter()
+  const [email, setEmail] = useState<string>("")
+  const [password, setPassword] = useState<string>("")
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
-    const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setError(null)
 
-        if (!email || !password) {
-            setError('Por favor, complete todos los espacios');
-            return;
+    if (!email || !password) {
+      setError("Por favor, complete todos los campos")
+      setIsLoading(false)
+      return
+    }
+
+    const data = {
+        user: {
+          user_email: email,
+          user_password: password,
         }
+      };
 
-        const data = {
-            user_email: email,
-            user_password: password,
-        };
+    try {
+      const response = await fetch("http://localhost:3000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(data),
+        credentials: "include",
+      })
 
-        try {
-            const response = await fetch('http://localhost:3000/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(data),
-            });
+      const contentType = response.headers.get("content-type")
+      if (!contentType || !contentType.includes("application/json")) {
+        const textResponse = await response.text()
+        console.error("Received non-JSON response:", textResponse)
+        throw new Error("La respuesta del servidor no es válida. Por favor, contacte al administrador.")
+      }
 
-            if (!response.ok) {
-                const result = await response.json();
-                throw new Error(result.message || 'Error al validar usuario');
-            }
+      const result = await response.json()
 
-            const result = await response.json();
-            console.log('Respuesta de la API:', result);
+      if (!response.ok) {
+        throw new Error(result.message || "Error al validar usuario")
+      }
 
-            const accessToken = result?.access_token;
-            const role = result?.user?.role;
+      console.log("Respuesta de la API:", result)
 
-            if (accessToken && role) {
-                localStorage.setItem('token', accessToken);
-                localStorage.setItem('role', role);
-                console.log('Token recibido:', accessToken);
-                console.log('Rol recibido:', role);
+      const accessToken = result?.data?.token
+      if (accessToken) {
+        localStorage.setItem("token", accessToken)
+        console.log("Token recibido:", accessToken)
+        router.push("/")
+      } else {
+        throw new Error("No se recibió el token de acceso")
+      }
+    } catch (error: unknown) {
+      const err = error as Error
+      console.error("Error en login:", err)
+      setError(err.message)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
-                //diferentes paginas segun el rol
-                switch (role){
+  return (
+    
+    <motion.div 
+      initial="hidden"
+      animate="visible"
+      className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-black"
+    >
 
-                    //adiministrador (developers)
-                    case "administrador":
-                        router.push("/administrador");
-                        break;
-                    //estudiante
-                    case "estudiante":
-                        router.push("/estudiante");
-                        break;
-                    //Administrador de la academia
-                    case "coordinador":
-                        router.push("/coordinador");
-                        break;
-                    //vista por defecto
-                    default:
-                        router.push("/login");
-                        break;
-                }
-            } else {
-                throw new Error('No se recibió el token de acceso o el Rol del usuario');
-            }
-        } catch (error: unknown) {
-            const err = error as Error;
-            console.error('Error en login:', err);
-            setError(err.message);
-        }
-    };
+<Particles />
+      {/* Home button */}
+      <motion.div
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        transition={{ type: "spring", stiffness: 400, damping: 10 }}
+      >
+        <Link
+          href="/"
+          className="fixed top-4 left-4 z-40 p-2 rounded-full bg-[rgb(var(--primary-rgb))] text-black shadow-lg"
+        >
+          <FontAwesomeIcon icon={faHome} className="w-5 h-5" /> 
+        </Link>
+      </motion.div>
 
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-black relative overflow-hidden">
-            {/* Fondo animado */}
-            <div className="absolute inset-0 bg-black">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,215,0,0.1),transparent_50%)] animate-pulse"></div>
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.1),transparent_30%)] animate-pulse delay-75"></div>
-            </div>
-
-            {/* Botón de inicio */}
-            <Link 
-                href="/" 
-                className="absolute top-4 left-4 p-3 rounded-full bg-yellow-500 hover:bg-yellow-600 transition-colors"
+      <div className="container mx-auto px-4 z-10">
+        <motion.div 
+          variants={containerVariants}
+          className="flex flex-col lg:flex-row items-center justify-between gap-12 max-w-6xl mx-auto"
+        >
+          {/* Left side - Call to action */}
+          <motion.div 
+            variants={itemVariants}
+            className="text-center lg:text-left text-white space-y-4 lg:w-2/5"
+          >
+            <motion.h1 
+              className="text-3xl lg:text-5xl font-bold"
+              whileHover={{ x: 5 }}
             >
-                <FontAwesomeIcon icon={faHome} className="text-black text-xl" />
-            </Link>
+              ¿No tienes cuenta aún?
+            </motion.h1>
+            <motion.p 
+              className="text-lg pb-6 max-w-md mx-auto lg:mx-0"
+              whileHover={{ x: 5 }}
+            >
+              Si no te has creado tu cuenta puedes registrarte en el siguiente botón.
+            </motion.p>
+            <motion.div
+              whileHover={buttonHover}
+              whileTap={buttonTap}
+            >
+              <Link
+                href="/register"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg transition-all bg-transparent hover:bg-[rgba(var(--primary-rgb),0.2)] text-white border border-[rgb(var(--primary-rgb))]"
+              >
+                <FontAwesomeIcon icon={faUser} className="text-[rgb(var(--primary-rgb))]" /> 
+                <span>Registrate</span>
+              </Link>
+            </motion.div>
+          </motion.div>
 
-            {/* Formulario de inicio de sesión */}
-            <div className="relative w-full max-w-xl mx-24">
-                <div className="backdrop-blur-xl bg-white/10 p-8 rounded-2xl shadow-2xl border border-yellow-500/20">
-                    <div className="relative bg-black/40 p-6 rounded-xl">
-                        <h1 className="text-4xl font-bold text-center mb-8 text-white">
-                            Inicio de sesión
-                        </h1>
+          {/* Right side - Login form */}
+          <motion.div 
+            variants={itemVariants}
+            className="backdrop-blur-xl bg-black/10 p-8 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)] w-full max-w-md lg:w-3/5"
+            whileHover={{ y: -5 }}
+          >
+            <motion.div 
+              className="relative bg-black/40 p-6 rounded-xl"
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 100 }}
+            >
+              <div className="text-center mb-8">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
 
-                        <form onSubmit={handleLogin} className="space-y-6">
-                            <input
-                                type="email"
-                                placeholder="Correo Electrónico"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="w-full p-3 bg-white/10 border border-yellow-500/30 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500 transition-all"
-                            />
+                </motion.div>
+                <motion.h2 
+                  className="text-3xl font-bold text-white"
+                  whileHover={{ scale: 1.02 }}
+                >
+                  Inicio de sesión
+                </motion.h2>
+                <motion.p 
+                  className="text-gray-300 mt-2"
+                  whileHover={{ scale: 1.01 }}
+                >
+                  Ingresa tus credenciales para acceder a todas las funcionalidades.
+                </motion.p>
+              </div>
 
-                            <input
-                                type="password"
-                                placeholder="Contraseña"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full p-3 bg-white/10 border border-yellow-500/30 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-yellow-500 transition-all"
-                            />
+              <form onSubmit={handleLogin} className="space-y-6">
+                <motion.div 
+                  className="space-y-1"
+                  variants={itemVariants}
+                >
+                  <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                    <FontAwesomeIcon icon={faEnvelope} className="text-[rgb(var(--primary-rgb))]" />
+                    <span>
+                      Correo Electrónico <span className="text-red-500">*</span>
+                    </span>
+                  </label>
+                  <motion.input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="ejemplo@correo.com"
+                    className="w-full p-3 bg-white/10 border border-[rgba(var(--primary-rgb),0.3)] rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-[rgb(var(--primary-rgb))] transition-all"
+                    whileFocus={{ scale: 1.01 }}
+                  />
+                </motion.div>
 
-                            <button
-                                type="submit"
-                                className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 px-6 rounded-md transition-all duration-300 transform hover:scale-105"
-                            >
-                                Iniciar Sesión
-                            </button>
+                <motion.div 
+                  className="space-y-1"
+                  variants={itemVariants}
+                >
+                  <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                    <FontAwesomeIcon icon={faLock} className="text-[rgb(var(--primary-rgb))]" />
+                    <span>
+                      Contraseña <span className="text-red-500">*</span>
+                    </span>
+                  </label>
+                  <motion.input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full p-3 bg-white/10 border border-[rgba(var(--primary-rgb),0.3)] rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-[rgb(var(--primary-rgb))] transition-all"
+                    whileFocus={{ scale: 1.01 }}
+                  />
+                </motion.div>
 
-                            {error && (
-                                <p className="text-red-500 text-center text-sm">{error}</p>
-                            )}
+                <motion.div 
+                  className="flex items-center justify-between"
+                  variants={itemVariants}
+                >
+                  <div className="flex items-center">
+                    <input
+                      id="remember-me"
+                      name="remember-me"
+                      type="checkbox"
+                      className="h-4 w-4 text-[rgb(var(--primary-rgb))] focus:ring-[rgb(var(--primary-rgb))] border-gray-700 rounded bg-black/50"
+                    />
+                    <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-300">
+                      Recordarme
+                    </label>
+                  </div>
+                  <Link 
+                    href="/forgot-password" 
+                    className="text-sm text-[rgb(var(--primary-rgb))] hover:text-[rgba(var(--primary-rgb),0.8)]"
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </Link>
+                </motion.div>
 
-                            <div className="space-y-4 text-center">
-                                <Link
-                                    href="/forgot-password"
-                                    className="block text-yellow-500 hover:text-yellow-400 text-sm transition-colors"
-                                >
-                                    ¿Olvidaste tu contraseña?
-                                </Link>
+                <motion.button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-[rgb(var(--primary-rgb))] hover:bg-[rgba(var(--primary-rgb),0.9)] text-black font-bold py-3 px-6 rounded-md transition-all duration-300 flex items-center justify-center gap-2"
+                  whileHover={buttonHover}
+                  whileTap={buttonTap}
+                >
+                  {isLoading ? (
+                    <span>Procesando...</span>
+                  ) : (
+                    <>
+                      <FontAwesomeIcon icon={faSignIn} /> 
+                      <span>Iniciar Sesión</span>
+                    </>
+                  )}
+                </motion.button>
 
-                                <p className="text-white text-sm">
-                                    ¿Aún no tienes cuenta?{" "}
-                                    <Link
-                                        href="/register"
-                                        className="text-yellow-500 hover:text-yellow-400 transition-colors"
-                                    >
-                                        Crear una ahora
-                                    </Link>
-                                </p>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
+                {error && (
+                  <motion.div 
+                    className="p-3 bg-red-500/20 border border-red-500/30 rounded-md"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <p className="text-red-400 text-center text-sm">{error}</p>
+                  </motion.div>
+                )}
 
-export default Login;
+                <motion.div 
+                  className="text-center"
+                  variants={itemVariants}
+                >
+                  <p className="text-white text-sm">
+                    ¿Aún no tienes cuenta?{" "}
+                    <Link 
+                      href="/register" 
+                      className="text-[rgb(var(--primary-rgb))] hover:text-[rgba(var(--primary-rgb),0.8)] transition-colors"
+                    >
+                      Crear una ahora
+                    </Link>
+                  </p>
+                </motion.div>
+              </form>
+            </motion.div>
+          </motion.div>
+        </motion.div>
+      </div>
+    </motion.div>
+  )
+}
+
+export default Login

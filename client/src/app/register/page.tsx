@@ -145,7 +145,7 @@ const Register: React.FC = () => {
       }
 
       console.log("Enviando datos:", userData)
-      const response = await fetch("http://localhost:3000/api/users", {
+      const response = await fetch("http://localhost:5000/api/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -239,10 +239,10 @@ const Register: React.FC = () => {
       animate="visible"
       className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-black"
     >
-      <Particles className="opacity-40" />
+      <Particles />
       <Link
         href="/"
-        className="fixed top-4 left-4 z-40 p-2 rounded-full bg-[rgb(var(--primary-rgb))] text-black shadow-lg hover:scale-105 transition-transform"
+        className="fixed top-4 left-4 z-40 p-2 rounded-full bg-[rgb(var(--primary-rgb))] text-black shadow-lg"
       >
         <FontAwesomeIcon icon={faHome} className="w-5 h-5" />
       </Link>
@@ -250,110 +250,81 @@ const Register: React.FC = () => {
       <div className="container mx-auto px-4 z-10 py-8">
         <motion.div
           variants={containerVariants}
-          className="flex flex-col items-center justify-center max-w-2xl mx-auto"
+          className="flex flex-col items-center justify-center max-w-4xl mx-auto"
         >
           <motion.div
             variants={itemVariants}
-            className="backdrop-blur-xl bg-black/30 p-8 rounded-2xl shadow-2xl border border-[rgba(var(--primary-rgb),0.2)] w-full"
+            className="backdrop-blur-xl bg-black/10 p-8 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)] w-full"
+            whileHover={{ y: -5 }}
           >
-            <motion.h2 className="text-3xl font-bold text-white text-center mb-2">
-              Registro de Usuario
-            </motion.h2>
-            <motion.p className="text-gray-400 text-center mb-6">
-              Complete todos los campos para crear tu cuenta.
-            </motion.p>
-
+            <motion.h2 className="text-3xl font-bold text-white text-center mb-6">Crear Cuenta</motion.h2>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 gap-4">
-                {[
-                  {
-                    name: "user_document_type",
-                    label: "Documento",
-                    icon: faIdBadge,
-                    isSelect: true,
-                    options: [
-                      { value: "CC", label: "CC" },
-                      { value: "TI", label: "TI" },
-                      { value: "CE", label: "CE" },
-                    ],
-                    className: "w-1/3"
-                  },
-                  { name: "user_document", label: "Número de documento", icon: faIdCard, pattern: "^\\d+$", title: "Solo números", className: "w-2/3" },
-                  { name: "user_name", label: "Nombre", icon: faUser, pattern: "^[A-Za-zÁÉÍÓÚáéíóúñÑ\\s]+$", title: "Solo letras y espacios" },
-                  { name: "user_lastname", label: "Apellido", icon: faUser, pattern: "^[A-Za-zÁÉÍÓÚáéíóúñÑ\\s]+$", title: "Solo letras y espacios" },
-                  { name: "user_email", label: "Correo Electrónico", icon: faEnvelope, type: "email" },
-                  { name: "user_password", label: "Contraseña", icon: faLock, type: "password", minLength: 8 },
-                  { name: "user_phone", label: "Teléfono", icon: faPhone, pattern: "^\\d+$", title: "Solo números" },
-                  { name: "user_birth", label: "Fecha de Nacimiento", icon: faBirthdayCake, type: "date" },
-                  {
-                    name: "role_id",
-                    label: "Rol",
-                    icon: faUserTag,
-                    isSelect: true,
-                    options: [
-                      { value: "1", label: "Estudiante" },
-                      { value: "3", label: "Administrador" },
-                      { value: "4", label: "Coordinador" },
-                    ],
-                  },
-                ].map((field, index) => (
-                  <motion.div 
-                    key={index} 
-                    variants={itemVariants} 
-                    className={field.className || 'w-full'}
-                  >
-                    <label className="text-sm font-medium text-yellow-300 flex items-center gap-2 mb-1">
-                      <FontAwesomeIcon icon={field.icon} className="text-[rgb(var(--primary-rgb))]" />
-                      {field.label}
-                    </label>
-                    {field.isSelect ? (
-                      <select
-                        name={field.name}
-                        value={formData[field.name as keyof typeof formData]}
-                        onChange={handleChange}
-                        className="w-full p-2.5 bg-gray-800/50 border border-[rgba(var(--primary-rgb),0.2)] rounded-md text-white focus:outline-none focus:border-[rgb(var(--primary-rgb))] transition-all font-medium"
-                        required
-                      >
-                        <option value="" disabled>
-                          Seleccionar {field.label.toLowerCase()}
-                        </option>
-                        {field.options?.map((option, idx) => (
-                          <option key={idx} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                    ) : (
-                      <motion.input
-                        type={field.type || "text"}
-                        name={field.name}
-                        value={formData[field.name as keyof typeof formData]}
-                        onChange={handleChange}
-                        placeholder={field.label}
-                        className="w-full p-2.5 bg-gray-800/50 border border-[rgba(var(--primary-rgb),0.2)] rounded-md text-white placeholder-gray-500 focus:outline-none focus:border-[rgb(var(--primary-rgb))] transition-all font-medium"
-                        required
-                        pattern={field.pattern}
-                        title={field.title}
-                        minLength={field.minLength}
-                      />
-                    )}
-                  </motion.div>
-                ))}
-              </div>
+              {formFields.map((section, sectionIndex) => (
+                <div key={sectionIndex} className="space-y-4">
+                  <h3 className="text-xl font-semibold text-[rgb(var(--primary-rgb))] mb-3">
+                    {section.section}
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {section.fields.map((field, fieldIndex) => (
+                      <motion.div key={fieldIndex} variants={itemVariants} className="flex flex-col">
+                        <label className="text-sm font-medium text-yellow-300 flex items-center gap-2 mb-1">
+                          <FontAwesomeIcon icon={field.icon} className="text-[rgb(var(--primary-rgb))]" />
+                          {field.label}
+                        </label>
+                        {field.isSelect ? (
+                          <select
+                            name={field.name}
+                            value={formData[field.name as keyof typeof formData]}
+                            onChange={handleChange}
+                            className="p-3 bg-gray-800 border border-[rgba(var(--primary-rgb),0.3)] rounded-md text-white focus:outline-none focus:border-[rgb(var(--primary-rgb))] transition-all font-medium"
+                            style={{ color: "white", fontWeight: "500" }}
+                            required
+                          >
+                            <option value="" style={{ backgroundColor: "#1a1a1a", color: "white" }}>
+                              Seleccionar {field.label.toLowerCase()}
+                            </option>
+                            {field.options?.map((option, idx) => (
+                              <option key={idx} value={option.value} style={{ backgroundColor: "#1a1a1a", color: "white" }}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <motion.input
+                            type={field.type || "text"}
+                            name={field.name}
+                            value={formData[field.name as keyof typeof formData]}
+                            onChange={handleChange}
+                            placeholder={field.label}
+                            className="p-3 bg-gray-800 border border-[rgba(var(--primary-rgb),0.3)] rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-[rgb(var(--primary-rgb))] transition-all font-medium"
+                            style={{ color: "white", fontWeight: "500" }}
+                            required
+                            pattern={field.pattern}
+                            title={field.title}
+                            minLength={field.minLength}
+                          />
+                        )}
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              ))}
 
-              <motion.button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-[rgb(var(--primary-rgb))] hover:bg-[rgba(var(--primary-rgb),0.9)] text-black font-bold py-2.5 px-6 rounded-md transition-all duration-300 flex items-center justify-center gap-2"
-                whileHover={buttonHover}
-                whileTap={buttonTap}
-              >
-                {isLoading ? "Registrando..." : "Registrarse"}
-              </motion.button>
+              <div className="mt-6">
+                <motion.button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-[rgb(var(--primary-rgb))] hover:bg-[rgba(var(--primary-rgb),0.9)] text-black font-bold py-3 px-6 rounded-md transition-all duration-300 flex items-center justify-center gap-2"
+                  whileHover={buttonHover}
+                  whileTap={buttonTap}
+                >
+                  {isLoading ? "Registrando..." : "Registrarse"}
+                </motion.button>
+              </div>
 
               {error && (
                 <motion.div
-                  className="p-3 bg-red-500/10 border border-red-500/20 rounded-md"
+                  className="p-4 bg-red-500/20 border border-red-500/30 rounded-md"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
@@ -361,14 +332,14 @@ const Register: React.FC = () => {
                   <p className="text-red-400 text-center text-sm">{error}</p>
                 </motion.div>
               )}
-
-              <div className="text-center text-gray-400 text-sm">
-                ¿Ya tienes una cuenta?{" "}
-                <Link href="/login" className="text-[rgb(var(--primary-rgb))] hover:underline">
-                  inicia sesión aquí
-                </Link>
-              </div>
             </form>
+
+            <div className="text-center text-white text-sm pt-4">
+              ¿Ya tienes una cuenta?{" "}
+              <Link href="/login" className="text-[rgb(var(--primary-rgb))] hover:underline">
+                Inicia sesión
+              </Link>
+            </div>
           </motion.div>
         </motion.div>
       </div>
@@ -381,7 +352,7 @@ const Register: React.FC = () => {
         }
         
         input::placeholder {
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(255, 255, 255, 0.6);
         }
         
         input[type="date"] {
@@ -398,7 +369,7 @@ const Register: React.FC = () => {
         }
       `}</style>
     </motion.div>
-  );
-};
+  )
+}
 
-export default Register;
+export default Register

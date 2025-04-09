@@ -15,7 +15,11 @@ const verifyToken = (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
     // Añadir la información del usuario decodificada a la solicitud
-    req.user = decoded;
+    req.user = {
+      user_id: decoded.user_id,
+      email: decoded.email,
+      role: decoded.role
+    };
     
     // Continuar con la siguiente función en la cadena
     next();

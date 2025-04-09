@@ -29,7 +29,7 @@ export function SchoolsCarousel() {
   const fetchEscuelas = async () => {
     try {
       setLoading(true)
-      const response = await fetch("http://localhost:3000/api/escuelas")
+      const response = await fetch("http://localhost:5000/api/escuelas")
       if (!response.ok) {
         throw new Error("Error al obtener las escuelas")
       }

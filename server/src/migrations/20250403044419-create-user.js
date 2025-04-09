@@ -45,10 +45,6 @@ module.exports = {
                 type: Sequelize.DATE,
                 allowNull: false,
             },
-            user_role: {
-                type: Sequelize.INTEGER,
-                allowNull: false,
-            },
             role_id: {
                 type: Sequelize.INTEGER,
                 allowNull: false,

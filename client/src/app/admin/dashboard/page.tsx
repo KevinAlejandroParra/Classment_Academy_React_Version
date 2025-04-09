@@ -7,8 +7,44 @@ import {
   faSchool,
   faUserGear,
   faChalkboardTeacher,
-  faSignOut,
+  faHome,
+  faUser,
 } from "@fortawesome/free-solid-svg-icons"
+import { Particles } from "@/components/particles"
+import Link from "next/link"
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    },
+  },
+}
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+      damping: 10,
+    },
+  },
+}
+
+const buttonHover = {
+  scale: 1.02,
+  transition: { type: "spring", stiffness: 400, damping: 10 },
+}
+
+const buttonTap = {
+  scale: 0.98,
+}
 
 const AdminDashboard = () => {
   const router = useRouter()
@@ -40,18 +76,13 @@ const AdminDashboard = () => {
 
         setUser(data.user)
       } catch (error) {
-        console.error("Error de autenticación:", error)
+        console.error("Error:", error)
         router.push("/login")
       }
     }
 
     checkAuth()
   }, [router])
-
-  const handleLogout = () => {
-    localStorage.removeItem("token")
-    router.push("/login")
-  }
 
   const menuItems = [
     {
@@ -77,42 +108,64 @@ const AdminDashboard = () => {
   if (!user) return null
 
   return (
-    <div className="min-h-screen bg-gray-900">
-      <nav className="bg-gray-800 text-white p-4">
-        <div className="container mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Panel de Administración</h1>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      className="min-h-screen w-full relative overflow-hidden bg-black"
+    >
+      <Particles />
+      
+      {/* Header */}
+      <div className="fixed top-0 left-0 right-0 bg-black/50 backdrop-blur-md z-40 border-b border-[rgba(var(--primary-rgb),0.2)]">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <Link
+              href="/"
+              className="p-2 rounded-full bg-[rgb(var(--primary-rgb))] text-black shadow-lg"
+            >
+              <FontAwesomeIcon icon={faHome} className="w-5 h-5" />
+            </Link>
+            <h1 className="text-2xl font-bold text-white">Panel de Administración</h1>
+          </div>
+          <motion.button
+            onClick={() => router.push("/profile")}
+            className="flex items-center gap-3 px-4 py-2 bg-[rgba(var(--primary-rgb),0.1)] text-[rgb(var(--primary-rgb))] rounded-lg hover:bg-[rgba(var(--primary-rgb),0.2)] transition-colors border border-[rgba(var(--primary-rgb),0.2)]"
+            whileHover={buttonHover}
+            whileTap={buttonTap}
           >
-            <FontAwesomeIcon icon={faSignOut} />
-            Cerrar Sesión
-          </button>
+            <FontAwesomeIcon icon={faUser} />
+            <span>{user?.user_name} {user?.user_lastname}</span>
+          </motion.button>
         </div>
-      </nav>
+      </div>
 
-      <main className="container mx-auto py-8 px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <main className="container mx-auto px-4 pt-24 pb-8">
+        <motion.div
+          variants={containerVariants}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
           {menuItems.map((item, index) => (
             <motion.div
               key={index}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="bg-gray-800 rounded-lg p-6 cursor-pointer"
+              variants={itemVariants}
+              whileHover={{ y: -5 }}
+              className="backdrop-blur-xl bg-black/10 p-6 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)] cursor-pointer"
               onClick={() => router.push(item.path)}
             >
               <div className="flex items-center gap-4 mb-4">
-                <div className="bg-[rgb(var(--primary-rgb))] p-3 rounded-lg">
-                  <FontAwesomeIcon icon={item.icon} className="text-2xl text-white" />
+                <div className="bg-[rgb(var(--primary-rgb))] p-4 rounded-lg">
+                  <FontAwesomeIcon icon={item.icon} className="text-2xl text-black" />
                 </div>
-                <h2 className="text-xl font-semibold text-white">{item.title}</h2>
+                <div>
+                  <h3 className="text-xl font-semibold text-white">{item.title}</h3>
+                  <p className="text-gray-400 text-sm">{item.description}</p>
+                </div>
               </div>
-              <p className="text-gray-400">{item.description}</p>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </main>
-    </div>
+    </motion.div>
   )
 }
 

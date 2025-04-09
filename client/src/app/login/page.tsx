@@ -1,5 +1,5 @@
 "use client"
-import { useState, type FormEvent } from "react"
+import { useState, useEffect, type FormEvent } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
@@ -53,6 +53,52 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState<string>("")
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
+
+  useEffect(() => {
+    // Verificar si hay un token almacenado
+    const token = localStorage.getItem("token")
+    if (token) {
+      checkAuthAndRedirect(token)
+    }
+  }, [])
+
+  const checkAuthAndRedirect = async (token: string) => {
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setIsAuthenticated(true)
+        
+        // Redirigir según el rol
+        switch (data.user.role) {
+          case 1: // Estudiante
+            router.push("/student/dashboard")
+            break
+          case 3: // Administrador
+            router.push("/admin/dashboard")
+            break
+          case 4: // Coordinador
+            router.push("/coordinator/dashboard")
+            break
+          default:
+            router.push("/")
+        }
+      } else {
+        localStorage.removeItem("token")
+        setIsAuthenticated(false)
+      }
+    } catch (error) {
+      console.error("Error al verificar autenticación:", error)
+      localStorage.removeItem("token")
+      setIsAuthenticated(false)
+    }
+  }
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -66,11 +112,11 @@ const Login: React.FC = () => {
     }
 
     const data = {
-        user: {
-          user_email: email,
-          user_password: password,
-        }
-      };
+      user: {
+        user_email: email,
+        user_password: password,
+      }
+    }
 
     try {
       const response = await fetch("http://localhost:5000/api/login", {
@@ -83,26 +129,16 @@ const Login: React.FC = () => {
         credentials: "include",
       })
 
-      const contentType = response.headers.get("content-type")
-      if (!contentType || !contentType.includes("application/json")) {
-        const textResponse = await response.text()
-        console.error("Received non-JSON response:", textResponse)
-        throw new Error("La respuesta del servidor no es válida. Por favor, contacte al administrador.")
-      }
-
       const result = await response.json()
 
       if (!response.ok) {
         throw new Error(result.message || "Error al validar usuario")
       }
 
-      console.log("Respuesta de la API:", result)
-
       const accessToken = result?.data?.token
       if (accessToken) {
         localStorage.setItem("token", accessToken)
-        console.log("Token recibido:", accessToken)
-        router.push("/")
+        checkAuthAndRedirect(accessToken)
       } else {
         throw new Error("No se recibió el token de acceso")
       }
@@ -115,15 +151,18 @@ const Login: React.FC = () => {
     }
   }
 
+  // Si ya está autenticado, no mostrar el formulario
+  if (isAuthenticated) {
+    return null
+  }
+
   return (
-    
     <motion.div 
       initial="hidden"
       animate="visible"
       className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-black"
     >
-
-<Particles />
+      <Particles />
       {/* Home button */}
       <motion.div
         whileHover={{ scale: 1.1 }}

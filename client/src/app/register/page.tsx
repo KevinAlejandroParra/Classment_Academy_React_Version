@@ -140,7 +140,7 @@ const Register: React.FC = () => {
           ...formData,
           role_id: parseInt(formData.role_id),
           user_birth: formattedDate,
-          user_image: "default.jpg" // Agregamos un valor por defecto para user_image
+          user_image: "default.jpg" 
         }
       }
 
@@ -156,15 +156,7 @@ const Register: React.FC = () => {
         credentials: "include",
       })
       
-      const contentType = response.headers.get("content-type")
-      let result
-      if (contentType && contentType.includes("application/json")) {
-        result = await response.json()
-      } else {
-        const text = await response.text()
-        console.error("Respuesta no JSON:", text)
-        throw new Error("El servidor no respondió con JSON. Verifica la URL del endpoint.")
-      }
+      const result = await response.json()
 
       if (!response.ok) {
         throw new Error(result.message || "Error al registrar usuario")

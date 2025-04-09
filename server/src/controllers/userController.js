@@ -282,6 +282,9 @@ class UserController {
                 user: {
                     id: user.user_id,
                     email: user.user_email,
+                    document: user.user_document,
+                    phone: user.user_phone,
+                    birthdate: user.user_birth,
                     role: user.role_id,
                     name: user.user_name,
                     lastname: user.user_lastname,

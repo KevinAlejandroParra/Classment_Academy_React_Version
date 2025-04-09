@@ -32,7 +32,7 @@ export function CoursesCarousel() {
     try {
       setLoading(true)
       // Cambia esta URL a tu API en producción
-      const response = await fetch("http://localhost:3000/api/cursos")
+      const response = await fetch("http://localhost:5000/api/cursos")
       if (!response.ok) {
         throw new Error("Error al obtener los cursos")
       }

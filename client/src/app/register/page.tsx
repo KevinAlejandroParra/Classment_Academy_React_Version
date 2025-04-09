@@ -84,6 +84,8 @@ const Register: React.FC = () => {
       if (formData.user_password.length < 8) {
         throw new Error("La contraseña debe tener al menos 8 caracteres")
       }
+
+      //Datos JSON
       const userData = {
         user: {
           user_name: formData.user_name,
@@ -95,24 +97,30 @@ const Register: React.FC = () => {
           user_phone: formData.user_phone,
           user_birth: formData.user_birth,
           role_id: formData.role_id,
-        },
+        }
       }
 
       console.log("Enviando datos:", userData) 
-
+      //uso API
       const response = await fetch("http://localhost:3000/api/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Accept: "application/json",
+          "Accept": "application/json",
         },
         body: JSON.stringify(userData),
+        mode: "cors",
+        credentials: "include",
       })
+      
+      //respuesta en consola
+      console.log("Respuesta Status", response.status);
+      console.log("Respuesta Headers", [...response.headers.entries()]);
 
       // Verifica si la respuesta es JSON
       const contentType = response.headers.get("content-type")
+      
       let result
-
       if (contentType && contentType.includes("application/json")) {
         result = await response.json()
       } else {

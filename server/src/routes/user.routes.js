@@ -14,6 +14,10 @@ userRoutes.delete("/users/:id", UserController.deleteUser);
 // Login    
 userRoutes.post("/login", UserController.login);
 
+// Rutas para recuperación de contraseña
+userRoutes.post("/forgot-password", UserController.forgotPassword);
+userRoutes.post("/reset-password", UserController.resetPassword);
+
 // Ruta para validar token
 userRoutes.get("/auth/me", verifyToken, UserController.validateToken);
 module.exports = userRoutes;

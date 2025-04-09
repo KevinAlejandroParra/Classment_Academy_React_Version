@@ -1,6 +1,16 @@
 const { User } = require("../models");
 const jwt = require("jsonwebtoken"); // Importamos jwt
 const bcrypt = require("bcrypt"); // Importamos bcrypt para comparar contraseñas
+const nodemailer = require("nodemailer");
+
+// Configurar el transporter de nodemailer
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
+    }
+});
 
 class UserController {
     static async getUsers(req, res) {
@@ -59,11 +69,88 @@ class UserController {
         try {
             const { user: userJSON } = req.body;
 
-            // Validación adicional para la contraseña
-            if (userJSON.user_password && userJSON.user_password.length < 8) {
+            // Validaciones adicionales
+            if (!userJSON.user_name || !userJSON.user_lastname || !userJSON.user_email || 
+                !userJSON.user_password || !userJSON.user_phone || !userJSON.user_birth || 
+                !userJSON.user_document || !userJSON.user_document_type || !userJSON.role_id) {
                 return res.status(400).json({
                     success: false,
-                    message: "La contraseña debe tener al menos 8 caracteres",
+                    message: "Todos los campos son requeridos"
+                });
+            }
+
+            // Validación de nombre y apellido (solo letras)
+            const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/;
+            if (!nameRegex.test(userJSON.user_name) || !nameRegex.test(userJSON.user_lastname)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "El nombre y apellido solo pueden contener letras"
+                });
+            }
+
+            // Validación de teléfono (solo números)
+            const phoneRegex = /^\d+$/;
+            if (!phoneRegex.test(userJSON.user_phone)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "El teléfono solo puede contener números"
+                });
+            }
+
+            // Validación de contraseña
+            if (userJSON.user_password.length < 8) {
+                return res.status(400).json({
+                    success: false,
+                    message: "La contraseña debe tener al menos 8 caracteres"
+                });
+            }
+
+            // Validación de documento (solo números)
+            if (!phoneRegex.test(userJSON.user_document)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "El documento solo puede contener números"
+                });
+            }
+
+            // Validación de tipo de documento
+            const validDocTypes = ["TI", "CC", "CE"];
+            if (!validDocTypes.includes(userJSON.user_document_type)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Tipo de documento no válido"
+                });
+            }
+
+            // Validación de rol
+            const validRoles = [1, 3, 4]; // 1: estudiante, 3: administrador, 4: coordinador
+            if (!validRoles.includes(parseInt(userJSON.role_id))) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Rol no válido"
+                });
+            }
+
+            // Verificar si el email ya existe
+            const existingUser = await User.findOne({ where: { user_email: userJSON.user_email } });
+            if (existingUser) {
+                return res.status(400).json({
+                    success: false,
+                    message: "El correo electrónico ya está registrado"
+                });
+            }
+
+            // Verificar si el documento ya existe
+            const existingDocument = await User.findOne({ 
+                where: { 
+                    user_document: userJSON.user_document,
+                    user_document_type: userJSON.user_document_type
+                } 
+            });
+            if (existingDocument) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Ya existe un usuario con este documento"
                 });
             }
 
@@ -76,23 +163,25 @@ class UserController {
             res.status(201).json({
                 success: true,
                 data: userResponse,
-                message: "Usuario creado correctamente",
+                message: "Usuario creado correctamente"
             });
         } catch (error) {
+            console.error("Error en createUser:", error);
+            
             // Manejo específico para errores de validación de Sequelize
             if (error.name === "SequelizeValidationError") {
                 const validationErrors = error.errors.map((err) => err.message);
                 return res.status(400).json({
                     success: false,
                     data: validationErrors,
-                    message: "Error de validación",
+                    message: "Error de validación"
                 });
             }
 
             res.status(500).json({
                 success: false,
-                data: error.message,
                 message: "Error al crear el usuario",
+                error: error.message
             });
         }
     }
@@ -292,6 +381,90 @@ class UserController {
                 success: false,
                 message: "Error al validar el token",
                 error: error.message
+            });
+        }
+    }
+
+    static async forgotPassword(req, res) {
+        try {
+            const { email } = req.body;
+            
+            // Buscar usuario por email
+            const user = await User.findOne({ where: { user_email: email } });
+            
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: "No se encontró un usuario con ese correo electrónico"
+                });
+            }
+
+            // Generar token de recuperación
+            const resetToken = jwt.sign(
+                { id: user.user_id },
+                process.env.JWT_SECRET,
+                { expiresIn: '1h' }
+            );
+
+            // Enviar correo electrónico
+            const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+            
+            await transporter.sendMail({
+                from: process.env.EMAIL_USER,
+                to: email,
+                subject: 'Recuperación de Contraseña',
+                html: `
+                    <h1>Recuperación de Contraseña</h1>
+                    <p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
+                    <a href="${resetUrl}">Restablecer Contraseña</a>
+                    <p>Este enlace expirará en 1 hora.</p>
+                `
+            });
+
+            res.status(200).json({
+                success: true,
+                message: "Se ha enviado un correo electrónico con las instrucciones para restablecer la contraseña"
+            });
+        } catch (error) {
+            console.error("Error en forgotPassword:", error);
+            res.status(500).json({
+                success: false,
+                message: "Error al procesar la solicitud de recuperación de contraseña"
+            });
+        }
+    }
+
+    static async resetPassword(req, res) {
+        try {
+            const { token, newPassword } = req.body;
+
+            // Verificar token
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            
+            // Buscar usuario
+            const user = await User.findByPk(decoded.id);
+            
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Usuario no encontrado"
+                });
+            }
+
+            // Actualizar contraseña
+            const salt = await bcrypt.genSalt(10);
+            user.user_password = await bcrypt.hash(newPassword, salt);
+            await user.save();
+
+            res.status(200).json({
+                success: true,
+                message: "Contraseña actualizada exitosamente"
+            });
+        } catch (error) {
+            console.error("Error en resetPassword:", error);
+            res.status(500).json({
+                success: false,
+                message: "Error al restablecer la contraseña"
             });
         }
     }

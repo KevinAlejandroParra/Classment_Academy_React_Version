@@ -1,7 +1,6 @@
 "use client"
 import { useState, type FormEvent } from "react"
 import type React from "react"
-
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -18,6 +17,27 @@ import {
 } from "@fortawesome/free-solid-svg-icons"
 import { Particles } from "@/components/particles"
 import { motion } from "framer-motion"
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core"
+
+interface FormField {
+  name: string
+  label: string
+  icon: IconDefinition
+  type?: string
+  pattern?: string
+  title?: string
+  minLength?: number
+  isSelect?: boolean
+  options?: Array<{
+    value: string
+    label: string
+  }>
+}
+
+interface FormSection {
+  section: string
+  fields: FormField[]
+}
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -63,15 +83,16 @@ const Register: React.FC = () => {
     user_password: "",
     user_phone: "",
     user_birth: "",
-    role_id: "",
+    role_id: "1", 
   })
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     })
   }
 
@@ -81,27 +102,49 @@ const Register: React.FC = () => {
     setError(null)
 
     try {
-      if (formData.user_password.length < 8) {
-        throw new Error("La contraseña debe tener al menos 8 caracteres")
+      // Validaciones en el frontend
+      if (!formData.user_name || !formData.user_lastname || !formData.user_email || 
+          !formData.user_password || !formData.user_phone || !formData.user_birth || 
+          !formData.user_document || !formData.user_document_type || !formData.role_id) {
+          throw new Error("Todos los campos son requeridos")
       }
 
-      //Datos JSON
+      // Validación de nombre y apellido (solo letras)
+      const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/;
+      if (!nameRegex.test(formData.user_name) || !nameRegex.test(formData.user_lastname)) {
+          throw new Error("El nombre y apellido solo pueden contener letras")
+      }
+
+      // Validación de teléfono (solo números)
+      const phoneRegex = /^\d+$/;
+      if (!phoneRegex.test(formData.user_phone)) {
+          throw new Error("El teléfono solo puede contener números")
+      }
+
+      // Validación de documento (solo números)
+      if (!phoneRegex.test(formData.user_document)) {
+          throw new Error("El documento solo puede contener números")
+      }
+
+      // Validación de contraseña
+      if (formData.user_password.length < 8) {
+          throw new Error("La contraseña debe tener al menos 8 caracteres")
+      }
+
+      // Asegurar que la fecha esté en formato YYYY-MM-DD
+      const formattedDate = new Date(formData.user_birth).toISOString().split('T')[0];
+
+      // Convertir role_id a número y preparar datos
       const userData = {
         user: {
-          user_name: formData.user_name,
-          user_lastname: formData.user_lastname,
-          user_document_type: formData.user_document_type,
-          user_document: formData.user_document,
-          user_email: formData.user_email,
-          user_password: formData.user_password,
-          user_phone: formData.user_phone,
-          user_birth: formData.user_birth,
-          role_id: formData.role_id,
+          ...formData,
+          role_id: parseInt(formData.role_id),
+          user_birth: formattedDate,
+          user_image: "default.jpg" // Agregamos un valor por defecto para user_image
         }
       }
 
-      console.log("Enviando datos:", userData) 
-      //uso API
+      console.log("Enviando datos:", userData)
       const response = await fetch("http://localhost:3000/api/users", {
         method: "POST",
         headers: {
@@ -113,13 +156,7 @@ const Register: React.FC = () => {
         credentials: "include",
       })
       
-      //respuesta en consola
-      console.log("Respuesta Status", response.status);
-      console.log("Respuesta Headers", [...response.headers.entries()]);
-
-      // Verifica si la respuesta es JSON
       const contentType = response.headers.get("content-type")
-      
       let result
       if (contentType && contentType.includes("application/json")) {
         result = await response.json()
@@ -144,117 +181,179 @@ const Register: React.FC = () => {
     }
   }
 
+  const formFields: FormSection[] = [
+    {
+      section: "Información Personal",
+      fields: [
+        { name: "user_name", label: "Nombre", icon: faUser, pattern: "^[A-Za-zÁÉÍÓÚáéíóúñÑ\\s]+$", title: "Solo letras y espacios" },
+        { name: "user_lastname", label: "Apellido", icon: faUser, pattern: "^[A-Za-zÁÉÍÓÚáéíóúñÑ\\s]+$", title: "Solo letras y espacios" },
+        { name: "user_birth", label: "Fecha de Nacimiento", icon: faBirthdayCake, type: "date" },
+      ]
+    },
+    {
+      section: "Información de Contacto",
+      fields: [
+        { name: "user_email", label: "Correo Electrónico", icon: faEnvelope, type: "email" },
+        { name: "user_phone", label: "Teléfono", icon: faPhone, pattern: "^\\d+$", title: "Solo números" },
+      ]
+    },
+    {
+      section: "Información de Identificación",
+      fields: [
+        { name: "user_document", label: "Documento", icon: faIdCard, pattern: "^\\d+$", title: "Solo números" },
+        {
+          name: "user_document_type",
+          label: "Tipo de Documento",
+          icon: faIdBadge,
+          isSelect: true,
+          options: [
+            { value: "CC", label: "CC" },
+            { value: "TI", label: "TI" },
+            { value: "CE", label: "CE" },
+          ],
+        },
+      ]
+    },
+    {
+      section: "Información de Cuenta",
+      fields: [
+        { name: "user_password", label: "Contraseña (mín. 8 caracteres)", icon: faLock, type: "password", minLength: 8 },
+        {
+          name: "role_id",
+          label: "Rol",
+          icon: faUserTag,
+          isSelect: true,
+          options: [
+            { value: "1", label: "Estudiante" },
+            { value: "3", label: "Administrador" },
+            { value: "4", label: "Coordinador" },
+          ],
+        },
+      ]
+    }
+  ]
+
   return (
     <motion.div
       initial="hidden"
       animate="visible"
       className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-black"
     >
-      <Particles />
+      <Particles className="opacity-40" />
       <Link
         href="/"
-        className="fixed top-4 left-4 z-40 p-2 rounded-full bg-[rgb(var(--primary-rgb))] text-black shadow-lg"
+        className="fixed top-4 left-4 z-40 p-2 rounded-full bg-[rgb(var(--primary-rgb))] text-black shadow-lg hover:scale-105 transition-transform"
       >
         <FontAwesomeIcon icon={faHome} className="w-5 h-5" />
       </Link>
 
-      <div className="container mx-auto px-4 z-10">
+      <div className="container mx-auto px-4 z-10 py-8">
         <motion.div
           variants={containerVariants}
-          className="flex flex-col items-center justify-center max-w-4xl mx-auto"
+          className="flex flex-col items-center justify-center max-w-2xl mx-auto"
         >
           <motion.div
             variants={itemVariants}
-            className="backdrop-blur-xl bg-black/10 p-8 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)] w-full"
-            whileHover={{ y: -5 }}
+            className="backdrop-blur-xl bg-black/30 p-8 rounded-2xl shadow-2xl border border-[rgba(var(--primary-rgb),0.2)] w-full"
           >
-            <motion.h2 className="text-3xl font-bold text-white text-center mb-6">Crear Cuenta</motion.h2>
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Campos */}
-              {[
-                { name: "user_name", label: "Nombre", icon: faUser },
-                { name: "user_lastname", label: "Apellido", icon: faUser },
-                { name: "user_document", label: "Documento", icon: faIdCard },
-                {
-                  name: "user_document_type",
-                  label: "Tipo de Documento",
-                  icon: faIdBadge,
-                  isSelect: true,
-                  options: [
-                    { value: "CC", label: "CC" },
-                    { value: "TI", label: "TI" },
-                    { value: "CE", label: "CE" },
-                  ],
-                },
-                { name: "user_email", label: "Correo Electrónico", icon: faEnvelope, type: "email" },
-                { name: "user_password", label: "Contraseña (mín. 8 caracteres)", icon: faLock, type: "password" },
-                { name: "user_phone", label: "Teléfono", icon: faPhone },
-                { name: "user_birth", label: "Fecha de Nacimiento", icon: faBirthdayCake, type: "date" },
-                {
-                  name: "role_id",
-                  label: "Rol",
-                  icon: faUserTag,
-                  isSelect: true,
-                  options: [
-                    { value: "1", label: "Administrador" },
-                    { value: "2", label: "Profesor" },
-                    { value: "3", label: "Estudiante" },
-                  ],
-                },
-              ].map((field, i) => (
-                <motion.div key={i} variants={itemVariants} className="flex flex-col">
-                  <label className="text-sm font-medium text-yellow-300 flex items-center gap-2 mb-1">
-                    <FontAwesomeIcon icon={field.icon} className="text-[rgb(var(--primary-rgb))]" />
-                    {field.label}
-                  </label>
-                  {field.isSelect ? (
-                    <select
-                      name={field.name}
-                      value={formData[field.name as keyof typeof formData]}
-                      onChange={handleChange}
-                      className="p-3 bg-gray-800 border border-[rgba(var(--primary-rgb),0.3)] rounded-md text-white focus:outline-none focus:border-[rgb(var(--primary-rgb))] transition-all font-medium"
-                      style={{ color: "white", fontWeight: "500" }}
-                      required
-                    >
-                      <option value="" style={{ backgroundColor: "#1a1a1a", color: "white" }}>
-                        Seleccionar {field.label.toLowerCase()}
-                      </option>
-                      {field.options?.map((option, idx) => (
-                        <option key={idx} value={option.value} style={{ backgroundColor: "#1a1a1a", color: "white" }}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <motion.input
-                      type={field.type || "text"}
-                      name={field.name}
-                      value={formData[field.name as keyof typeof formData]}
-                      onChange={handleChange}
-                      placeholder={field.label}
-                      className="p-3 bg-gray-800 border border-[rgba(var(--primary-rgb),0.3)] rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-[rgb(var(--primary-rgb))] transition-all font-medium"
-                      style={{ color: "white", fontWeight: "500" }}
-                      required
-                    />
-                  )}
-                </motion.div>
-              ))}
+            <motion.h2 className="text-3xl font-bold text-white text-center mb-2">
+              Registro de Usuario
+            </motion.h2>
+            <motion.p className="text-gray-400 text-center mb-6">
+              Complete todos los campos para crear tu cuenta.
+            </motion.p>
 
-              <div className="md:col-span-2 mt-2">
-                <motion.button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full bg-[rgb(var(--primary-rgb))] hover:bg-[rgba(var(--primary-rgb),0.9)] text-black font-bold py-3 px-6 rounded-md transition-all duration-300 flex items-center justify-center gap-2"
-                  whileHover={buttonHover}
-                  whileTap={buttonTap}
-                >
-                  {isLoading ? "Registrando..." : "Registrarse"}
-                </motion.button>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 gap-4">
+                {[
+                  {
+                    name: "user_document_type",
+                    label: "Documento",
+                    icon: faIdBadge,
+                    isSelect: true,
+                    options: [
+                      { value: "CC", label: "CC" },
+                      { value: "TI", label: "TI" },
+                      { value: "CE", label: "CE" },
+                    ],
+                    className: "w-1/3"
+                  },
+                  { name: "user_document", label: "Número de documento", icon: faIdCard, pattern: "^\\d+$", title: "Solo números", className: "w-2/3" },
+                  { name: "user_name", label: "Nombre", icon: faUser, pattern: "^[A-Za-zÁÉÍÓÚáéíóúñÑ\\s]+$", title: "Solo letras y espacios" },
+                  { name: "user_lastname", label: "Apellido", icon: faUser, pattern: "^[A-Za-zÁÉÍÓÚáéíóúñÑ\\s]+$", title: "Solo letras y espacios" },
+                  { name: "user_email", label: "Correo Electrónico", icon: faEnvelope, type: "email" },
+                  { name: "user_password", label: "Contraseña", icon: faLock, type: "password", minLength: 8 },
+                  { name: "user_phone", label: "Teléfono", icon: faPhone, pattern: "^\\d+$", title: "Solo números" },
+                  { name: "user_birth", label: "Fecha de Nacimiento", icon: faBirthdayCake, type: "date" },
+                  {
+                    name: "role_id",
+                    label: "Rol",
+                    icon: faUserTag,
+                    isSelect: true,
+                    options: [
+                      { value: "1", label: "Estudiante" },
+                      { value: "3", label: "Administrador" },
+                      { value: "4", label: "Coordinador" },
+                    ],
+                  },
+                ].map((field, index) => (
+                  <motion.div 
+                    key={index} 
+                    variants={itemVariants} 
+                    className={field.className || 'w-full'}
+                  >
+                    <label className="text-sm font-medium text-yellow-300 flex items-center gap-2 mb-1">
+                      <FontAwesomeIcon icon={field.icon} className="text-[rgb(var(--primary-rgb))]" />
+                      {field.label}
+                    </label>
+                    {field.isSelect ? (
+                      <select
+                        name={field.name}
+                        value={formData[field.name as keyof typeof formData]}
+                        onChange={handleChange}
+                        className="w-full p-2.5 bg-gray-800/50 border border-[rgba(var(--primary-rgb),0.2)] rounded-md text-white focus:outline-none focus:border-[rgb(var(--primary-rgb))] transition-all font-medium"
+                        required
+                      >
+                        <option value="" disabled>
+                          Seleccionar {field.label.toLowerCase()}
+                        </option>
+                        {field.options?.map((option, idx) => (
+                          <option key={idx} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <motion.input
+                        type={field.type || "text"}
+                        name={field.name}
+                        value={formData[field.name as keyof typeof formData]}
+                        onChange={handleChange}
+                        placeholder={field.label}
+                        className="w-full p-2.5 bg-gray-800/50 border border-[rgba(var(--primary-rgb),0.2)] rounded-md text-white placeholder-gray-500 focus:outline-none focus:border-[rgb(var(--primary-rgb))] transition-all font-medium"
+                        required
+                        pattern={field.pattern}
+                        title={field.title}
+                        minLength={field.minLength}
+                      />
+                    )}
+                  </motion.div>
+                ))}
               </div>
+
+              <motion.button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-[rgb(var(--primary-rgb))] hover:bg-[rgba(var(--primary-rgb),0.9)] text-black font-bold py-2.5 px-6 rounded-md transition-all duration-300 flex items-center justify-center gap-2"
+                whileHover={buttonHover}
+                whileTap={buttonTap}
+              >
+                {isLoading ? "Registrando..." : "Registrarse"}
+              </motion.button>
 
               {error && (
                 <motion.div
-                  className="md:col-span-2 p-3 bg-red-500/20 border border-red-500/30 rounded-md"
+                  className="p-3 bg-red-500/10 border border-red-500/20 rounded-md"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
@@ -262,19 +361,18 @@ const Register: React.FC = () => {
                   <p className="text-red-400 text-center text-sm">{error}</p>
                 </motion.div>
               )}
-            </form>
 
-            <div className="text-center text-white text-sm pt-4">
-              ¿Ya tienes una cuenta?{" "}
-              <Link href="/login" className="text-[rgb(var(--primary-rgb))] hover:underline">
-                Inicia sesión
-              </Link>
-            </div>
+              <div className="text-center text-gray-400 text-sm">
+                ¿Ya tienes una cuenta?{" "}
+                <Link href="/login" className="text-[rgb(var(--primary-rgb))] hover:underline">
+                  inicia sesión aquí
+                </Link>
+              </div>
+            </form>
           </motion.div>
         </motion.div>
       </div>
 
-      {/* Estilos globales para los select */}
       <style jsx global>{`
         select option {
           background-color: #1a1a1a;
@@ -283,15 +381,13 @@ const Register: React.FC = () => {
         }
         
         input::placeholder {
-          color: rgba(255, 255, 255, 0.6);
+          color: rgba(255, 255, 255, 0.4);
         }
         
-        /* Mejora la apariencia del selector de fecha */
         input[type="date"] {
           color-scheme: dark;
         }
         
-        /* Mejora la apariencia del selector */
         select {
           appearance: none;
           background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23FFD700' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
@@ -302,7 +398,7 @@ const Register: React.FC = () => {
         }
       `}</style>
     </motion.div>
-  )
-}
+  );
+};
 
-export default Register
+export default Register;

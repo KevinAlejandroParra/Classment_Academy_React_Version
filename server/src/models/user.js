@@ -93,11 +93,14 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
             },
             user_birth: {
-                type: DataTypes.DATE,
+                type: DataTypes.DATEONLY,
                 allowNull: false,
                 validate: {
                     isDate: {
                         msg: "Debe proporcionar una fecha válida"
+                    },
+                    notEmpty: {
+                        msg: "La fecha de nacimiento es requerida"
                     }
                 }
             },

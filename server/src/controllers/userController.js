@@ -232,9 +232,8 @@ class UserController {
             // Creamos el token JWT
             const token = jwt.sign(
                 {
-                    id: foundUser.id,
+                    user_id: foundUser.user_id,
                     email: foundUser.user_email,
-                    role: foundUser.user_rol,
                 },
                 process.env.JWT_SECRET || "fullsecret",
                 { expiresIn: "24h" }
@@ -265,7 +264,7 @@ class UserController {
             // Verificar si el usuario existe en la base de datos
             const user = await User.findOne({
                 where: {
-                    user_email: req.user.email
+                    user_id: req.user.user_id
                 }
             });
             
@@ -281,9 +280,12 @@ class UserController {
                 success: true,
                 valid: true,
                 user: {
-                    id: user.id,
+                    id: user.user_id,
                     email: user.user_email,
-                    role: user.user_rol
+                    role: user.role_id,
+                    name: user.user_name,
+                    lastname: user.user_lastname,
+                    image: user.user_image
                 }
             });
         } catch (error) {

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
+import Swal from "sweetalert2"
 
 // Component imports
 import { Particles } from "@/components/particles"
@@ -22,6 +23,10 @@ import {
   faTimes,
   faTrash,
   faUser,
+  faGraduationCap,
+  faClock,
+  faCalendar,
+  faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons"
 
 // Animation imports
@@ -43,19 +48,31 @@ interface UserData {
 
 // Tipos para los cursos
 interface Course {
-  id: string
-  name: string
-  description: string
-  image: string
+  course_id: string
+  course_name: string
+  course_description: string
+  course_image: string
+  course_price: number
+  course_places: number
+  course_age: number
   school?: School
+  UserCourse?: {
+    course_plan: string
+    course_state: string
+    course_start: string
+    course_end: string
+  }
 }
 
 // Tipos para la escuela
 interface School {
-  id: string
-  name: string
-  logo: string
-  description: string
+  school_id: string
+  school_name: string
+  school_description: string
+  school_phone: string
+  school_address: string
+  school_image: string
+  school_email: string
 }
 
 const containerVariants = {
@@ -117,6 +134,7 @@ const ProfilePage = () => {
           return
         }
 
+        // Fetch user data
         const response = await fetch("http://localhost:5000/api/auth/me", {
           method: "GET",
           headers: {
@@ -135,13 +153,33 @@ const ProfilePage = () => {
           setUserData(data.user)
           setEditForm(data.user)
 
-          // Usar los datos reales de los cursos y la escuela
-          if (data.user.courses && data.user.courses.length > 0) {
-            setCourses(data.user.courses)
-            
-            // Si hay cursos, usar la escuela del primer curso
-            if (data.user.courses[0].school) {
-              setSchool(data.user.courses[0].school)
+          // Fetch user's courses
+          const coursesResponse = await fetch(`http://localhost:5000/api/users/${data.user.id}/courses`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          })
+
+          if (coursesResponse.ok) {
+            const coursesData = await coursesResponse.json()
+            if (coursesData.success) {
+              setCourses(coursesData.data)
+            }
+          }
+
+          // Fetch user's schools
+          const schoolsResponse = await fetch(`http://localhost:5000/api/users/${data.user.id}/schools`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          })
+
+          if (schoolsResponse.ok) {
+            const schoolsData = await schoolsResponse.json()
+            if (schoolsData.success && schoolsData.data.length > 0) {
+              setSchool(schoolsData.data[0]) // Set the first school as default
             }
           }
         } else {
@@ -150,6 +188,14 @@ const ProfilePage = () => {
       } catch (err) {
         setError(err instanceof Error ? err.message : "Error desconocido")
         console.error("Error al cargar datos del usuario:", err)
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: err instanceof Error ? err.message : "Error desconocido",
+          confirmButtonColor: '#FFD700',
+          background: '#1a1a1a',
+          color: '#fff'
+        })
       } finally {
         setIsLoading(false)
       }
@@ -201,12 +247,30 @@ const ProfilePage = () => {
       if (data.success) {
         setUserData(prev => ({ ...prev, ...editForm } as UserData))
         setShowEditModal(false)
+        
+        Swal.fire({
+          icon: 'success',
+          title: 'Perfil actualizado',
+          text: 'Tu perfil ha sido actualizado correctamente',
+          confirmButtonColor: '#FFD700',
+          background: '#1a1a1a',
+          color: '#fff'
+        })
       } else {
         throw new Error(data.message || "Error al actualizar el perfil")
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error desconocido")
       console.error("Error al actualizar perfil:", err)
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: err instanceof Error ? err.message : "Error desconocido",
+        confirmButtonColor: '#FFD700',
+        background: '#1a1a1a',
+        color: '#fff'
+      })
     }
   }
 
@@ -241,12 +305,30 @@ const ProfilePage = () => {
       if (data.success) {
         // Cerrar sesión después de desactivar el perfil
         handleLogout()
+        
+        Swal.fire({
+          icon: 'success',
+          title: 'Perfil desactivado',
+          text: 'Tu perfil ha sido desactivado correctamente',
+          confirmButtonColor: '#FFD700',
+          background: '#1a1a1a',
+          color: '#fff'
+        })
       } else {
         throw new Error(data.message || "Error al desactivar el perfil")
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error desconocido")
       console.error("Error al desactivar perfil:", err)
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: err instanceof Error ? err.message : "Error desconocido",
+        confirmButtonColor: '#FFD700',
+        background: '#1a1a1a',
+        color: '#fff'
+      })
     }
   }
 
@@ -256,208 +338,287 @@ const ProfilePage = () => {
     router.push("/login")
   }
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="text-[rgb(var(--primary-rgb))] text-xl">Cargando perfil...</div>
-      </div>
-    )
+  // Función para confirmar cierre de sesión
+  const confirmLogout = () => {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "Se cerrará tu sesión",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#FFD700',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, cerrar sesión',
+      cancelButtonText: 'Cancelar',
+      background: '#1a1a1a',
+      color: '#fff'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleLogout()
+      }
+    })
   }
 
-  if (error) {
+  // Función para confirmar eliminación de perfil
+  const confirmDeleteProfile = () => {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "Tu perfil será desactivado y no podrás acceder hasta que un administrador lo reactive",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#FFD700',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, desactivar perfil',
+      cancelButtonText: 'Cancelar',
+      background: '#1a1a1a',
+      color: '#fff'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleDeleteProfile()
+      }
+    })
+  }
+
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="text-red-500 text-xl">{error}</div>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-white text-xl">Cargando...</div>
       </div>
     )
   }
 
   if (!userData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-white text-xl">No se encontraron datos del usuario</div>
       </div>
     )
   }
 
   return (
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
-      className="min-h-screen w-full relative overflow-hidden bg-black"
-    >
+    <div className="min-h-screen bg-black relative overflow-hidden">
       <Particles />
-
-      <div className="container mx-auto px-4 py-12 z-10">
+      <div className="container mx-auto px-4 py-8 relative z-10">
         <motion.div
-          variants={itemVariants}
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
           className="max-w-6xl mx-auto"
         >
-          {/* Encabezado del perfil */}
-          <div className="flex flex-col md:flex-row items-center gap-8 mb-12">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="relative w-40 h-40 rounded-full overflow-hidden border-4 border-[rgb(var(--primary-rgb))]"
-            >
-              <img
-                src={userData.image}
-                alt={`${userData.name} ${userData.lastname}`}
-                className="object-cover w-full h-full"
-              />
-            </motion.div>
-
-            <div className="text-center md:text-left">
-              <motion.h1
-                className="text-4xl font-bold text-white mb-2"
-                variants={itemVariants}
-              >
-                {userData.name} {userData.lastname}
-              </motion.h1>
-
-              <motion.p
-                className="text-[rgb(var(--primary-rgb))] text-xl mb-4"
-                variants={itemVariants}
-              >
-                {userData.email}
-              </motion.p>
-
-              <motion.div
-                className="flex flex-wrap gap-3 justify-center md:justify-start"
-                variants={itemVariants}
-              >
+          <motion.div
+            variants={itemVariants}
+            className="backdrop-blur-xl bg-black/10 p-8 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)]"
+          >
+            {/* Encabezado del perfil */}
+            <div className="flex flex-col md:flex-row items-center gap-6 mb-8">
+              <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-[rgb(var(--primary-rgb))]">
+                <Image
+                  src={userData.image || "/Img/default-avatar.png"}
+                  alt={`${userData.name} ${userData.lastname}`}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="text-center md:text-left">
+                <h1 className="text-3xl font-bold text-white">
+                  {userData.name} {userData.lastname}
+                </h1>
+                <p className="text-gray-300">{userData.email}</p>
+                <div className="flex flex-wrap gap-2 mt-2 justify-center md:justify-start">
+                  <span className="px-3 py-1 bg-[rgba(var(--primary-rgb),0.2)] text-[rgb(var(--primary-rgb))] rounded-full text-sm">
+                    {userData.role === 1
+                      ? "Estudiante"
+                      : userData.role === 3
+                      ? "Administrador"
+                      : userData.role === 4
+                      ? "Coordinador"
+                      : "Usuario"}
+                  </span>
+                </div>
+              </div>
+              <div className="ml-auto flex gap-2">
                 <motion.button
                   whileHover={buttonHover}
                   whileTap={buttonTap}
                   onClick={() => setShowEditModal(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-[rgb(var(--primary-rgb))] text-black rounded-md"
+                  className="p-2 bg-[rgba(var(--primary-rgb),0.2)] text-[rgb(var(--primary-rgb))] rounded-full hover:bg-[rgba(var(--primary-rgb),0.3)] transition-colors"
                 >
                   <FontAwesomeIcon icon={faEdit} />
-                  <span>Editar Perfil</span>
                 </motion.button>
-
                 <motion.button
                   whileHover={buttonHover}
                   whileTap={buttonTap}
-                  onClick={() => setShowDeleteModal(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-md"
+                  onClick={confirmDeleteProfile}
+                  className="p-2 bg-red-500/20 text-red-400 rounded-full hover:bg-red-500/30 transition-colors"
                 >
                   <FontAwesomeIcon icon={faTrash} />
-                  <span>Eliminar Perfil</span>
                 </motion.button>
-
                 <motion.button
                   whileHover={buttonHover}
                   whileTap={buttonTap}
-                  onClick={() => setShowLogoutModal(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-700 text-white rounded-md"
+                  onClick={confirmLogout}
+                  className="p-2 bg-gray-700/50 text-gray-300 rounded-full hover:bg-gray-700/70 transition-colors"
                 >
                   <FontAwesomeIcon icon={faSignOutAlt} />
-                  <span>Cerrar Sesión</span>
                 </motion.button>
-              </motion.div>
-            </div>
-          </div>
-
-          {/* Información del usuario */}
-          <motion.div
-            variants={itemVariants}
-            className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12"
-          >
-            {/* Información personal */}
-            <div className="backdrop-blur-xl bg-black/10 p-6 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)]">
-              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                <FontAwesomeIcon icon={faUser} className="text-[rgb(var(--primary-rgb))]" />
-                <span>Información Personal</span>
-              </h2>
-
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <FontAwesomeIcon icon={faIdCard} className="text-[rgb(var(--primary-rgb))] w-5" />
-                  <div>
-                    <p className="text-gray-400 text-sm">Documento</p>
-                    <p className="text-white">{userData.document_type} {userData.document}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <FontAwesomeIcon icon={faPhone} className="text-[rgb(var(--primary-rgb))] w-5" />
-                  <div>
-                    <p className="text-gray-400 text-sm">Teléfono</p>
-                    <p className="text-white">{userData.phone || "No registrado"}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <FontAwesomeIcon icon={faCalendarAlt} className="text-[rgb(var(--primary-rgb))] w-5" />
-                  <div>
-                    <p className="text-gray-400 text-sm">Fecha de Nacimiento</p>
-                    <p className="text-white">{userData.birthdate ? new Date(userData.birthdate).toLocaleDateString() : "No registrado"}</p>
-                  </div>
-                </div>
               </div>
             </div>
 
-            {/* Escuela */}
-            <div className="backdrop-blur-xl bg-black/10 p-6 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)]">
-              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                <FontAwesomeIcon icon={faSchool} className="text-[rgb(var(--primary-rgb))]" />
-                <span>Mi Escuela</span>
-              </h2>
-
-              {school ? (
+            {/* Información del usuario */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              <motion.div
+                variants={itemVariants}
+                className="backdrop-blur-xl bg-black/10 p-6 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)]"
+              >
+                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                  <FontAwesomeIcon icon={faUser} className="text-[rgb(var(--primary-rgb))]" />
+                  <span>Información Personal</span>
+                </h2>
                 <div className="space-y-4">
-                  <div className="relative w-24 h-24 mx-auto mb-4">
-                    <Image
-                      src={school.logo}
-                      alt={school.name}
-                      fill
-                      className="object-contain"
-                    />
+                  <div className="flex items-center gap-3">
+                    <FontAwesomeIcon icon={faIdCard} className="text-[rgb(var(--primary-rgb))] w-5" />
+                    <div>
+                      <p className="text-gray-400 text-sm">Documento</p>
+                      <p className="text-white">
+                        {userData.document_type} {userData.document}
+                      </p>
+                    </div>
                   </div>
-
-                  <h3 className="text-xl font-bold text-white text-center">{school.name}</h3>
-                  <p className="text-gray-300 text-center">{school.description}</p>
+                  <div className="flex items-center gap-3">
+                    <FontAwesomeIcon icon={faPhone} className="text-[rgb(var(--primary-rgb))] w-5" />
+                    <div>
+                      <p className="text-gray-400 text-sm">Teléfono</p>
+                      <p className="text-white">{userData.phone || "No especificado"}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <FontAwesomeIcon icon={faCalendarAlt} className="text-[rgb(var(--primary-rgb))] w-5" />
+                    <div>
+                      <p className="text-gray-400 text-sm">Fecha de Nacimiento</p>
+                      <p className="text-white">
+                        {userData.birthdate
+                          ? new Date(userData.birthdate).toLocaleDateString()
+                          : "No especificada"}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              ) : (
-                <p className="text-gray-400 text-center">No estás inscrito en ninguna escuela</p>
-              )}
-            </div>
+              </motion.div>
 
-            {/* Cursos */}
-            <div className="backdrop-blur-xl bg-black/10 p-6 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)]">
-              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                <FontAwesomeIcon icon={faBook} className="text-[rgb(var(--primary-rgb))]" />
-                <span>Mis Cursos</span>
-              </h2>
+              {/* Escuela */}
+              <motion.div
+                variants={itemVariants}
+                className="backdrop-blur-xl bg-black/10 p-6 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)]"
+              >
+                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                  <FontAwesomeIcon icon={faSchool} className="text-[rgb(var(--primary-rgb))]" />
+                  <span>Mi Escuela</span>
+                </h2>
 
-              {courses.length > 0 ? (
-                <div className="space-y-4">
-                  {courses.map(course => (
-                    <div key={course.id} className="flex items-center gap-3 p-3 bg-black/20 rounded-lg">
-                      <div className="relative w-16 h-16">
-                        <Image
-                          src={course.image}
-                          alt={course.name}
-                          fill
-                          className="object-cover rounded-md"
-                        />
+                {school ? (
+                  <div className="space-y-4">
+                    <div className="relative w-24 h-24 mx-auto mb-4">
+                      <Image
+                        src={school.school_image}
+                        alt={school.school_name}
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+
+                    <h3 className="text-xl font-bold text-white text-center">{school.school_name}</h3>
+                    <p className="text-gray-300 text-center">{school.school_description}</p>
+                    
+                    <div className="mt-4 space-y-2 text-sm text-gray-300">
+                      <div className="flex items-center gap-2">
+                        <FontAwesomeIcon icon={faPhone} className="text-[rgb(var(--primary-rgb))] w-4" />
+                        <span>{school.school_phone}</span>
                       </div>
-                      <div>
-                        <h3 className="text-white font-bold">{course.name}</h3>
-                        <p className="text-gray-400 text-sm">{course.description}</p>
-                        {course.school && (
-                          <p className="text-[rgb(var(--primary-rgb))] text-xs mt-1">
-                            Escuela: {course.school.name}
-                          </p>
-                        )}
+                      <div className="flex items-center gap-2">
+                        <FontAwesomeIcon icon={faEnvelope} className="text-[rgb(var(--primary-rgb))] w-4" />
+                        <span>{school.school_email}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <FontAwesomeIcon icon={faIdCard} className="text-[rgb(var(--primary-rgb))] w-4" />
+                        <span>{school.school_address}</span>
                       </div>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-400 text-center">No estás inscrito en ningún curso</p>
-              )}
+                  </div>
+                ) : (
+                  <p className="text-gray-400 text-center">No estás inscrito en ninguna escuela</p>
+                )}
+              </motion.div>
+
+              {/* Cursos */}
+              <motion.div
+                variants={itemVariants}
+                className="backdrop-blur-xl bg-black/10 p-6 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)]"
+              >
+                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                  <FontAwesomeIcon icon={faBook} className="text-[rgb(var(--primary-rgb))]" />
+                  <span>Mis Cursos</span>
+                </h2>
+
+                {courses.length > 0 ? (
+                  <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                    {courses.map(course => (
+                      <div key={course.course_id} className="bg-black/30 p-4 rounded-lg border border-[rgba(var(--primary-rgb),0.2)] hover:border-[rgba(var(--primary-rgb),0.4)] transition-all">
+                        <div className="flex items-start gap-3">
+                          <div className="relative w-16 h-16 flex-shrink-0">
+                            <Image
+                              src={course.course_image}
+                              alt={course.course_name}
+                              fill
+                              className="object-cover rounded-md"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-white font-bold truncate">{course.course_name}</h3>
+                            <p className="text-gray-400 text-xs line-clamp-2">{course.course_description}</p>
+                            
+                            {course.school && (
+                              <div className="flex items-center gap-1 mt-1">
+                                <FontAwesomeIcon icon={faSchool} className="text-[rgb(var(--primary-rgb))] text-xs" />
+                                <p className="text-[rgb(var(--primary-rgb))] text-xs truncate">
+                                  {course.school.school_name}
+                                </p>
+                              </div>
+                            )}
+                            
+                            {course.UserCourse && (
+                              <div className="mt-2 grid grid-cols-2 gap-1 text-xs text-gray-300">
+                                <div className="flex items-center gap-1">
+                                  <FontAwesomeIcon icon={faGraduationCap} className="text-[rgb(var(--primary-rgb))] w-3" />
+                                  <span className="truncate">{course.UserCourse.course_plan}</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <FontAwesomeIcon icon={faCheckCircle} className="text-[rgb(var(--primary-rgb))] w-3" />
+                                  <span className="truncate">
+                                    {new Date(course.UserCourse.course_state).toLocaleDateString()}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <FontAwesomeIcon icon={faCalendar} className="text-[rgb(var(--primary-rgb))] w-3" />
+                                  <span className="truncate">
+                                    {new Date(course.UserCourse.course_start).toLocaleDateString()}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <FontAwesomeIcon icon={faClock} className="text-[rgb(var(--primary-rgb))] w-3" />
+                                  <span className="truncate">
+                                    {new Date(course.UserCourse.course_end).toLocaleDateString()}
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-400 text-center">No estás inscrito en ningún curso</p>
+                )}
+              </motion.div>
             </div>
           </motion.div>
         </motion.div>
@@ -469,167 +630,137 @@ const ProfilePage = () => {
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="backdrop-blur-xl bg-black/90 p-8 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)] w-full max-w-md"
+            className="bg-black rounded-xl p-6 w-full max-w-md border-2 border-[rgb(var(--primary-rgb))] shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]"
           >
-            <h2 className="text-2xl font-bold text-white mb-6">Editar Perfil</h2>
-
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-white">Editar Perfil</h2>
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="text-gray-400 hover:text-white"
+              >
+                <FontAwesomeIcon icon={faTimes} />
+              </button>
+            </div>
             <div className="space-y-4">
               <div>
-                <label className="text-gray-300 block mb-1">Nombre</label>
+                <label className="block text-gray-300 mb-1">Nombre</label>
                 <input
                   type="text"
                   name="name"
                   value={editForm.name || ""}
                   onChange={handleEditChange}
-                  className="w-full p-3 bg-white/10 border border-[rgba(var(--primary-rgb),0.3)] rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-[rgb(var(--primary-rgb))]"
+                  className="w-full p-2 bg-gray-800 rounded-lg text-white"
                 />
               </div>
-
               <div>
-                <label className="text-gray-300 block mb-1">Apellido</label>
+                <label className="block text-gray-300 mb-1">Apellido</label>
                 <input
                   type="text"
                   name="lastname"
                   value={editForm.lastname || ""}
                   onChange={handleEditChange}
-                  className="w-full p-3 bg-white/10 border border-[rgba(var(--primary-rgb),0.3)] rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-[rgb(var(--primary-rgb))]"
+                  className="w-full p-2 bg-gray-800 rounded-lg text-white"
                 />
               </div>
-
               <div>
-                <label className="text-gray-300 block mb-1">Email</label>
+                <label className="block text-gray-300 mb-1">Email</label>
                 <input
                   type="email"
                   name="email"
                   value={editForm.email || ""}
                   onChange={handleEditChange}
-                  className="w-full p-3 bg-white/10 border border-[rgba(var(--primary-rgb),0.3)] rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-[rgb(var(--primary-rgb))]"
+                  className="w-full p-2 bg-gray-800 rounded-lg text-white"
                 />
               </div>
-
               <div>
-                <label className="text-gray-300 block mb-1">Teléfono</label>
+                <label className="block text-gray-300 mb-1">Teléfono</label>
                 <input
                   type="text"
                   name="phone"
                   value={editForm.phone || ""}
                   onChange={handleEditChange}
-                  className="w-full p-3 bg-white/10 border border-[rgba(var(--primary-rgb),0.3)] rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-[rgb(var(--primary-rgb))]"
+                  className="w-full p-2 bg-gray-800 rounded-lg text-white"
                 />
               </div>
-
               <div>
-                <label className="text-gray-300 block mb-1">Fecha de Nacimiento</label>
+                <label className="block text-gray-300 mb-1">Fecha de Nacimiento</label>
                 <input
                   type="date"
                   name="birthdate"
-                  value={editForm.birthdate ? new Date(editForm.birthdate).toISOString().split('T')[0] : ""}
+                  value={editForm.birthdate || ""}
                   onChange={handleEditChange}
-                  className="w-full p-3 bg-white/10 border border-[rgba(var(--primary-rgb),0.3)] rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-[rgb(var(--primary-rgb))]"
+                  className="w-full p-2 bg-gray-800 rounded-lg text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-300 mb-1">Tipo de Documento</label>
+                <select
+                  name="document_type"
+                  value={editForm.document_type || ""}
+                  onChange={handleEditChange as any}
+                  className="w-full p-2 bg-gray-800 rounded-lg text-white"
+                >
+                  <option value="CC">Cédula de Ciudadanía</option>
+                  <option value="TI">Tarjeta de Identidad</option>
+                  <option value="CE">Cédula de Extranjería</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-gray-300 mb-1">Documento</label>
+                <input
+                  type="text"
+                  name="document"
+                  value={editForm.document || ""}
+                  onChange={handleEditChange}
+                  className="w-full p-2 bg-gray-800 rounded-lg text-white"
                 />
               </div>
             </div>
-
-            <div className="flex justify-end gap-3 mt-6">
-              <motion.button
-                whileHover={buttonHover}
-                whileTap={buttonTap}
+            <div className="mt-6 flex justify-end gap-2">
+              <button
                 onClick={() => setShowEditModal(false)}
-                className="px-4 py-2 bg-gray-700 text-white rounded-md"
+                className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600"
               >
                 Cancelar
-              </motion.button>
-
-              <motion.button
-                whileHover={buttonHover}
-                whileTap={buttonTap}
+              </button>
+              <button
                 onClick={handleSaveProfile}
-                className="px-4 py-2 bg-[rgb(var(--primary-rgb))] text-black rounded-md flex items-center gap-2"
+                className="px-4 py-2 bg-[rgb(var(--primary-rgb))] text-black rounded-lg hover:bg-[rgba(var(--primary-rgb),0.9)]"
               >
-                <FontAwesomeIcon icon={faSave} />
-                <span>Guardar</span>
-              </motion.button>
+                Guardar
+              </button>
             </div>
           </motion.div>
         </div>
       )}
 
-      {/* Modal de Eliminación */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="backdrop-blur-xl bg-black/90 p-8 rounded-2xl shadow-2xl border-2 border-red-500/50 w-full max-w-md"
-          >
-            <h2 className="text-2xl font-bold text-white mb-6">Eliminar Perfil</h2>
-
-            <p className="text-gray-300 mb-6">
-              ¿Estás seguro de que deseas eliminar tu perfil? Esta acción cambiará tu estado a inactivo y no podrás acceder a la plataforma.
-            </p>
-
-            <div className="flex justify-end gap-3">
-              <motion.button
-                whileHover={buttonHover}
-                whileTap={buttonTap}
-                onClick={() => setShowDeleteModal(false)}
-                className="px-4 py-2 bg-gray-700 text-white rounded-md"
-              >
-                Cancelar
-              </motion.button>
-
-              <motion.button
-                whileHover={buttonHover}
-                whileTap={buttonTap}
-                onClick={handleDeleteProfile}
-                className="px-4 py-2 bg-red-600 text-white rounded-md flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={faTrash} />
-                <span>Eliminar</span>
-              </motion.button>
-            </div>
-          </motion.div>
-        </div>
-      )}
-
-      {/* Modal de Cierre de Sesión */}
-      {showLogoutModal && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="backdrop-blur-xl bg-black/90 p-8 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)] w-full max-w-md"
-          >
-            <h2 className="text-2xl font-bold text-white mb-6">Cerrar Sesión</h2>
-
-            <p className="text-gray-300 mb-6">
-              ¿Estás seguro de que deseas cerrar sesión?
-            </p>
-
-            <div className="flex justify-end gap-3">
-              <motion.button
-                whileHover={buttonHover}
-                whileTap={buttonTap}
-                onClick={() => setShowLogoutModal(false)}
-                className="px-4 py-2 bg-gray-700 text-white rounded-md"
-              >
-                Cancelar
-              </motion.button>
-
-              <motion.button
-                whileHover={buttonHover}
-                whileTap={buttonTap}
-                onClick={handleLogout}
-                className="px-4 py-2 bg-[rgb(var(--primary-rgb))] text-black rounded-md flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={faSignOutAlt} />
-                <span>Cerrar Sesión</span>
-              </motion.button>
-            </div>
-          </motion.div>
-        </div>
-      )}
-    </motion.div>
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(0, 0, 0, 0.2);
+          border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(var(--primary-rgb), 0.5);
+          border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(var(--primary-rgb), 0.7);
+        }
+        
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+      `}</style>
+    </div>
   )
 }
 

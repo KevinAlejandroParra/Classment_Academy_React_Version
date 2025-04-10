@@ -12,6 +12,7 @@ import {
   faLock,
 } from "@fortawesome/free-solid-svg-icons"
 import { motion } from "framer-motion"
+import Swal from "sweetalert2"
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -107,6 +108,15 @@ const Login: React.FC = () => {
     if (!email || !password) {
       setError("Por favor, complete todos los campos")
       setIsLoading(false)
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Por favor, complete todos los campos',
+        confirmButtonColor: '#FFD700',
+        background: '#1a1a1a',
+        color: '#fff'
+      })
       return
     }
 
@@ -137,7 +147,19 @@ const Login: React.FC = () => {
       const accessToken = result?.data?.token
       if (accessToken) {
         localStorage.setItem("token", accessToken)
-        checkAuthAndRedirect(accessToken)
+        
+        Swal.fire({
+          icon: 'success',
+          title: '¡Bienvenido!',
+          text: 'Has iniciado sesión correctamente',
+          confirmButtonColor: '#FFD700',
+          background: '#1a1a1a',
+          color: '#fff',
+          timer: 1500,
+          showConfirmButton: false
+        }).then(() => {
+          checkAuthAndRedirect(accessToken)
+        })
       } else {
         throw new Error("No se recibió el token de acceso")
       }
@@ -145,6 +167,15 @@ const Login: React.FC = () => {
       const err = error as Error
       console.error("Error en login:", err)
       setError(err.message)
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: err.message,
+        confirmButtonColor: '#FFD700',
+        background: '#1a1a1a',
+        color: '#fff'
+      })
     } finally {
       setIsLoading(false)
     }

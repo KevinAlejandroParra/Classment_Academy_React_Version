@@ -20,4 +20,9 @@ userRoutes.post("/reset-password", UserController.resetPassword);
 
 // Ruta para validar token
 userRoutes.get("/auth/me", verifyToken, UserController.validateToken);
+
+// Rutas para obtener cursos y escuelas del usuario
+userRoutes.get("/users/:id/courses", UserController.getUserCourses);
+userRoutes.get("/users/:id/schools", UserController.getUserSchools);
+
 module.exports = userRoutes;

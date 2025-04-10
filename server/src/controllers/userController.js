@@ -1,7 +1,8 @@
 const { User } = require("../models");
-const jwt = require("jsonwebtoken"); // Importamos jwt
-const bcrypt = require("bcrypt"); // Importamos bcrypt para comparar contraseñas
+const jwt = require("jsonwebtoken"); 
+const bcrypt = require("bcrypt"); 
 const nodemailer = require("nodemailer");
+const { Course, School } = require("../models");
 
 // Configurar el transporter de nodemailer
 const transporter = nodemailer.createTransport({
@@ -476,6 +477,84 @@ class UserController {
             res.status(500).json({
                 success: false,
                 message: "Error al restablecer la contraseña"
+            });
+        }
+    }
+
+    static async getUserCourses(req, res) {
+        try {
+            const userId = req.params.id;
+            const user = await User.findByPk(userId, {
+                include: [{
+                    model: Course,
+                    as: 'courses',
+                    include: [{
+                        model: School,
+                        as: 'school'
+                    }],
+                    through: {
+                        attributes: ['course_plan', 'course_state', 'course_start', 'course_end']
+                    }
+                }]
+            });
+
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Usuario no encontrado"
+                });
+            }
+
+            return res.status(200).json({
+                success: true,
+                data: user.courses,
+                message: "Cursos del usuario obtenidos correctamente"
+            });
+        } catch (error) {
+            console.error("Error al obtener cursos del usuario:", error);
+            return res.status(500).json({
+                success: false,
+                message: "Error al obtener los cursos del usuario",
+                error: error.message
+            });
+        }
+    }
+
+    static async getUserSchools(req, res) {
+        try {
+            const userId = req.params.id;
+            const user = await User.findByPk(userId, {
+                include: [{
+                    model: Course,
+                    as: 'courses',
+                    include: [{
+                        model: School,
+                        as: 'school'
+                    }]
+                }]
+            });
+
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Usuario no encontrado"
+                });
+            }
+
+            // Extract unique schools from user's courses
+            const schools = [...new Set(user.courses.map(course => course.school))];
+
+            return res.status(200).json({
+                success: true,
+                data: schools,
+                message: "Escuelas del usuario obtenidas correctamente"
+            });
+        } catch (error) {
+            console.error("Error al obtener escuelas del usuario:", error);
+            return res.status(500).json({
+                success: false,
+                message: "Error al obtener las escuelas del usuario",
+                error: error.message
             });
         }
     }

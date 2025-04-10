@@ -6,6 +6,7 @@ module.exports = {
             school_id: {
                 type: Sequelize.UUID,
                 defaultValue: Sequelize.UUIDV4,
+                primaryKey: true,
                 allowNull: false,
             },
             teacher_id: {

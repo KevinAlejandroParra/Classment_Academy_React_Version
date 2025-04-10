@@ -12,9 +12,12 @@ import {
   faPlus,
   faHome,
   faUser,
+  faEdit,
+  faTrash,
 } from "@fortawesome/free-solid-svg-icons"
 import { Particles } from "@/components/particles"
 import Link from "next/link"
+import Swal from "sweetalert2"
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -52,9 +55,10 @@ const buttonTap = {
 const CoordinatorDashboard = () => {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
-  const [school, setSchool] = useState<any>(null)
+  const [schools, setSchools] = useState<any[]>([])
   const [showSchoolModal, setShowSchoolModal] = useState(false)
   const [showCourseModal, setShowCourseModal] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const [newSchool, setNewSchool] = useState({
     school_name: "",
     school_description: "",
@@ -95,14 +99,29 @@ const CoordinatorDashboard = () => {
 
         setUser(data.user)
         
-        // Obtener la escuela del coordinador
-        const schoolResponse = await fetch(`http://localhost:5000/api/schools/coordinator/${data.user.id}`)
+        // Obtener las escuelas del coordinador
+        const schoolResponse = await fetch(`http://localhost:5000/api/schools/coordinator`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        
         if (schoolResponse.ok) {
           const schoolData = await schoolResponse.json()
-          setSchool(schoolData.data)
+          setSchools(schoolData.data || [])
+        } else {
+          console.error("Error al obtener escuelas:", await schoolResponse.json())
         }
+        
+        setIsLoading(false)
       } catch (error) {
         console.error("Error de autenticación:", error)
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Ha ocurrido un error al cargar tus datos',
+          confirmButtonColor: '#3085d6'
+        })
         router.push("/login")
       }
     }
@@ -133,7 +152,7 @@ const CoordinatorDashboard = () => {
 
       if (response.ok) {
         const data = await response.json()
-        setSchool(data.data)
+        setSchools([...schools, data.data])
         setShowSchoolModal(false)
         setNewSchool({
           school_name: "",
@@ -144,12 +163,88 @@ const CoordinatorDashboard = () => {
           school_email: "",
           teacher_id: ""
         })
+        
+        Swal.fire({
+          icon: 'success',
+          title: '¡Éxito!',
+          text: 'Escuela creada correctamente',
+          confirmButtonColor: '#3085d6'
+        })
       } else {
         const errorData = await response.json()
         console.error("Error al crear escuela:", errorData.message)
+        
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: errorData.message || 'Ha ocurrido un error al crear la escuela',
+          confirmButtonColor: '#3085d6'
+        })
       }
     } catch (error) {
       console.error("Error al crear escuela:", error)
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Ha ocurrido un error al crear la escuela',
+        confirmButtonColor: '#3085d6'
+      })
+    }
+  }
+
+  const handleDeleteSchool = async (schoolId: string) => {
+    try {
+      const result = await Swal.fire({
+        title: '¿Estás seguro?',
+        text: "Esta acción no se puede deshacer",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+      })
+      
+      if (result.isConfirmed) {
+        const token = localStorage.getItem("token")
+        const response = await fetch(`http://localhost:5000/api/schools/${schoolId}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        if (response.ok) {
+          setSchools(schools.filter(school => school.school_id !== schoolId))
+          
+          Swal.fire({
+            icon: 'success',
+            title: '¡Eliminado!',
+            text: 'La escuela ha sido eliminada correctamente',
+            confirmButtonColor: '#3085d6'
+          })
+        } else {
+          const errorData = await response.json()
+          console.error("Error al eliminar escuela:", errorData.message)
+          
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: errorData.message || 'Ha ocurrido un error al eliminar la escuela',
+            confirmButtonColor: '#3085d6'
+          })
+        }
+      }
+    } catch (error) {
+      console.error("Error al eliminar escuela:", error)
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Ha ocurrido un error al eliminar la escuela',
+        confirmButtonColor: '#3085d6'
+      })
     }
   }
 
@@ -166,7 +261,7 @@ const CoordinatorDashboard = () => {
         body: JSON.stringify({
           course: {
             ...newCourse,
-            school_id: school.id,
+            school_id: schools[0]?.school_id,
           },
         }),
       })
@@ -174,15 +269,52 @@ const CoordinatorDashboard = () => {
       if (response.ok) {
         setShowCourseModal(false)
         setNewCourse({ name: "", description: "", duration: "" })
+        
+        Swal.fire({
+          icon: 'success',
+          title: '¡Éxito!',
+          text: 'Curso creado correctamente',
+          confirmButtonColor: '#3085d6'
+        })
+      } else {
+        const errorData = await response.json()
+        console.error("Error al crear curso:", errorData.message)
+        
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: errorData.message || 'Ha ocurrido un error al crear el curso',
+          confirmButtonColor: '#3085d6'
+        })
       }
     } catch (error) {
       console.error("Error al crear curso:", error)
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Ha ocurrido un error al crear el curso',
+        confirmButtonColor: '#3085d6'
+      })
     }
   }
 
   const handleLogout = () => {
-    localStorage.removeItem("token")
-    router.push("/login")
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "¿Deseas cerrar sesión?",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, cerrar sesión',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        localStorage.removeItem("token")
+        router.push("/login")
+      }
+    })
   }
 
   const menuItems = [
@@ -193,10 +325,10 @@ const CoordinatorDashboard = () => {
       path: "/coordinator/students",
     },
     {
-      title: "Mi Escuela",
+      title: "Mis Escuelas",
       icon: faSchool,
-      description: "Gestionar información y cursos de tu escuela",
-      path: "/coordinator/school",
+      description: "Gestionar información y cursos de tus escuelas",
+      path: "/coordinator/schools",
     },
     {
       title: "Control de Asistencia",
@@ -211,6 +343,14 @@ const CoordinatorDashboard = () => {
       path: "/coordinator/reports",
     },
   ]
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-white text-xl">Cargando...</div>
+      </div>
+    )
+  }
 
   if (!user) return null
 
@@ -246,8 +386,8 @@ const CoordinatorDashboard = () => {
         </div>
       </div>
 
-      <main className="container mx-auto px-4 pt-24 pb-8">
-        {!school && (
+      <main className="container mx-auto px-4 pt-24 pb-12">
+        {schools.length === 0 && (
           <motion.div
             variants={containerVariants}
             className="backdrop-blur-xl bg-black/10 p-8 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)] mb-8"
@@ -267,6 +407,80 @@ const CoordinatorDashboard = () => {
                 Crear Escuela
               </motion.button>
             </motion.div>
+          </motion.div>
+        )}
+
+        {schools.length > 0 && (
+          <motion.div
+            variants={containerVariants}
+            className="backdrop-blur-xl bg-black/10 p-6 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)] mb-8"
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-white">Mis Escuelas</h2>
+              <motion.button
+                onClick={() => setShowSchoolModal(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-[rgb(var(--primary-rgb))] text-black rounded-lg hover:bg-[rgba(var(--primary-rgb),0.9)] transition-colors"
+                whileHover={buttonHover}
+                whileTap={buttonTap}
+              >
+                <FontAwesomeIcon icon={faPlus} />
+                Nueva Escuela
+              </motion.button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {schools.map((school, index) => (
+                <motion.div
+                  key={school.school_id}
+                  variants={itemVariants}
+                  className="backdrop-blur-xl bg-black/20 p-6 rounded-xl shadow-lg border border-[rgba(var(--primary-rgb),0.3)]"
+                >
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="bg-[rgb(var(--primary-rgb))] p-4 rounded-lg">
+                      <FontAwesomeIcon icon={faSchool} className="text-2xl text-black" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold text-white">{school.school_name}</h3>
+                      <p className="text-gray-400 text-sm line-clamp-2">{school.school_description}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 gap-2 text-gray-300 text-sm mb-4">
+                    <div className="flex items-center gap-2">
+                      <FontAwesomeIcon icon={faUser} className="text-[rgb(var(--primary-rgb))]" />
+                      <span>Email: {school.school_email}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FontAwesomeIcon icon={faSchool} className="text-[rgb(var(--primary-rgb))]" />
+                      <span>Teléfono: {school.school_phone}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <FontAwesomeIcon icon={faHome} className="text-[rgb(var(--primary-rgb))]" />
+                      <span>Dirección: {school.school_address}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-end gap-2">
+                    <motion.button
+                      onClick={() => router.push(`/coordinator/school/${school.school_id}`)}
+                      className="p-2 bg-[rgba(var(--primary-rgb),0.1)] text-[rgb(var(--primary-rgb))] rounded-lg hover:bg-[rgba(var(--primary-rgb),0.2)] transition-colors"
+                      whileHover={buttonHover}
+                      whileTap={buttonTap}
+                    >
+                      <FontAwesomeIcon icon={faEdit} />
+                    </motion.button>
+                    <motion.button
+                      onClick={() => handleDeleteSchool(school.school_id)}
+                      className="p-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500/20 transition-colors"
+                      whileHover={buttonHover}
+                      whileTap={buttonTap}
+                    >
+                      <FontAwesomeIcon icon={faTrash} />
+                    </motion.button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
         )}
 

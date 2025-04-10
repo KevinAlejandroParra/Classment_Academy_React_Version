@@ -1,19 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const schoolController = require('../controllers/schoolController');
-const { authenticateToken } = require('../middleware/auth');
+const { verifyToken } = require('../middleware/auth');
 
 // Rutas protegidas que requieren autenticación
-router.use(authenticateToken);
+router.use(verifyToken);
 
 // Obtener todas las escuelas
-router.get('/', schoolController.getSchools);
+router.get('/', schoolController.getAllSchools);
 
 // Obtener escuelas del coordinador
 router.get('/coordinator', schoolController.getCoordinatorSchools);
 
 // Obtener una escuela específica
-router.get('/:id', schoolController.getSchool);
+router.get('/:id', schoolController.getSchoolById);
 
 // Crear una nueva escuela (solo coordinadores)
 router.post('/', schoolController.createSchool);

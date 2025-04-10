@@ -31,13 +31,58 @@ export function Sidebar() {
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme } = useTheme()
   const pathname = usePathname()
+  const [user, setUser] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const token = localStorage.getItem("token")
+        if (!token) {
+          setIsLoading(false)
+          return
+        }
+
+        const response = await fetch("http://localhost:5000/api/auth/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        const data = await response.json()
+        if (!response.ok) throw new Error(data.message)
+
+        setUser(data.user)
+        setIsLoading(false)
+      } catch (error) {
+        console.error("Error de autenticación:", error)
+        setIsLoading(false)
+      }
+    }
+
+    checkAuth()
+  }, [])
+
+  const getDashboardPath = () => {
+    if (!user) return "/login"
+    switch (user.role) {
+      case 1:
+        return "/student/dashboard"
+      case 3:
+        return "/admin/dashboard"
+      case 4:
+        return "/coordinator/dashboard"
+      default:
+        return "/"
+    }
+  }
 
   const navItems: NavItem[] = [
     { name: "INICIO", href: "/", icon: faHome },
     { name: "PERFIL", href: "/profile", icon: faUser },
     { name: "ESCUELAS", href: "/schools", icon: faSchool },
     { name: "CURSOS", href: "/courses", icon: faBook },
-    { name: "INFORMACIÓN", href: "/info", icon: faInfoCircle },
+    { name: "PANEL DE CONTROL", href: getDashboardPath(), icon: faInfoCircle },
     { name: "CONTACTO", href: "/contact", icon: faEnvelope },
   ]
 

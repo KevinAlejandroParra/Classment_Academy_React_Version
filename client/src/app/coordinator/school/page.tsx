@@ -122,7 +122,7 @@ const SchoolPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-white text-xl">Cargando...</div>
       </div>
     )
@@ -130,7 +130,7 @@ const SchoolPage = () => {
 
   if (!school) {
     return (
-      <div className="min-h-screen bg-gray-900 p-8">
+      <div className="min-h-screen bg-black p-8">
         <div className="text-white text-xl text-center">
           No tienes una escuela registrada.
           <button
@@ -145,7 +145,7 @@ const SchoolPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-black">
       <nav className="bg-gray-800 text-white p-4">
         <div className="container mx-auto flex items-center gap-4">
           <button

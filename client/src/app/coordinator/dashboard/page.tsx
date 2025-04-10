@@ -515,7 +515,7 @@ const CoordinatorDashboard = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-gray-900/90 backdrop-blur-xl rounded-2xl p-8 w-full max-w-md border-2 border-[rgba(var(--primary-rgb),0.4)]"
+              className="bg-black/90 backdrop-blur-xl rounded-2xl p-8 w-full max-w-md border-2 border-[rgba(var(--primary-rgb),0.4)]"
             >
               <h2 className="text-2xl font-semibold text-white mb-6">Crear Nueva Escuela</h2>
               <form onSubmit={handleCreateSchool} className="space-y-4">

@@ -317,6 +317,12 @@ class UserController {
                 });
             }
 
+            if (foundUser.user_state == "inactivo") {
+                return res.status(401).json({
+                    success: false,
+                    message: "Usuario inactivo, por favor contacte al administrador para mas información",
+                });
+            }
             // Si llegamos aquí, las credenciales son correctas
             // Creamos el token JWT
             const token = jwt.sign(

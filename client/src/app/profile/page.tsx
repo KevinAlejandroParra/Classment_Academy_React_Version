@@ -412,7 +412,7 @@ const ProfilePage = () => {
             <div className="flex flex-col md:flex-row items-center gap-6 mb-8">
               <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-[rgb(var(--primary-rgb))]">
                 <Image
-                  src={userData.image || "/Img/default-avatar.png"}
+                  src={userData.image || "/images/default-avatar.png"}
                   alt={`${userData.name} ${userData.lastname}`}
                   fill
                   className="object-cover"

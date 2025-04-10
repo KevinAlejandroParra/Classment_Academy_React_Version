@@ -47,6 +47,7 @@ interface Course {
   name: string
   description: string
   image: string
+  school?: School
 }
 
 // Tipos para la escuela
@@ -134,29 +135,15 @@ const ProfilePage = () => {
           setUserData(data.user)
           setEditForm(data.user)
 
-          // Aquí se cargarían los cursos y la escuela del usuario
-          // Por ahora usamos datos de ejemplo
-          setCourses([
-            {
-              id: "1",
-              name: "Fútbol Avanzado",
-              description: "Técnicas avanzadas de fútbol para jugadores intermedios",
-              image: "/Images/resources/futbol.jpg"
-            },
-            {
-              id: "2",
-              name: "Baloncesto Básico",
-              description: "Fundamentos del baloncesto para principiantes",
-              image: "/Images/resources/basquetbol.jpg"
+          // Usar los datos reales de los cursos y la escuela
+          if (data.user.courses && data.user.courses.length > 0) {
+            setCourses(data.user.courses)
+            
+            // Si hay cursos, usar la escuela del primer curso
+            if (data.user.courses[0].school) {
+              setSchool(data.user.courses[0].school)
             }
-          ])
-
-          setSchool({
-            id: "1",
-            name: "Academia Deportiva Elite",
-            logo: "/Images/resources/basquetbolista.png",
-            description: "Centro de formación deportiva de alto rendimiento"
-          })
+          }
         } else {
           throw new Error("Datos de usuario no válidos")
         }
@@ -192,7 +179,17 @@ const ProfilePage = () => {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ user: editForm }),
+        body: JSON.stringify({ 
+          user: {
+            user_name: editForm.name,
+            user_lastname: editForm.lastname,
+            user_email: editForm.email,
+            user_phone: editForm.phone,
+            user_birth: editForm.birthdate,
+            user_document_type: editForm.document_type,
+            user_document: editForm.document
+          }
+        }),
       })
 
       if (!response.ok) {
@@ -449,6 +446,11 @@ const ProfilePage = () => {
                       <div>
                         <h3 className="text-white font-bold">{course.name}</h3>
                         <p className="text-gray-400 text-sm">{course.description}</p>
+                        {course.school && (
+                          <p className="text-[rgb(var(--primary-rgb))] text-xs mt-1">
+                            Escuela: {course.school.name}
+                          </p>
+                        )}
                       </div>
                     </div>
                   ))}

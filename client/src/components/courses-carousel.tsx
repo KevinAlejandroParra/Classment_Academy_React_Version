@@ -13,13 +13,17 @@ import "swiper/css/effect-coverflow"
 import "swiper/css/pagination"
 
 interface Curso {
-  curso_id: number
-  curso_nombre: string
-  curso_descripcion: string
-  curso_precio: number
-  curso_imagen_url: string
-  escuela_nombre: string
+  course_id: string
+  course_name: string
+  course_description: string
+  course_price: number
+  course_image: string
+  school: {
+    school_name: string
+  }
 }
+
+const API_BASE_URL = "http://localhost:5000"
 
 export function CoursesCarousel() {
   const [cursos, setCursos] = useState<Curso[]>([])
@@ -31,16 +35,44 @@ export function CoursesCarousel() {
   const fetchCursos = async () => {
     try {
       setLoading(true)
-      // Cambia esta URL a tu API en producción
-      const response = await fetch("http://localhost:5000/api/cursos")
-      if (!response.ok) {
-        throw new Error("Error al obtener los cursos")
+      setError(null)
+      
+      const token = localStorage.getItem("token")
+      if (!token) {
+        throw new Error("No se encontró el token de autenticación")
       }
+      
+      console.log("Iniciando petición a la API de cursos...")
+      const response = await fetch(`${API_BASE_URL}/api/courses`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      
+      console.log("Respuesta recibida:", response.status)
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: "Error desconocido" }))
+        console.error("Error en la respuesta:", errorData)
+        throw new Error(`Error al obtener los cursos: ${errorData.message || response.statusText}`)
+      }
+      
       const data = await response.json()
-      setCursos(data)
+      console.log("Datos recibidos:", data)
+      
+      if (!data.success) {
+        throw new Error(data.message || "Error al obtener los cursos")
+      }
+      
+      if (!data.data || !Array.isArray(data.data)) {
+        console.warn("Los datos recibidos no son un array:", data)
+        setCursos([])
+      } else {
+        setCursos(data.data)
+      }
     } catch (error) {
       console.error("Error al obtener los cursos:", error)
-      setError("No se pudieron cargar los cursos")
+      setError(error instanceof Error ? error.message : "No se pudieron cargar los cursos")
     } finally {
       setLoading(false)
     }
@@ -64,6 +96,31 @@ export function CoursesCarousel() {
     }
   }, [])
 
+  // Función para validar URLs de imágenes
+  const isValidImageUrl = (url: string): boolean => {
+    if (!url) return false
+    try {
+      // Verificar si es una URL válida
+      new URL(url)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  // Función para obtener la URL de la imagen o una imagen de respaldo
+  const getImageUrl = (url: string): string => {
+    if (!url) return "/placeholder.svg"
+    
+    // Si la URL ya es absoluta, la devolvemos tal cual
+    if (isValidImageUrl(url)) {
+      return url
+    }
+    
+    // Si es una ruta relativa, la combinamos con la URL base del servidor
+    return `${API_BASE_URL}${url}`
+  }
+
   if (loading) {
     return (
       <div className="py-16 text-center">
@@ -76,7 +133,13 @@ export function CoursesCarousel() {
   if (error) {
     return (
       <div className="py-16 text-center">
-        <p className="text-red-500">{error}</p>
+        <p className="text-red-500 mb-4">{error}</p>
+        <button 
+          onClick={fetchCursos}
+          className="px-4 py-2 bg-[rgb(var(--primary-rgb))] text-black rounded-lg hover:bg-[rgba(var(--primary-rgb),0.9)]"
+        >
+          Reintentar
+        </button>
       </div>
     )
   }
@@ -111,7 +174,6 @@ export function CoursesCarousel() {
           grabCursor={true}
           centeredSlides={true}
           slidesPerView={3}
-
           coverflowEffect={{
             rotate: 50,
             stretch: 0,
@@ -135,14 +197,14 @@ export function CoursesCarousel() {
         >
           {cursos.map((curso) => (
             <SwiperSlide
-              key={curso.curso_id}
+              key={curso.course_id}
               className="bg-center bg-cover w-[300px] sm:w-[350px] md:w-[400px] lg:w-[450px] drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.4)]"
             >
               <div className="card bg-[rgb(var(--background-rgb))] rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 border border-[rgba(var(--foreground-rgb),0.1)]">
                 <figure className="relative h-[200px] w-full">
                   <Image
-                    src={curso.curso_imagen_url}
-                    alt={curso.curso_nombre}
+                    src={getImageUrl(curso.course_image)}
+                    alt={curso.course_name}
                     fill
                     className="object-cover"
                   />
@@ -150,16 +212,16 @@ export function CoursesCarousel() {
                 </figure>
                 <div className="card-body p-4">
                   <h2 className="card-title text-xl font-semibold mb-2 text-[rgb(var(--foreground-rgb))]">
-                    {curso.curso_nombre}
+                    {curso.course_name}
                   </h2>
                   <p className="text-lg mb-2 text-[rgba(var(--foreground-rgb),0.8)] line-clamp-2">
-                    {curso.curso_descripcion}
+                    {curso.course_description}
                   </p>
-                  <p className="text-sm mb-2 text-[rgba(var(--foreground-rgb),0.6)]">Escuela: {curso.escuela_nombre}</p>
-                  <p className="text-lg font-bold mb-2 text-[rgb(var(--primary-rgb))]">${curso.curso_precio}</p>
+                  <p className="text-sm mb-2 text-[rgba(var(--foreground-rgb),0.6)]">Escuela: {curso.school.school_name}</p>
+                  <p className="text-lg font-bold mb-2 text-[rgb(var(--primary-rgb))]">${curso.course_price}</p>
                   <div className="card-actions justify-end pt-2 pb-2">
                     <Link
-                      href={`/curso/${curso.curso_id}`}
+                      href={`/curso/${curso.course_id}`}
                       className="inline-flex items-center justify-center rounded-full bg-[rgb(var(--primary-rgb))] text-black font-bold py-2 px-4 min-w-[120px] text-sm transition-transform hover:scale-105 hover:shadow-lg"
                     >
                       Ver Curso
@@ -174,4 +236,3 @@ export function CoursesCarousel() {
     </motion.div>
   )
 }
-

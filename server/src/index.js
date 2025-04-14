@@ -4,6 +4,8 @@ const userRoutes = require("./routes/user.routes.js");
 const schoolRoutes = require("./routes/school.routes.js");
 const courseRoutes = require("./routes/course.routes.js");
 const errorHandler = require("./middleware/errorHandler.js");
+const path = require('path');
+
 
 const app = express();
 
@@ -12,8 +14,9 @@ app.use(cors({
   origin: 'http://localhost:3000', 
   credentials: true 
 }));
-
 app.use(express.json());
+app.use('/images', express.static(path.join(__dirname, '..', 'public', 'images')));
+
 
 // Rutas existentes
 app.use('/api', userRoutes);
@@ -23,11 +26,13 @@ app.use('/api/schools', schoolRoutes);
 app.use('/api/courses', courseRoutes);
 
 // Manejo de rutas no encontradas
-app.use((req, res, next) => {
-  const error = new Error("Ruta no encontrada");
-  error.statusCode = 404;
-  next(error);
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Ruta no encontrada",
+  });
 });
+
 
 // Middleware de manejo de errores
 app.use(errorHandler);

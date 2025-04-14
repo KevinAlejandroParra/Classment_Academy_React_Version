@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt"); 
 const nodemailer = require("nodemailer");
 const { Course, School } = require("../models");
+const path = require("path");
 
 // Configurar el transporter de nodemailer
 const transporter = nodemailer.createTransport({
@@ -188,68 +189,82 @@ class UserController {
     }
 
     static async updateUser(req, res) {
+        console.log("📥 Entrando a updateUser");
+        console.log("Imagen recibida:", req.file);
+
         try {
             const userId = req.params.id;
-            // Verificamos primero si existe user en el body
-            const userJSON = req.body.user;
-
-            if (!userJSON) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Datos de usuario no proporcionados",
-                });
+            let userJSON;
+            if (typeof req.body.user === "string") {
+              userJSON = JSON.parse(req.body.user);
+            } else if (typeof req.body.user === "object") {
+              userJSON = req.body.user;
+            } else {
+              userJSON = req.body;
             }
-
+            
             const user = await User.findByPk(userId);
-
             if (!user) {
                 return res.status(404).json({
                     success: false,
                     message: "Usuario no encontrado",
                 });
             }
-
-            // Validación adicional para la contraseña solo si se proporciona
-            if (userJSON.user_password) {
-                if (userJSON.user_password.length < 8) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "La contraseña debe tener al menos 8 caracteres",
-                    });
-                }
+    
+            // Si hay imagen, actualizarla
+            if (req.file) {
+                const imagePath = path.join("images/users", req.file.filename).replace(/\\/g, "/");
+                user.user_image = imagePath;
             }
-
-            await user.update(userJSON);
-
-            // Eliminar la contraseña de la respuesta
+    
+            // Validación adicional para contraseña
+            if (userJSON.user_password && userJSON.user_password.length < 8) {
+                return res.status(400).json({
+                    success: false,
+                    message: "La contraseña debe tener al menos 8 caracteres",
+                });
+            }
+    
+            // Actualizar campos si llegan
+            const campos = [
+                "user_name",
+                "user_lastname",
+                "user_email",
+                "user_phone",
+                "user_birthdate",
+                "user_document_type",
+                "user_document",
+                "user_state",
+                "user_password"
+            ];
+    
+            campos.forEach((campo) => {
+                if (userJSON[campo]) {
+                    user[campo] = userJSON[campo];
+                }
+            });
+    
+            await user.save();
+    
             const userResponse = user.toJSON();
             delete userResponse.user_password;
-
-            res.status(200).json({
+    
+            return res.status(200).json({
                 success: true,
-                data: userResponse,
-                message: "Usuario actualizado correctamente",
+                user: userResponse,
+                message: "Perfil actualizado correctamente",
             });
         } catch (error) {
             console.error("Error al actualizar usuario:", error);
-
-            // Manejo específico para errores de validación de Sequelize
-            if (error.name === "SequelizeValidationError") {
-                const validationErrors = error.errors.map((err) => err.message);
-                return res.status(400).json({
-                    success: false,
-                    data: validationErrors,
-                    message: "Error de validación",
-                });
-            }
-
-            res.status(500).json({
+            return res.status(500).json({
                 success: false,
-                data: error.message,
                 message: "Error al actualizar el usuario",
+                error: error.message,
+                
             });
         }
     }
+    
 
     static async deleteUser(req, res) {
         try {

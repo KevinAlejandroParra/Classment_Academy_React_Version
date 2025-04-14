@@ -556,8 +556,12 @@ class UserController {
                 });
             }
 
-            // Extract unique schools from user's courses
-            const schools = [...new Set(user.courses.map(course => course.school))];
+            // Obtener escuelas sin duplicados
+            const schools = Array.from(
+                new Map(
+                  user.courses.map(course => [course.school.school_id, course.school])
+                ).values()
+              );
 
             return res.status(200).json({
                 success: true,

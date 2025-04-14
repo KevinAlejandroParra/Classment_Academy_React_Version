@@ -113,7 +113,7 @@ const ProfilePage = () => {
     const router = useRouter();
     const [userData, setUserData] = useState<UserData | null>(null);
     const [courses, setCourses] = useState<Course[]>([]);
-    const [school, setSchool] = useState<School | null>(null);
+    const [schools, setSchools] = useState<School[]>([])
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -214,7 +214,7 @@ const ProfilePage = () => {
                     setUserData(data.user);
                     setEditForm(data.user);
 
-                    // Fetch user's courses
+                    // Fetch cursos
                     const coursesResponse = await fetch(
                         `http://localhost:5000/api/users/${data.user.id}/courses`,
                         {
@@ -232,46 +232,42 @@ const ProfilePage = () => {
                         }
                     }
 
-                    // Fetch user's schools
-                    const schoolsResponse = await fetch(
-                        `http://localhost:5000/api/users/${data.user.id}/schools`,
-                        {
-                            headers: {
-                                Authorization: `Bearer ${token}`,
-                                "Content-Type": "application/json",
-                            },
-                        }
-                    );
-
+                     // Fetch escuelas
+                     const schoolsResponse = await fetch(`http://localhost:5000/api/users/${data.user.id}/schools`, {
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                      },
+                    })
+          
                     if (schoolsResponse.ok) {
-                        const schoolsData = await schoolsResponse.json();
-                        if (schoolsData.success && schoolsData.data.length > 0) {
-                            setSchool(schoolsData.data[0]); // Set the first school as default
-                        }
+                      const schoolsData = await schoolsResponse.json()
+                      if (schoolsData.success && schoolsData.data.length > 0) {
+                        setSchools(schoolsData.data)
+                      }
                     }
-                } else {
-                    throw new Error("Datos de usuario no válidos");
-                }
-            } catch (err) {
-                setError(err instanceof Error ? err.message : "Error desconocido");
-                console.error("Error al cargar datos del usuario:", err);
-                Swal.fire({
+                  } else {
+                    throw new Error("Datos de usuario no válidos")
+                  }
+                } catch (err) {
+                  setError(err instanceof Error ? err.message : "Error desconocido")
+                  console.error("Error al cargar datos del usuario:", err)
+                  Swal.fire({
                     icon: "error",
                     title: "Error",
                     text: err instanceof Error ? err.message : "Error desconocido",
                     confirmButtonColor: "#FFD700",
                     background: "#1a1a1a",
                     color: "#fff",
-                });
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchUserData();
-    }, [router]);
-
-
+                  })
+                } finally {
+                  setIsLoading(false)
+                }
+              }
+          
+              fetchUserData()
+            }, [router])
+          
 
    
 
@@ -526,66 +522,55 @@ const ProfilePage = () => {
                             </motion.div>
 
                             {/* Escuela */}
-                            <motion.div
-                                variants={itemVariants}
-                                className="backdrop-blur-xl bg-black/10 p-6 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)]"
-                            >
-                                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                                    <FontAwesomeIcon
-                                        icon={faSchool}
-                                        className="text-[rgb(var(--primary-rgb))]"
-                                    />
-                                    <span>Mi Escuela</span>
-                                </h2>
+                          {/* Escuelas */}
+              <motion.div
+                variants={itemVariants}
+                className="backdrop-blur-xl bg-black/10 p-6 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)]"
+              >
+                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                  <FontAwesomeIcon icon={faSchool} className="text-[rgb(var(--primary-rgb))]" />
+                  <span>Mis Escuelas</span>
+                </h2>
 
-                                {school ? (
-                                    <div className="space-y-4">
-                                        <div className="relative w-24 h-24 mx-auto mb-4">
-                                            <Image
-                                                src={school.school_image}
-                                                alt={school.school_name}
-                                                fill
-                                                className="object-contain"
-                                            />
-                                        </div>
+                {schools.length > 0 ? (
+                  <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                    {schools.map((school) => (
+                      <div
+                      key={`school-${school.school_id}`}
+                      className="bg-black/30 p-4 rounded-lg border border-[rgba(var(--primary-rgb),0.2)] hover:border-[rgba(var(--primary-rgb),0.4)] transition-all"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="relative w-16 h-16 flex-shrink-0">
+                            <Image
+                              src={school.school_image || "/images/default-school.png"}
+                              alt={school.school_name}
+                              fill
+                              className="object-cover rounded-md"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-white font-bold truncate">{school.school_name}</h3>
+                            <p className="text-gray-400 text-xs line-clamp-2">{school.school_description}</p>
 
-                                        <h3 className="text-xl font-bold text-white text-center">
-                                            {school.school_name}
-                                        </h3>
-                                        <p className="text-gray-300 text-center">
-                                            {school.school_description}
-                                        </p>
-
-                                        <div className="mt-4 space-y-2 text-sm text-gray-300">
-                                            <div className="flex items-center gap-2">
-                                                <FontAwesomeIcon
-                                                    icon={faPhone}
-                                                    className="text-[rgb(var(--primary-rgb))] w-4"
-                                                />
-                                                <span>{school.school_phone}</span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <FontAwesomeIcon
-                                                    icon={faEnvelope}
-                                                    className="text-[rgb(var(--primary-rgb))] w-4"
-                                                />
-                                                <span>{school.school_email}</span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <FontAwesomeIcon
-                                                    icon={faIdCard}
-                                                    className="text-[rgb(var(--primary-rgb))] w-4"
-                                                />
-                                                <span>{school.school_address}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <p className="text-gray-400 text-center">
-                                        No estás inscrito en ninguna escuela
-                                    </p>
-                                )}
-                            </motion.div>
+                            <div className="mt-2 grid grid-cols-1 gap-1 text-xs text-gray-300">
+                              <div className="flex items-center gap-1">
+                                <FontAwesomeIcon icon={faPhone} className="text-[rgb(var(--primary-rgb))] w-3" />
+                                <span className="truncate">{school.school_phone}</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <FontAwesomeIcon icon={faEnvelope} className="text-[rgb(var(--primary-rgb))] w-3" />
+                                <span className="truncate">{school.school_email}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-400 text-center">No estás inscrito en ninguna escuela</p>
+                )}
+              </motion.div>
 
                             {/* Cursos */}
                             <motion.div

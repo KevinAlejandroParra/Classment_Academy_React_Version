@@ -143,18 +143,6 @@
             "school_email": "taekwondo@gmail.com",
             "createdAt": "2025-04-03T12:00:00Z",
             "updatedAt": "2025-04-03T12:00:00Z"
-        },
-        {
-            "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa9",
-            "teacher_id": "550e8400-e29b-41d4-a716-446655440003",
-            "school_name": "Administrativo",
-            "school_description": "Administracion classment academy",
-            "school_phone": 1234567891,
-            "school_address": "sena complejo sur, Bogota D.C.",
-            "school_image": "/images/escuelas/administrativo.jpg",
-            "school_email": "classmentacademy@gmail.com",
-            "createdAt": "2025-04-03T12:00:00Z",
-            "updatedAt": "2025-04-03T12:00:00Z"
         }
     ],
     "courses": [

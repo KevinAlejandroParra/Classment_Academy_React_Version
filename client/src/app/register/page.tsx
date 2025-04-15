@@ -140,7 +140,7 @@ const Register: React.FC = () => {
           ...formData,
           role_id: parseInt(formData.role_id),
           user_birth: formattedDate,
-          user_image: "default.jpg" 
+          user_image: "images/users/default.jpg" 
         }
       }
 
@@ -217,7 +217,6 @@ const Register: React.FC = () => {
           isSelect: true,
           options: [
             { value: "1", label: "Estudiante" },
-            { value: "3", label: "Administrador" },
             { value: "4", label: "Coordinador" },
           ],
         },

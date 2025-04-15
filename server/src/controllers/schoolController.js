@@ -3,7 +3,13 @@ const asyncHandler = require('../middleware/asyncHandler');
 
 // Obtener todas las escuelas
 exports.getAllSchools = asyncHandler(async (req, res) => {
-  const schools = await School.findAll();
+  const schools = await School.findAll({
+    include: [{
+      model: User,
+      as: 'coordinators',
+      attributes: ['user_id', 'user_name', 'user_lastname', 'user_email']
+    }]
+  });
   
   return res.status(200).json({
     success: true,
@@ -16,10 +22,18 @@ exports.getSchoolById = asyncHandler(async (req, res) => {
   const { id } = req.params;
   
   const school = await School.findByPk(id, {
-    include: [{ 
-      model: Course, 
-      as: 'courses'
-    }]
+    include: [
+      { 
+        model: Course, 
+        as: 'courses',
+        attributes: ['course_id', 'course_name', 'course_description']
+      },
+      {
+        model: User,
+        as: 'coordinators',
+        attributes: ['user_id', 'user_name', 'user_lastname', 'user_email']
+      }
+    ]
   });
   
   if (!school) {

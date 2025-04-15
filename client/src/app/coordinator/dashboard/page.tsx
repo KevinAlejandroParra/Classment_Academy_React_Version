@@ -168,7 +168,15 @@ const CoordinatorDashboard = () => {
           icon: 'success',
           title: '¡Éxito!',
           text: 'Escuela creada correctamente',
-          confirmButtonColor: '#3085d6'
+          background: "#1a1a1a",
+          color: "#ffffff",
+          iconColor: "rgb(var(--primary-rgb))",
+          confirmButtonColor: "rgb(var(--primary-rgb))",
+          customClass: {
+            popup: "border border-[rgba(var(--primary-rgb),0.3)] rounded-xl",
+            title: "text-white",
+            htmlContainer: "text-gray-300",
+          },
         })
       } else {
         const errorData = await response.json()
@@ -200,7 +208,10 @@ const CoordinatorDashboard = () => {
         text: "Esta acción no se puede deshacer",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#3085d6',
+        background: "#1a1a1a",
+        color: "#ffffff",
+        iconColor: "rgb(var(--primary-rgb))", 
+        confirmButtonColor: 'rgb(var(--primary-rgb))',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Sí, eliminar',
         cancelButtonText: 'Cancelar'
@@ -222,7 +233,15 @@ const CoordinatorDashboard = () => {
             icon: 'success',
             title: '¡Eliminado!',
             text: 'La escuela ha sido eliminada correctamente',
-            confirmButtonColor: '#3085d6'
+            background: "#1a1a1a",
+            color: "#ffffff",
+            iconColor: "rgb(var(--primary-rgb))",
+            confirmButtonColor: "rgb(var(--primary-rgb))",
+            customClass: {
+              popup: "border border-[rgba(var(--primary-rgb),0.3)] rounded-xl",
+              title: "text-white",
+              htmlContainer: "text-gray-300",
+            },
           })
         } else {
           const errorData = await response.json()
@@ -232,7 +251,15 @@ const CoordinatorDashboard = () => {
             icon: 'error',
             title: 'Error',
             text: errorData.message || 'Ha ocurrido un error al eliminar la escuela',
-            confirmButtonColor: '#3085d6'
+            background: "#1a1a1a",
+            color: "#ffffff",
+            iconColor: "rgb(var(--primary-rgb))",
+            confirmButtonColor: "rgb(var(--primary-rgb))",
+            customClass: {
+              popup: "border border-[rgba(var(--primary-rgb),0.3)] rounded-xl",
+              title: "text-white",
+              htmlContainer: "text-gray-300",
+      },
           })
         }
       }
@@ -243,7 +270,15 @@ const CoordinatorDashboard = () => {
         icon: 'error',
         title: 'Error',
         text: 'Ha ocurrido un error al eliminar la escuela',
-        confirmButtonColor: '#3085d6'
+        background: "#1a1a1a",
+      color: "#ffffff",
+      iconColor: "rgb(var(--primary-rgb))",
+      confirmButtonColor: "rgb(var(--primary-rgb))",
+      customClass: {
+        popup: "border border-[rgba(var(--primary-rgb),0.3)] rounded-xl",
+        title: "text-white",
+        htmlContainer: "text-gray-300",
+      },
       })
     }
   }
@@ -274,7 +309,15 @@ const CoordinatorDashboard = () => {
           icon: 'success',
           title: '¡Éxito!',
           text: 'Curso creado correctamente',
-          confirmButtonColor: '#3085d6'
+          background: "#1a1a1a",
+          color: "#ffffff",
+          iconColor: "rgb(var(--primary-rgb))",
+          confirmButtonColor: "rgb(var(--primary-rgb))",
+          customClass: {
+            popup: "border border-[rgba(var(--primary-rgb),0.3)] rounded-xl",
+            title: "text-white",
+            htmlContainer: "text-gray-300",
+          },
         })
       } else {
         const errorData = await response.json()
@@ -284,7 +327,15 @@ const CoordinatorDashboard = () => {
           icon: 'error',
           title: 'Error',
           text: errorData.message || 'Ha ocurrido un error al crear el curso',
-          confirmButtonColor: '#3085d6'
+          background: "#1a1a1a",
+          color: "#ffffff",
+          iconColor: "rgb(var(--primary-rgb))",
+          confirmButtonColor: "rgb(var(--primary-rgb))",
+          customClass: {
+            popup: "border border-[rgba(var(--primary-rgb),0.3)] rounded-xl",
+            title: "text-white",
+            htmlContainer: "text-gray-300",
+          },
         })
       }
     } catch (error) {
@@ -294,7 +345,15 @@ const CoordinatorDashboard = () => {
         icon: 'error',
         title: 'Error',
         text: 'Ha ocurrido un error al crear el curso',
-        confirmButtonColor: '#3085d6'
+        background: "#1a1a1a",
+      color: "#ffffff",
+      iconColor: "rgb(var(--primary-rgb))",
+      confirmButtonColor: "rgb(var(--primary-rgb))",
+      customClass: {
+        popup: "border border-[rgba(var(--primary-rgb),0.3)] rounded-xl",
+        title: "text-white",
+        htmlContainer: "text-gray-300",
+      },
       })
     }
   }
@@ -304,8 +363,11 @@ const CoordinatorDashboard = () => {
       title: '¿Estás seguro?',
       text: "¿Deseas cerrar sesión?",
       icon: 'question',
+      background: "#1a1a1a",
+      color: "#ffffff",
+      iconColor: "rgb(var(--primary-rgb))",
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
+      confirmButtonColor: 'rgb(var(--primary-rgb))',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Sí, cerrar sesión',
       cancelButtonText: 'Cancelar'

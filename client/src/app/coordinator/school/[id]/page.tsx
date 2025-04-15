@@ -146,7 +146,15 @@ const SchoolManagementPage = ({ params }: { params: { id: string } }) => {
           icon: 'error',
           title: 'Error',
           text: 'Ha ocurrido un error al cargar los datos',
-          confirmButtonColor: '#3085d6'
+          background: "#1a1a1a",
+          color: "#ffffff",
+          iconColor: "rgb(var(--primary-rgb))",
+          confirmButtonColor: "rgb(var(--primary-rgb))",
+          customClass: {
+            popup: "border border-[rgba(var(--primary-rgb),0.3)] rounded-xl",
+            title: "text-white",
+            htmlContainer: "text-gray-300",
+          },
         })
         router.push("/login")
       }
@@ -177,7 +185,15 @@ const SchoolManagementPage = ({ params }: { params: { id: string } }) => {
           icon: 'success',
           title: '¡Éxito!',
           text: 'Escuela actualizada correctamente',
-          confirmButtonColor: '#3085d6'
+          background: "#1a1a1a",
+          color: "#ffffff",
+          iconColor: "rgb(var(--primary-rgb))",
+          confirmButtonColor: "rgb(var(--primary-rgb))",
+          customClass: {
+            popup: "border border-[rgba(var(--primary-rgb),0.3)] rounded-xl",
+            title: "text-white",
+            htmlContainer: "text-gray-300",
+          },
         })
       } else {
         const errorData = await response.json()
@@ -188,7 +204,15 @@ const SchoolManagementPage = ({ params }: { params: { id: string } }) => {
         icon: 'error',
         title: 'Error',
         text: error.message || 'Ha ocurrido un error al actualizar la escuela',
-        confirmButtonColor: '#3085d6'
+        background: "#1a1a1a",
+        color: "#ffffff",
+        iconColor: "rgb(var(--primary-rgb))",
+        confirmButtonColor: "rgb(var(--primary-rgb))",
+        customClass: {
+          popup: "border border-[rgba(var(--primary-rgb),0.3)] rounded-xl",
+          title: "text-white",
+          htmlContainer: "text-gray-300",
+        },
       })
     }
   }
@@ -226,7 +250,15 @@ const SchoolManagementPage = ({ params }: { params: { id: string } }) => {
           icon: 'success',
           title: '¡Éxito!',
           text: 'Curso creado correctamente',
-          confirmButtonColor: '#3085d6'
+          background: "#1a1a1a",
+          color: "#ffffff",
+          iconColor: "rgb(var(--primary-rgb))",
+          confirmButtonColor: "rgb(var(--primary-rgb))",
+          customClass: {
+            popup: "border border-[rgba(var(--primary-rgb),0.3)] rounded-xl",
+            title: "text-white",
+            htmlContainer: "text-gray-300",
+          },
         })
       } else {
         const errorData = await response.json()
@@ -237,7 +269,15 @@ const SchoolManagementPage = ({ params }: { params: { id: string } }) => {
         icon: 'error',
         title: 'Error',
         text: error.message || 'Ha ocurrido un error al crear el curso',
-        confirmButtonColor: '#3085d6'
+        background: "#1a1a1a",
+        color: "#ffffff",
+        iconColor: "rgb(var(--primary-rgb))",
+        confirmButtonColor: "rgb(var(--primary-rgb))",
+        customClass: {
+          popup: "border border-[rgba(var(--primary-rgb),0.3)] rounded-xl",
+          title: "text-white",
+          htmlContainer: "text-gray-300",
+        },
       })
     }
   }
@@ -268,7 +308,15 @@ const SchoolManagementPage = ({ params }: { params: { id: string } }) => {
           icon: 'success',
           title: '¡Éxito!',
           text: 'Curso actualizado correctamente',
-          confirmButtonColor: '#3085d6'
+          background: "#1a1a1a",
+          color: "#ffffff",
+          iconColor: "rgb(var(--primary-rgb))",
+          confirmButtonColor: "rgb(var(--primary-rgb))",
+          customClass: {
+            popup: "border border-[rgba(var(--primary-rgb),0.3)] rounded-xl",
+            title: "text-white",
+            htmlContainer: "text-gray-300",
+          },
         })
       } else {
         const errorData = await response.json()
@@ -279,7 +327,15 @@ const SchoolManagementPage = ({ params }: { params: { id: string } }) => {
         icon: 'error',
         title: 'Error',
         text: error.message || 'Ha ocurrido un error al actualizar el curso',
-        confirmButtonColor: '#3085d6'
+        background: "#1a1a1a",
+        color: "#ffffff",
+        iconColor: "rgb(var(--primary-rgb))",
+        confirmButtonColor: "rgb(var(--primary-rgb))",
+        customClass: {
+          popup: "border border-[rgba(var(--primary-rgb),0.3)] rounded-xl",
+          title: "text-white",
+          htmlContainer: "text-gray-300",
+        },
       })
     }
   }
@@ -294,7 +350,15 @@ const SchoolManagementPage = ({ params }: { params: { id: string } }) => {
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar'
+        cancelButtonText: 'Cancelar',
+        background: "#1a1a1a",
+        color: "#ffffff",
+        iconColor: "rgb(var(--primary-rgb))",
+        customClass: {
+          popup: "border border-[rgba(var(--primary-rgb),0.3)] rounded-xl",
+          title: "text-white",
+          htmlContainer: "text-gray-300",
+        },
       })
 
       if (result.isConfirmed) {
@@ -313,7 +377,15 @@ const SchoolManagementPage = ({ params }: { params: { id: string } }) => {
             icon: 'success',
             title: '¡Éxito!',
             text: 'Curso eliminado correctamente',
-            confirmButtonColor: '#3085d6'
+            background: "#1a1a1a",
+            color: "#ffffff",
+            iconColor: "rgb(var(--primary-rgb))",
+            confirmButtonColor: "rgb(var(--primary-rgb))",
+            customClass: {
+              popup: "border border-[rgba(var(--primary-rgb),0.3)] rounded-xl",
+              title: "text-white",
+              htmlContainer: "text-gray-300",
+            },
           })
         } else {
           const errorData = await response.json()
@@ -325,7 +397,15 @@ const SchoolManagementPage = ({ params }: { params: { id: string } }) => {
         icon: 'error',
         title: 'Error',
         text: error.message || 'Ha ocurrido un error al eliminar el curso',
-        confirmButtonColor: '#3085d6'
+        background: "#1a1a1a",
+        color: "#ffffff",
+        iconColor: "rgb(var(--primary-rgb))",
+        confirmButtonColor: "rgb(var(--primary-rgb))",
+        customClass: {
+          popup: "border border-[rgba(var(--primary-rgb),0.3)] rounded-xl",
+          title: "text-white",
+          htmlContainer: "text-gray-300",
+        },
       })
     }
   }

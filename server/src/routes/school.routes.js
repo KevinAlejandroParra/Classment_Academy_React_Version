@@ -3,11 +3,13 @@ const router = express.Router();
 const schoolController = require('../controllers/schoolController');
 const { verifyToken } = require('../middleware/auth');
 
-// Rutas protegidas que requieren autenticación
-router.use(verifyToken);
+
 
 // Obtener todas las escuelas
 router.get('/', schoolController.getAllSchools);
+
+// Rutas protegidas que requieren autenticación
+router.use(verifyToken);
 
 // Obtener escuelas del coordinador
 router.get('/coordinator', schoolController.getCoordinatorSchools);

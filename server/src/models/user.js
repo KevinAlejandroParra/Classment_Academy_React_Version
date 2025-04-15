@@ -21,9 +21,6 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: false,
                 validate: {
-                    isAlpha: {
-                       // msg: "El nombre solo debe contener letras"
-                    },
                     notEmpty: {
                         msg: "El nombre es requerido"
                     }
@@ -33,9 +30,6 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: false,
                 validate: {
-                    isAlpha: {
-                        msg: "El apellido solo debe contener letras"
-                    },
                     notEmpty: {
                         msg: "El apellido es requerido"
                     }

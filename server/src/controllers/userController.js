@@ -81,12 +81,14 @@ class UserController {
                 });
             }
 
-            // Validación de nombre y apellido (solo letras)
+            // Validación de nombre y apellido (solo letras y espacios)
             const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/;
-            if (!nameRegex.test(userJSON.user_name) || !nameRegex.test(userJSON.user_lastname)) {
+            const names = userJSON.user_name.split(" ");
+            const lastnames = userJSON.user_lastname.split(" ");
+            if (names.some(name => !nameRegex.test(name)) || lastnames.some(lastname => !nameRegex.test(lastname))) {
                 return res.status(400).json({
                     success: false,
-                    message: "El nombre y apellido solo pueden contener letras"
+                    message: "El nombre y apellido solo pueden contener letras y espacios"
                 });
             }
 
@@ -189,8 +191,6 @@ class UserController {
     }
 
     static async updateUser(req, res) {
-        console.log("📥 Entrando a updateUser");
-        console.log("Imagen recibida:", req.file);
 
         try {
             const userId = req.params.id;

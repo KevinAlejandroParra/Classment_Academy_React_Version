@@ -17,7 +17,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons"
 import { Particles } from "@/components/particles"
 import { motion } from "framer-motion"
-import { IconDefinition } from "@fortawesome/fontawesome-svg-core"
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core"
+import Swal from "sweetalert2"
 
 interface FormField {
   name: string
@@ -83,10 +84,22 @@ const Register: React.FC = () => {
     user_password: "",
     user_phone: "",
     user_birth: "",
-    role_id: "1", 
+    role_id: "1",
   })
-  const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+
+  // Custom SweetAlert toast configuration
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.onmouseenter = Swal.stopTimer
+      toast.onmouseleave = Swal.resumeTimer
+    },
+  })
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -96,66 +109,130 @@ const Register: React.FC = () => {
     })
   }
 
+  const showSuccessAlert = () => {
+    Swal.fire({
+      title: "¡Registro Exitoso!",
+      text: "Tu cuenta ha sido creada correctamente",
+      icon: "success",
+      confirmButtonText: "Continuar",
+      background: "#1a1a1a",
+      color: "#ffffff",
+      iconColor: "rgb(var(--primary-rgb))",
+      confirmButtonColor: "rgb(var(--primary-rgb))",
+      customClass: {
+        popup: "border border-[rgba(var(--primary-rgb),0.3)] rounded-xl",
+        title: "text-white",
+        htmlContainer: "text-gray-300",
+      },
+    }).then(() => {
+      router.push("/login")
+    })
+  }
+
+  const showErrorAlert = (message: string) => {
+    Swal.fire({
+      title: "Error",
+      text: message,
+      icon: "error",
+      confirmButtonText: "Intentar de nuevo",
+      background: "#1a1a1a",
+      color: "#ffffff",
+      iconColor: "#f87171",
+      confirmButtonColor: "rgb(var(--primary-rgb))",
+      customClass: {
+        popup: "border border-red-500/30 rounded-xl",
+        title: "text-red-400",
+        htmlContainer: "text-gray-300",
+      },
+    })
+  }
+
+  const showToast = (type: "success" | "error" | "warning" | "info", message: string) => {
+    Toast.fire({
+      icon: type,
+      title: message,
+      background: "#1a1a1a",
+      color: "#ffffff",
+      iconColor:
+        type === "success"
+          ? "rgb(var(--primary-rgb))"
+          : type === "error"
+            ? "#f87171"
+            : type === "warning"
+              ? "#fbbf24"
+              : "#60a5fa",
+    })
+  }
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
-    setError(null)
 
     try {
       // Validaciones en el frontend
-      if (!formData.user_name || !formData.user_lastname || !formData.user_email || 
-          !formData.user_password || !formData.user_phone || !formData.user_birth || 
-          !formData.user_document || !formData.user_document_type || !formData.role_id) {
-          throw new Error("Todos los campos son requeridos")
+      if (
+        !formData.user_name ||
+        !formData.user_lastname ||
+        !formData.user_email ||
+        !formData.user_password ||
+        !formData.user_phone ||
+        !formData.user_birth ||
+        !formData.user_document ||
+        !formData.user_document_type ||
+        !formData.role_id
+      ) {
+        throw new Error("Todos los campos son requeridos")
       }
 
       // Validación de nombre y apellido (solo letras)
-      const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/;
+      const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/
       if (!nameRegex.test(formData.user_name) || !nameRegex.test(formData.user_lastname)) {
-          throw new Error("El nombre y apellido solo pueden contener letras")
+        throw new Error("El nombre y apellido solo pueden contener letras")
       }
 
       // Validación de teléfono (solo números)
-      const phoneRegex = /^\d+$/;
+      const phoneRegex = /^\d+$/
       if (!phoneRegex.test(formData.user_phone)) {
-          throw new Error("El teléfono solo puede contener números")
+        throw new Error("El teléfono solo puede contener números")
       }
 
       // Validación de documento (solo números)
       if (!phoneRegex.test(formData.user_document)) {
-          throw new Error("El documento solo puede contener números")
+        throw new Error("El documento solo puede contener números")
       }
 
       // Validación de contraseña
       if (formData.user_password.length < 8) {
-          throw new Error("La contraseña debe tener al menos 8 caracteres")
+        throw new Error("La contraseña debe tener al menos 8 caracteres")
       }
 
       // Asegurar que la fecha esté en formato YYYY-MM-DD
-      const formattedDate = new Date(formData.user_birth).toISOString().split('T')[0];
+      const formattedDate = new Date(formData.user_birth).toISOString().split("T")[0]
 
       // Convertir role_id a número y preparar datos
       const userData = {
         user: {
           ...formData,
-          role_id: parseInt(formData.role_id),
+          role_id: Number.parseInt(formData.role_id),
           user_birth: formattedDate,
-          user_image: "images/users/default.jpg" 
-        }
+          user_image: "images/users/default.jpg",
+        },
       }
 
       console.log("Enviando datos:", userData)
+      showToast("info", "Procesando registro...")
+
       const response = await fetch("http://localhost:5000/api/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify(userData),
         mode: "cors",
         credentials: "include",
       })
-      
+
       const result = await response.json()
 
       if (!response.ok) {
@@ -163,10 +240,10 @@ const Register: React.FC = () => {
       }
 
       console.log("Registro exitoso:", result)
-      router.push("/login")
+      showSuccessAlert()
     } catch (error: unknown) {
       const err = error as Error
-      setError(err.message)
+      showErrorAlert(err.message)
       console.error("Error completo:", error)
     } finally {
       setIsLoading(false)
@@ -177,17 +254,29 @@ const Register: React.FC = () => {
     {
       section: "Información Personal",
       fields: [
-        { name: "user_name", label: "Nombre", icon: faUser, pattern: "^[A-Za-zÁÉÍÓÚáéíóúñÑ\\s]+$", title: "Solo letras y espacios" },
-        { name: "user_lastname", label: "Apellido", icon: faUser, pattern: "^[A-Za-zÁÉÍÓÚáéíóúñÑ\\s]+$", title: "Solo letras y espacios" },
+        {
+          name: "user_name",
+          label: "Nombre",
+          icon: faUser,
+          pattern: "^[A-Za-zÁÉÍÓÚáéíóúñÑ\\s]+$",
+          title: "Solo letras y espacios",
+        },
+        {
+          name: "user_lastname",
+          label: "Apellido",
+          icon: faUser,
+          pattern: "^[A-Za-zÁÉÍÓÚáéíóúñÑ\\s]+$",
+          title: "Solo letras y espacios",
+        },
         { name: "user_birth", label: "Fecha de Nacimiento", icon: faBirthdayCake, type: "date" },
-      ]
+      ],
     },
     {
       section: "Información de Contacto",
       fields: [
         { name: "user_email", label: "Correo Electrónico", icon: faEnvelope, type: "email" },
         { name: "user_phone", label: "Teléfono", icon: faPhone, pattern: "^\\d+$", title: "Solo números" },
-      ]
+      ],
     },
     {
       section: "Información de Identificación",
@@ -204,12 +293,18 @@ const Register: React.FC = () => {
             { value: "CE", label: "CE" },
           ],
         },
-      ]
+      ],
     },
     {
       section: "Información de Cuenta",
       fields: [
-        { name: "user_password", label: "Contraseña (mín. 8 caracteres)", icon: faLock, type: "password", minLength: 8 },
+        {
+          name: "user_password",
+          label: "Contraseña (mín. 8 caracteres)",
+          icon: faLock,
+          type: "password",
+          minLength: 8,
+        },
         {
           name: "role_id",
           label: "Rol",
@@ -220,8 +315,8 @@ const Register: React.FC = () => {
             { value: "4", label: "Coordinador" },
           ],
         },
-      ]
-    }
+      ],
+    },
   ]
 
   return (
@@ -252,9 +347,7 @@ const Register: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               {formFields.map((section, sectionIndex) => (
                 <div key={sectionIndex} className="space-y-4">
-                  <h3 className="text-xl font-semibold text-[rgb(var(--primary-rgb))] mb-3">
-                    {section.section}
-                  </h3>
+                  <h3 className="text-xl font-semibold text-[rgb(var(--primary-rgb))] mb-3">{section.section}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {section.fields.map((field, fieldIndex) => (
                       <motion.div key={fieldIndex} variants={itemVariants} className="flex flex-col">
@@ -275,7 +368,11 @@ const Register: React.FC = () => {
                               Seleccionar {field.label.toLowerCase()}
                             </option>
                             {field.options?.map((option, idx) => (
-                              <option key={idx} value={option.value} style={{ backgroundColor: "#1a1a1a", color: "white" }}>
+                              <option
+                                key={idx}
+                                value={option.value}
+                                style={{ backgroundColor: "#1a1a1a", color: "white" }}
+                              >
                                 {option.label}
                               </option>
                             ))}
@@ -312,17 +409,6 @@ const Register: React.FC = () => {
                   {isLoading ? "Registrando..." : "Registrarse"}
                 </motion.button>
               </div>
-
-              {error && (
-                <motion.div
-                  className="p-4 bg-red-500/20 border border-red-500/30 rounded-md"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <p className="text-red-400 text-center text-sm">{error}</p>
-                </motion.div>
-              )}
             </form>
 
             <div className="text-center text-white text-sm pt-4">
@@ -357,6 +443,19 @@ const Register: React.FC = () => {
           background-position: right 0.7rem center;
           background-size: 1em;
           padding-right: 2.5rem;
+        }
+        
+        /* SweetAlert2 custom styles */
+        .swal2-popup {
+          font-family: inherit;
+        }
+        
+        .swal2-styled.swal2-confirm {
+          font-weight: 600;
+        }
+        
+        .swal2-timer-progress-bar {
+          background: rgba(var(--primary-rgb), 0.5);
         }
       `}</style>
     </motion.div>

@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const { Course, School } = require("../models");
 const path = require("path");
+const asyncHandler = require("express-async-handler");
 
 // Configurar el transporter de nodemailer
 const transporter = nodemailer.createTransport({
@@ -399,7 +400,8 @@ class UserController {
                     role: user.role_id,
                     name: user.user_name,
                     lastname: user.user_lastname,
-                    image: user.user_image
+                    image: user.user_image,
+                    state: user.user_state
                 }
             });
         } catch (error) {
@@ -573,6 +575,139 @@ class UserController {
             return res.status(500).json({
                 success: false,
                 message: "Error al obtener las escuelas del usuario",
+                error: error.message
+            });
+        }
+    }
+
+    // Obtener todos los coordinadores
+    static async getCoordinators(req, res) {
+        try {
+            const coordinators = await User.findAll({
+                where: { role_id: 4 },
+                include: [{
+                    model: School,
+                    as: 'managedSchools',
+                    attributes: ['school_id', 'school_name'],
+                    through: {
+                        attributes: []
+                    }
+                }],
+                attributes: [
+                    'user_id',
+                    'user_name',
+                    'user_lastname',
+                    'user_email',
+                    'user_phone',
+                    'user_state'
+                ]
+            });
+
+            return res.status(200).json({
+                success: true,
+                data: coordinators
+            });
+        } catch (error) {
+            console.error("Error al obtener coordinadores:", error);
+            return res.status(500).json({
+                success: false,
+                message: "Error al obtener los coordinadores",
+                error: error.message
+            });
+        }
+    }
+
+    // Obtener coordinador por ID
+    static async getCoordinatorById(req, res) {
+        try {
+            const { id } = req.params;
+            console.log('Buscando coordinador con ID:', id);
+
+            const coordinator = await User.findOne({
+                where: { 
+                    user_id: id,
+                    role_id: 4
+                },
+                include: [{
+                    model: School,
+                    as: 'managedSchools',
+                    through: {
+                        attributes: ['is_owner']
+                    }
+                }],
+                attributes: [
+                    'user_id',
+                    'user_name',
+                    'user_lastname',
+                    'user_email',
+                    'user_phone',
+                    'user_state',
+                    'user_document',
+                    'user_document_type',
+                    'user_birth',
+                    'user_image',
+                    'role_id'
+                ]
+            });
+
+            if (!coordinator) {
+                console.log('Coordinador no encontrado');
+                return res.status(404).json({
+                    success: false,
+                    message: "Coordinador no encontrado"
+                });
+            }
+
+            console.log('Coordinador encontrado:', coordinator.user_name);
+            return res.status(200).json({
+                success: true,
+                data: coordinator
+            });
+        } catch (error) {
+            console.error("Error al obtener coordinador:", error);
+            return res.status(500).json({
+                success: false,
+                message: "Error al obtener el coordinador",
+                error: error.message
+            });
+        }
+    }
+
+    // Cambiar estado de un usuario
+    static async toggleUserState(req, res) {
+        try {
+            const { id } = req.params;
+            
+            const user = await User.findByPk(id);
+            if (!user) {
+                const error = new Error('Usuario no encontrado');
+                error.statusCode = 404;
+                throw error;
+            }
+
+            // Solo permitir cambiar estado de coordinadores
+            if (user.role_id !== 4) {
+                const error = new Error('Solo se puede cambiar el estado de coordinadores');
+                error.statusCode = 403;
+                throw error;
+            }
+
+            const newState = user.user_state === 'activo' ? 'inactivo' : 'activo';
+            await user.update({ user_state: newState });
+
+            return res.status(200).json({
+                success: true,
+                message: `Estado del usuario actualizado a ${newState}`,
+                data: {
+                    user_id: user.user_id,
+                    user_state: newState
+                }
+            });
+        } catch (error) {
+            console.error("Error al cambiar el estado del usuario:", error);
+            return res.status(500).json({
+                success: false,
+                message: "Error al cambiar el estado del usuario",
                 error: error.message
             });
         }

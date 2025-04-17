@@ -1,6 +1,6 @@
 const { Router } = require("express");
 const UserController = require("../controllers/userController.js");
-const { verifyToken } = require("../middleware/auth.js");
+const { verifyToken, checkRole } = require("../middleware/auth.js");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
@@ -41,5 +41,12 @@ userRoutes.post("/reset-password", UserController.resetPassword);
 userRoutes.get("/auth/me", verifyToken, UserController.validateToken);
 userRoutes.get("/users/:id/courses", UserController.getUserCourses);
 userRoutes.get("/users/:id/schools", UserController.getUserSchools);
+
+// Obtener todos los coordinadores
+userRoutes.get('/coordinators', verifyToken, checkRole([3, 4]), UserController.getCoordinators);
+userRoutes.get('/coordinators/:id', verifyToken, checkRole([3, 4]), UserController.getCoordinatorById);
+
+// Cambiar estado de un usuario
+userRoutes.put('/:id/toggle-state', verifyToken, checkRole([4]), UserController.toggleUserState);
 
 module.exports = userRoutes;

@@ -16,74 +16,71 @@
             "createdAt": "2025-04-03T12:00:00Z",
             "updatedAt": "2025-04-03T12:00:00Z"
         },
-      
-            {
-                "user_id": "550e8400-e29b-41d4-a716-446655440001",
-                "user_name": "Carlos",
-                "user_lastname": "Rodríguez",
-                "user_document_type": "CC",
-                "user_document": 1003003003,
-                "user_email": "carlos.rodriguez@email.com",
-                "user_password": "$2a$10$lrTDwCCjDLcXuf7.Lm/pku.Vci8H1cPlsf29pHN.Tivjlir4p523S",
-                "user_phone": 3005555555,
-                "user_image": "http://localhost:3000/images/users/default.jpg",
-                "user_birth": "1988-03-25",
-                "user_state": "activo",
-                "role_id": 3,
-                "createdAt": "2025-04-03T12:00:00Z",
-                "updatedAt": "2025-04-03T12:00:00Z"
-            },
-            {
-                "user_id": "550e8400-e29b-41d4-a716-446655440002",
-                "user_name": "Ana",
-                "user_lastname": "Martínez",
-                "user_document_type": "CC",
-                "user_document": 1004004004,
-                "user_email": "ana.martinez@email.com",
-                "user_password": "$2a$10$cDl6ZPTZSqrtecqY/aA8Au6bzI79MICWtYe9.uEMzCGwQIFTMeIw2",
-                "user_phone": 3007777777,
-                "user_image": "http://localhost:3000/images/users/default.jpg",
-                "user_birth": "1992-12-10",
-                "user_state": "activo",
-                "role_id": 4,
-                "createdAt": "2025-04-03T12:00:00Z",
-                "updatedAt": "2025-04-03T12:00:00Z"
-            },
-            {
-                "user_id": "550e8400-e29b-41d4-a716-446655440003",
-                "user_name": "Marco",
-                "user_lastname": "Gonzalez",
-                "user_document_type": "CC",
-                "user_document": 1004004005,
-                "user_email": "marco@email.com",
-                "user_password": "$2a$10$xsMhIclPh1kWAFD4gm35D.EPlJyMALzhgMmha4tcw.N9N33REPXMG",
-                "user_phone": 3087777777,
-                "user_image": "http://localhost:3000/images/users/default.jpg",
-                "user_birth": "1999-12-10",
-                "user_state": "activo",
-                "role_id": 2,
-                "createdAt": "2025-04-03T12:00:00Z",
-                "updatedAt": "2025-04-03T12:00:00Z"
-            },
-            {
-                "user_id": "550e8400-e29b-41d4-a716-446655440004",
-                "user_name": "Daniel",
-                "user_lastname": "Gomez",
-                "user_document_type": "CC",
-                "user_document": 1025531522,
-                "user_email": "danielbernalg.04@gmail.com",
-                "user_password": "$2a$10$gnplREnLwwfxgNB8mQu9EOaObcQTs13wkkQRB1wAIVmIpsjLv3KCK",
-                "user_phone": 3001234565,
-                "user_image": "http://localhost:3000/images/users/default.jpg",
-                "user_birth": "1991-05-15",
-                "user_state": "activo",
-                "role_id": 3,
-                "createdAt": "2025-04-03T12:00:00Z",
-                "updatedAt": "2025-04-03T12:00:00Z"
-            }
-        ],
-
-
+        {
+            "user_id": "550e8400-e29b-41d4-a716-446655440001",
+            "user_name": "Carlos",
+            "user_lastname": "Rodríguez",
+            "user_document_type": "CC",
+            "user_document": 1003003003,
+            "user_email": "carlos.rodriguez@email.com",
+            "user_password": "$2a$10$lrTDwCCjDLcXuf7.Lm/pku.Vci8H1cPlsf29pHN.Tivjlir4p523S",
+            "user_phone": 3005555555,
+            "user_image": "http://localhost:3000/images/users/default.jpg",
+            "user_birth": "1988-03-25",
+            "user_state": "activo",
+            "role_id": 3,
+            "createdAt": "2025-04-03T12:00:00Z",
+            "updatedAt": "2025-04-03T12:00:00Z"
+        },
+        {
+            "user_id": "550e8400-e29b-41d4-a716-446655440002",
+            "user_name": "Ana",
+            "user_lastname": "Martínez",
+            "user_document_type": "CC",
+            "user_document": 1004004004,
+            "user_email": "ana.martinez@email.com",
+            "user_password": "$2a$10$cDl6ZPTZSqrtecqY/aA8Au6bzI79MICWtYe9.uEMzCGwQIFTMeIw2",
+            "user_phone": 3007777777,
+            "user_image": "http://localhost:3000/images/users/default.jpg",
+            "user_birth": "1992-12-10",
+            "user_state": "activo",
+            "role_id": 4,
+            "createdAt": "2025-04-03T12:00:00Z",
+            "updatedAt": "2025-04-03T12:00:00Z"
+        },
+        {
+            "user_id": "550e8400-e29b-41d4-a716-446655440003",
+            "user_name": "Marco",
+            "user_lastname": "Gonzalez",
+            "user_document_type": "CC",
+            "user_document": 1004004005,
+            "user_email": "marco@email.com",
+            "user_password": "$2a$10$xsMhIclPh1kWAFD4gm35D.EPlJyMALzhgMmha4tcw.N9N33REPXMG",
+            "user_phone": 3087777777,
+            "user_image": "http://localhost:3000/images/users/default.jpg",
+            "user_birth": "1999-12-10",
+            "user_state": "activo",
+            "role_id": 2,
+            "createdAt": "2025-04-03T12:00:00Z",
+            "updatedAt": "2025-04-03T12:00:00Z"
+        },
+        {
+            "user_id": "550e8400-e29b-41d4-a716-446655440004",
+            "user_name": "Daniel",
+            "user_lastname": "Gomez",
+            "user_document_type": "CC",
+            "user_document": 1025531522,
+            "user_email": "danielbernalg.04@gmail.com",
+            "user_password": "$2a$10$gnplREnLwwfxgNB8mQu9EOaObcQTs13wkkQRB1wAIVmIpsjLv3KCK",
+            "user_phone": 3001234565,
+            "user_image": "http://localhost:3000/images/users/default.jpg",
+            "user_birth": "1991-05-15",
+            "user_state": "activo",
+            "role_id": 3,
+            "createdAt": "2025-04-03T12:00:00Z",
+            "updatedAt": "2025-04-03T12:00:00Z"
+        }
+    ],
     "roles": [
         {
             "role_id": 1,
@@ -105,7 +102,6 @@
             "role_id": 5,
             "role_name": "invitado"
         }
-
     ],
     "schools": [
         {
@@ -198,107 +194,11 @@
             "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0855",
             "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa7",
             "course_name": "Zumba",
-            "course_description": "Clases de Zumba para quemar calorías y divertirse",
-            "course_price": 400000,
-            "course_places": 20,
+            "course_description": "Clases de zumba para mantenerte en forma",
+            "course_price": 450000,
+            "course_places": 25,
             "course_age": 16,
             "course_image": "/images/cursos/zumba.jpg",
-            "createdAt": "2025-04-03T12:00:00Z",
-            "updatedAt": "2025-04-03T12:00:00Z"
-        },
-        {
-            "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0856",
-            "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa8",
-            "course_name": "Taekwondo Básico",
-            "course_description": "Curso de taekwondo para principiantes",
-            "course_price": 500000,
-            "course_places": 20,
-            "course_age": 8,
-            "course_image": "/images/cursos/taekwondo_ninos.jpg",
-            "createdAt": "2025-04-03T12:00:00Z",
-            "updatedAt": "2025-04-03T12:00:00Z"
-        },
-        {
-            "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0857",
-            "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa8",
-            "course_name": "Taekwondo Avanzado",
-            "course_description": "Curso avanzado de taekwondo para competidores",
-            "course_price": 700000,
-            "course_places": 15,
-            "course_age": 10,
-            "course_image": "/images/cursos/2.jpg",
-            "createdAt": "2025-04-03T12:00:00Z",
-            "updatedAt": "2025-04-03T12:00:00Z"
-        }
-    ],
-    "usercourses": [
-        {
-            "user_id": "550e8400-e29b-41d4-a716-446655440000",
-            "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0851",
-            "course_plan": "mensual",
-            "course_state": "2025-04-03T12:00:00Z",
-            "course_start": "2024-08-01T00:00:00Z",
-            "course_end": "2024-12-15T00:00:00Z",
-            "createdAt": "2025-04-03T12:00:00Z",
-            "updatedAt": "2025-04-03T12:00:00Z"
-        },
-        {
-            "user_id": "550e8400-e29b-41d4-a716-446655440000",
-            "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0852",
-            "course_plan": "mensual",
-            "course_state": "2025-04-03T12:00:00Z",
-            "course_start": "2024-08-01T00:00:00Z",
-            "course_end": "2024-12-15T00:00:00Z",
-            "createdAt": "2025-04-03T12:00:00Z",
-            "updatedAt": "2025-04-03T12:00:00Z"
-        },
-        {
-            "user_id": "550e8400-e29b-41d4-a716-446655440000",
-            "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0856",
-            "course_plan": "mensual",
-            "course_state": "2025-04-03T12:00:00Z",
-            "course_start": "2024-07-15T00:00:00Z",
-            "course_end": "2024-12-20T00:00:00Z",
-            "createdAt": "2025-04-03T12:00:00Z",
-            "updatedAt": "2025-04-03T12:00:00Z"
-        },
-        {
-            "user_id": "550e8400-e29b-41d4-a716-446655440001",
-            "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0853",
-            "course_plan": "mensual",
-            "course_state": "2025-04-03T12:00:00Z",
-            "course_start": "2024-09-01T00:00:00Z",
-            "course_end": "2025-01-15T00:00:00Z",
-            "createdAt": "2025-04-03T12:00:00Z",
-            "updatedAt": "2025-04-03T12:00:00Z"
-        },
-        {
-            "user_id": "550e8400-e29b-41d4-a716-446655440001",
-            "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0854",
-            "course_plan": "mensual",
-            "course_state": "2025-04-03T12:00:00Z",
-            "course_start": "2024-08-15T00:00:00Z",
-            "course_end": "2024-12-15T00:00:00Z",
-            "createdAt": "2025-04-03T12:00:00Z",
-            "updatedAt": "2025-04-03T12:00:00Z"
-        },
-        {
-            "user_id": "550e8400-e29b-41d4-a716-446655440002",
-            "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0855",
-            "course_plan": "mensual",
-            "course_state": "2025-04-03T12:00:00Z",
-            "course_start": "2024-09-01T00:00:00Z",
-            "course_end": "2025-02-28T00:00:00Z",
-            "createdAt": "2025-04-03T12:00:00Z",
-            "updatedAt": "2025-04-03T12:00:00Z"
-        },
-        {
-            "user_id": "550e8400-e29b-41d4-a716-446655440002",
-            "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0857",
-            "course_plan": "mensual",
-            "course_state": "2025-04-03T12:00:00Z",
-            "course_start": "2024-08-01T00:00:00Z",
-            "course_end": "2025-01-15T00:00:00Z",
             "createdAt": "2025-04-03T12:00:00Z",
             "updatedAt": "2025-04-03T12:00:00Z"
         }

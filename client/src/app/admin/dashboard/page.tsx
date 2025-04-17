@@ -9,6 +9,7 @@ import {
   faChalkboardTeacher,
   faHome,
   faUser,
+  faChartBar,
 } from "@fortawesome/free-solid-svg-icons"
 import { Particles } from "@/components/particles"
 import Link from "next/link"
@@ -98,10 +99,10 @@ const AdminDashboard = () => {
       path: "/admin/coordinators",
     },
     {
-      title: "Gestión de Cursos",
-      icon: faChalkboardTeacher,
-      description: "Administrar cursos, contenidos y materiales",
-      path: "/admin/courses",
+      title: "Reportes y Estadísticas",
+      icon: faChartBar,
+      description: "Ver reportes de rendimiento y estadísticas del sistema",
+      path: "/admin/reports",
     },
   ]
 

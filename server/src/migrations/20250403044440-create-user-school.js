@@ -2,7 +2,6 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
-        // Primero creamos la tabla sin las restricciones
         await queryInterface.createTable("UserSchools", {
             user_id: {
                 type: Sequelize.UUID,
@@ -13,6 +12,16 @@ module.exports = {
                 allowNull: false
             },
             is_owner: {
+                type: Sequelize.BOOLEAN,
+                defaultValue: false,
+                allowNull: false
+            },
+            is_teacher: {
+                type: Sequelize.BOOLEAN,
+                defaultValue: false,
+                allowNull: false
+            },
+            is_coordinator: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: false,
                 allowNull: false
@@ -30,7 +39,6 @@ module.exports = {
             }
         });
 
-        // Luego agregamos las restricciones de clave foránea
         await queryInterface.addConstraint('UserSchools', {
             fields: ['user_id'],
             type: 'foreign key',
@@ -55,14 +63,12 @@ module.exports = {
             onUpdate: 'CASCADE'
         });
 
-        // Agregamos la clave primaria compuesta
         await queryInterface.addConstraint('UserSchools', {
             fields: ['user_id', 'school_id'],
             type: 'primary key',
             name: 'pk_userschool'
         });
 
-        // Finalmente agregamos el índice único
         await queryInterface.addIndex('UserSchools', ['user_id', 'school_id'], {
             unique: true,
             name: 'idx_userschool_unique'
@@ -71,4 +77,4 @@ module.exports = {
     async down(queryInterface, Sequelize) {
         await queryInterface.dropTable("UserSchools");
     },
-}; 
+};

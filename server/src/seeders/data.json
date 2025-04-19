@@ -79,6 +79,38 @@
             "role_id": 3,
             "createdAt": "2025-04-03T12:00:00Z",
             "updatedAt": "2025-04-03T12:00:00Z"
+        },
+        {
+            "user_id": "550e8400-e29b-41d4-a716-446655440005",
+            "user_name": "Felipe",
+            "user_lastname": "Gómez",
+            "user_document_type": "CC",
+            "user_document": 1022334455,
+            "user_email": "felipe@email.com",
+            "user_password": "$2a$10$xsMhIclPh1kWAFD4gm35D.EPlJyMALzhgMmha4tcw.N9N33REPXMG",
+            "user_phone": 3101234567,
+            "user_image": "http://localhost:3000/images/users/default.jpg",
+            "user_birth": "1985-07-20",
+            "user_state": "activo",
+            "role_id": 4,
+            "createdAt": "2025-04-03T12:00:00Z",
+            "updatedAt": "2025-04-03T12:00:00Z"
+        },
+        {
+            "user_id": "550e8400-e29b-41d4-a716-446655440006",
+            "user_name": "Laura",
+            "user_lastname": "Pérez",
+            "user_document_type": "CC",
+            "user_document": 1022334456,
+            "user_email": "laura@email.com",
+            "user_password": "$2a$10$xsMhIclPh1kWAFD4gm35D.EPlJyMALzhgMmha4tcw.N9N33REPXMG",
+            "user_phone": 3101234568,
+            "user_image": "http://localhost:3000/images/users/default.jpg",
+            "user_birth": "1990-09-15",
+            "user_state": "activo",
+            "role_id": 2,
+            "createdAt": "2025-04-03T12:00:00Z",
+            "updatedAt": "2025-04-03T12:00:00Z"
         }
     ],
     "roles": [
@@ -202,5 +234,121 @@
             "createdAt": "2025-04-03T12:00:00Z",
             "updatedAt": "2025-04-03T12:00:00Z"
         }
-    ]
+    ],
+    "userschools": [
+        {
+            "user_id": "550e8400-e29b-41d4-a716-446655440005", 
+            "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6", 
+            "is_owner": false,
+            "is_teacher": false,
+            "is_coordinator": true,
+            "createdAt": "2025-04-03T12:00:00Z",
+            "updatedAt": "2025-04-03T12:00:00Z"
+        },
+        {
+            "user_id": "550e8400-e29b-41d4-a716-446655440006", 
+            "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6", 
+            "is_owner": false,
+            "is_teacher": true,
+            "is_coordinator": false,
+            "createdAt": "2025-04-03T12:00:00Z",
+            "updatedAt": "2025-04-03T12:00:00Z"
+        },
+        {
+            "user_id": "550e8400-e29b-41d4-a716-446655440003", 
+            "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6", 
+            "is_owner": true,
+            "is_teacher": true, 
+            "is_coordinator": false,
+            "createdAt": "2025-04-03T12:00:00Z",
+            "updatedAt": "2025-04-03T12:00:00Z"
+        },
+        {
+            "user_id": "550e8400-e29b-41d4-a716-446655440003", 
+            "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa7", 
+            "is_owner": true,
+            "is_teacher": true,
+            "is_coordinator": false,
+            "createdAt": "2025-04-03T12:00:00Z",
+            "updatedAt": "2025-04-03T12:00:00Z"
+        },
+        {
+            "user_id": "550e8400-e29b-41d4-a716-446655440002", 
+            "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa7", 
+            "is_owner": false,
+            "is_teacher": false,
+            "is_coordinator": true,
+            "createdAt": "2025-04-03T12:00:00Z",
+            "updatedAt": "2025-04-03T12:00:00Z"
+        }
+    ],
+    
+    "usercourses": [
+   
+    {
+        "user_id": "550e8400-e29b-41d4-a716-446655440000", 
+        "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0851", 
+        "course_plan": "basic",
+        "course_state": "active",
+        "course_start": "2025-04-10",
+        "course_end": "2025-07-10",
+        "createdAt": "2025-04-03T12:00:00Z",
+        "updatedAt": "2025-04-03T12:00:00Z"
+    },
+    {
+        "user_id": "550e8400-e29b-41d4-a716-446655440000",
+        "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0852", 
+        "course_plan": "premium",
+        "course_state": "active",
+        "course_start": "2025-04-10",
+        "course_end": "2025-07-10",
+        "createdAt": "2025-04-03T12:00:00Z",
+        "updatedAt": "2025-04-03T12:00:00Z"
+    },
+    
+   
+    {
+        "user_id": "550e8400-e29b-41d4-a716-446655440003", 
+        "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0851", 
+        "course_plan": "teacher",
+        "course_state": "active",
+        "course_start": "2025-04-10",
+        "course_end": "2025-07-10",
+        "createdAt": "2025-04-03T12:00:00Z",
+        "updatedAt": "2025-04-03T12:00:00Z"
+    },
+    {
+        "user_id": "550e8400-e29b-41d4-a716-446655440006",
+        "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0852", 
+        "course_plan": "teacher",
+        "course_state": "active",
+        "course_start": "2025-04-10",
+        "course_end": "2025-07-10",
+        "createdAt": "2025-04-03T12:00:00Z",
+        "updatedAt": "2025-04-03T12:00:00Z"
+    },
+    
+
+    {
+        "user_id": "550e8400-e29b-41d4-a716-446655440001", 
+        "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0854", 
+        "course_plan": "basic",
+        "course_state": "active",
+        "course_start": "2025-04-10",
+        "course_end": "2025-07-10",
+        "createdAt": "2025-04-03T12:00:00Z",
+        "updatedAt": "2025-04-03T12:00:00Z"
+    },
+    {
+        "user_id": "550e8400-e29b-41d4-a716-446655440004", 
+        "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0855", 
+        "course_plan": "premium",
+        "course_state": "active",
+        "course_start": "2025-04-10",
+        "course_end": "2025-07-10",
+        "createdAt": "2025-04-03T12:00:00Z",
+        "updatedAt": "2025-04-03T12:00:00Z"
+    }
+]
 }
+

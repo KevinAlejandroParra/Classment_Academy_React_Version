@@ -1,5 +1,5 @@
 "use strict";
-const { courses, schools, usercourses } = require("./data.json");
+const { courses, schools, usercourses, userschools } = require("./data.json");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -10,6 +10,7 @@ module.exports = {
         await queryInterface.bulkInsert("Courses", courses, {});
         await queryInterface.bulkInsert("Schools", schools, {});
         await queryInterface.bulkInsert("UserCourses", usercourses, {});
+        await queryInterface.bulkInsert("UserSchools", userschools, {});
     },
 
     async down(queryInterface, Sequelize) {
@@ -19,6 +20,7 @@ module.exports = {
         await queryInterface.bulkDelete("Courses", null, {});
         await queryInterface.bulkDelete("Schools", null, {});
         await queryInterface.bulkDelete("UserCourses", null, {});
+        await queryInterface.bulkDelete("UserSchools", null, {});
         
     },
 };

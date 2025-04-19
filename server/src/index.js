@@ -4,7 +4,9 @@ const userRoutes = require("./routes/user.routes.js");
 const schoolRoutes = require("./routes/school.routes.js");
 const courseRoutes = require("./routes/course.routes.js");
 const errorHandler = require("./middleware/errorHandler.js");
-const path = require("path");
+const path = require('path');
+const studentRoutes = require('./routes/student.routes');
+
 
 const app = express();
 
@@ -22,8 +24,9 @@ app.use("/images", express.static(path.join(__dirname, "..", "public", "images")
 app.use("/api", userRoutes);
 
 // Nuevas rutas para escuelas y cursos
-app.use("/api/schools", schoolRoutes);
-app.use("/api/courses", courseRoutes);
+app.use('/api/schools', schoolRoutes);
+app.use('/api/courses', courseRoutes);
+app.use('/api/students', studentRoutes);
 
 // Manejo de rutas no encontradas
 app.use((req, res) => {

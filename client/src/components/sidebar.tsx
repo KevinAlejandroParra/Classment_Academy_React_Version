@@ -80,7 +80,7 @@ export function Sidebar() {
   const navItems: NavItem[] = [
     { name: "INICIO", href: "/", icon: faHome },
     { name: "PERFIL", href: "/profile", icon: faUser },
-    { name: "ESCUELAS", href: "/schools", icon: faSchool },
+    { name: "ESCUELAS", href: "/student/schools", icon: faSchool },
     { name: "CURSOS", href: "/courses", icon: faBook },
     { name: "PANEL DE CONTROL", href: getDashboardPath(), icon: faInfoCircle },
     { name: "CONTACTO", href: "/contact", icon: faEnvelope },

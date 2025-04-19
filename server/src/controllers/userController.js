@@ -1,8 +1,7 @@
-const { User } = require("../models");
+const { User, UserSchool, Course, School } = require("../models");
 const jwt = require("jsonwebtoken"); 
 const bcrypt = require("bcrypt"); 
 const nodemailer = require("nodemailer");
-const { Course, School } = require("../models");
 const path = require("path");
 const asyncHandler = require("express-async-handler");
 
@@ -128,7 +127,7 @@ class UserController {
             }
 
             // Validación de rol
-            const validRoles = [1, 3, 4]; // 1: estudiante, 3: administrador, 4: coordinador
+            const validRoles = [1, 2, 3, 4]; // 1: estudiante, 2: profesor, 3: administrador, 4: coordinador
             if (!validRoles.includes(parseInt(userJSON.role_id))) {
                 return res.status(400).json({
                     success: false,
@@ -160,6 +159,27 @@ class UserController {
             }
 
             const user = await User.create(userJSON);
+
+            // Si es profesor (role_id: 2) y tiene school_id en el request
+            if (userJSON.role_id === 2 && userJSON.school_id) {
+                await user.addManagedSchools(userJSON.school_id, { 
+                    through: { 
+                        is_teacher: true,
+                        is_owner: false,
+                        is_coordinator: false
+                    }
+                });
+            }
+            // Si es coordinador (role_id: 4) y tiene school_id
+        if (userJSON.role_id === 4 && userJSON.school_id) {
+            await user.addManagedSchools(userJSON.school_id, {
+                through: {
+                    is_teacher: false,
+                    is_owner: false,
+                    is_coordinator: true
+                }
+            });
+        }
 
             // Eliminar la contraseña de la respuesta
             const userResponse = user.toJSON();
@@ -540,31 +560,46 @@ class UserController {
     static async getUserSchools(req, res) {
         try {
             const userId = req.params.id;
-            const user = await User.findByPk(userId, {
-                include: [{
-                    model: Course,
-                    as: 'courses',
-                    include: [{
-                        model: School,
-                        as: 'school'
-                    }]
-                }]
-            });
-
+            // Primero obtenemos el usuario para saber su rol
+            const user = await User.findByPk(userId);
             if (!user) {
                 return res.status(404).json({
                     success: false,
                     message: "Usuario no encontrado"
                 });
             }
-
-            // Obtener escuelas sin duplicados
-            const schools = Array.from(
-                new Map(
-                  user.courses.map(course => [course.school.school_id, course.school])
-                ).values()
-              );
-
+    
+            let schools = [];
+    
+            if (user.role_id === 1) { // Estudiante - obtiene escuelas a través de cursos
+                const userWithCourses = await User.findByPk(userId, {
+                    include: [{
+                        model: Course,
+                        as: 'courses',
+                        include: [{
+                            model: School,
+                            as: 'school'
+                        }]
+                    }]
+                });
+    
+                schools = Array.from(
+                    new Map(
+                        userWithCourses.courses.map(course => [course.school.school_id, course.school])
+                    ).values()
+                );
+            } else { // Profesor o coordinador - obtiene escuelas directamente
+                const userSchools = await UserSchool.findAll({
+                    where: { user_id: userId },
+                    include: [{
+                        model: School,
+                        as: 'school'
+                    }]
+                });
+    
+                schools = userSchools.map(us => us.school);
+            }
+    
             return res.status(200).json({
                 success: true,
                 data: schools,
@@ -579,7 +614,7 @@ class UserController {
             });
         }
     }
-
+    
     // Obtener todos los coordinadores
     static async getCoordinators(req, res) {
         try {

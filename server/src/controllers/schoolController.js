@@ -7,6 +7,9 @@ exports.getAllSchools = asyncHandler(async (req, res) => {
     include: [{
       model: User,
       as: 'coordinators',
+      through: {
+        attributes: ['is_owner']
+      },
       attributes: ['user_id', 'user_name', 'user_lastname', 'user_email']
     }]
   });

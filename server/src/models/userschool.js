@@ -16,7 +16,17 @@ module.exports = (sequelize, DataTypes) => {
             is_owner: {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false,
-                allowNull: false
+                allowNull: false,
+            },
+            is_student: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: false,
+                allowNull: false,
+            },
+            enrollment_date: {
+                type: DataTypes.DATE,
+                defaultValue: DataTypes.NOW,
+                allowNull: false,
             }
         },
         {

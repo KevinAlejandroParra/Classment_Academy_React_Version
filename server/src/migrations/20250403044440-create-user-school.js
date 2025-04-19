@@ -17,6 +17,16 @@ module.exports = {
                 defaultValue: false,
                 allowNull: false
             },
+            is_student: {
+                type: Sequelize.BOOLEAN,
+                defaultValue: false,
+                allowNull: false
+            },
+            enrollment_date: {
+                type: Sequelize.DATE,
+                defaultValue: Sequelize.NOW,
+                allowNull: false
+            },
             createdAt: {
                 type: Sequelize.DATE,
                 defaultValue: Sequelize.NOW,

@@ -41,8 +41,25 @@ Course.belongsToMany(User, { through: UserCourse, as: "students", foreignKey: "c
 User.belongsToMany(Course, { through: UserCourse, as: "courses", foreignKey: "user_id" });
 
 // Relaciones para UserSchool
-User.belongsToMany(School, { through: UserSchool, as: "managedSchools", foreignKey: "user_id" });
-School.belongsToMany(User, { through: UserSchool, as: "coordinators", foreignKey: "school_id" });
+User.belongsToMany(School, { 
+    through: UserSchool, 
+    as: "managedSchools", 
+    foreignKey: "user_id",
+    otherKey: "school_id"
+});
+School.belongsToMany(User, { 
+    through: UserSchool, 
+    as: "coordinators", 
+    foreignKey: "school_id",
+    otherKey: "user_id"
+});
+
+// Relaciones para UserSchool
+UserSchool.belongsTo(School, { foreignKey: 'school_id', as: 'school' });
+School.hasMany(UserSchool, { foreignKey: 'school_id' });
+
+UserSchool.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+User.hasMany(UserSchool, { foreignKey: 'user_id' });
 
 module.exports = {
     User,

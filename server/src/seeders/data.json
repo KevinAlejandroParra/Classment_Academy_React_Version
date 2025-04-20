@@ -128,7 +128,7 @@
         },
         {
             "role_id": 4,
-            "role_name": "coordinador"
+            "role_name": "regulador"
         },
         {
             "role_id": 5,
@@ -138,7 +138,6 @@
     "schools": [
         {
             "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-            "teacher_id": "550e8400-e29b-41d4-a716-446655440003",
             "school_name": "GO FIT",
             "school_description": "Entrenamiento y acondicionamiento fisico",
             "school_phone": 1234567890,
@@ -150,7 +149,6 @@
         },
         {
             "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa7",
-            "teacher_id": "550e8400-e29b-41d4-a716-446655440003",
             "school_name": "Soy Fitness",
             "school_description": "Yoga, Pilates y mas",
             "school_phone": 9876543210,
@@ -162,7 +160,6 @@
         },
         {
             "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa8",
-            "teacher_id": "550e8400-e29b-41d4-a716-446655440003",
             "school_name": "Taekwondo",
             "school_description": "Cursos de taekwondo para todos los niveles",
             "school_phone": 5555555555,
@@ -235,120 +232,40 @@
             "updatedAt": "2025-04-03T12:00:00Z"
         }
     ],
-    "userschools": [
+    "user_school_roles": [
         {
-            "user_id": "550e8400-e29b-41d4-a716-446655440005", 
-            "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6", 
-            "is_owner": false,
-            "is_teacher": false,
-            "is_coordinator": true,
-            "createdAt": "2025-04-03T12:00:00Z",
-            "updatedAt": "2025-04-03T12:00:00Z"
+          "user_id": "550e8400-e29b-41d4-a716-446655440002", 
+          "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6", 
+          "role_id": 3
         },
         {
-            "user_id": "550e8400-e29b-41d4-a716-446655440006", 
-            "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6", 
-            "is_owner": false,
-            "is_teacher": true,
-            "is_coordinator": false,
-            "createdAt": "2025-04-03T12:00:00Z",
-            "updatedAt": "2025-04-03T12:00:00Z"
-        },
-        {
-            "user_id": "550e8400-e29b-41d4-a716-446655440003", 
-            "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6", 
-            "is_owner": true,
-            "is_teacher": true, 
-            "is_coordinator": false,
-            "createdAt": "2025-04-03T12:00:00Z",
-            "updatedAt": "2025-04-03T12:00:00Z"
-        },
-        {
-            "user_id": "550e8400-e29b-41d4-a716-446655440003", 
-            "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa7", 
-            "is_owner": true,
-            "is_teacher": true,
-            "is_coordinator": false,
-            "createdAt": "2025-04-03T12:00:00Z",
-            "updatedAt": "2025-04-03T12:00:00Z"
-        },
-        {
-            "user_id": "550e8400-e29b-41d4-a716-446655440002", 
-            "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa7", 
-            "is_owner": false,
-            "is_teacher": false,
-            "is_coordinator": true,
-            "createdAt": "2025-04-03T12:00:00Z",
-            "updatedAt": "2025-04-03T12:00:00Z"
+          "user_id": "550e8400-e29b-41d4-a716-446655440001", 
+          "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa7", 
+          "role_id": 3
         }
-    ],
-    
-    "usercourses": [
-   
-    {
-        "user_id": "550e8400-e29b-41d4-a716-446655440000", 
-        "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0851", 
-        "course_plan": "basic",
-        "course_state": "active",
-        "course_start": "2025-04-10",
-        "course_end": "2025-07-10",
-        "createdAt": "2025-04-03T12:00:00Z",
-        "updatedAt": "2025-04-03T12:00:00Z"
-    },
-    {
-        "user_id": "550e8400-e29b-41d4-a716-446655440000",
-        "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0852", 
-        "course_plan": "premium",
-        "course_state": "active",
-        "course_start": "2025-04-10",
-        "course_end": "2025-07-10",
-        "createdAt": "2025-04-03T12:00:00Z",
-        "updatedAt": "2025-04-03T12:00:00Z"
-    },
-    
-   
-    {
-        "user_id": "550e8400-e29b-41d4-a716-446655440003", 
-        "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0851", 
-        "course_plan": "teacher",
-        "course_state": "active",
-        "course_start": "2025-04-10",
-        "course_end": "2025-07-10",
-        "createdAt": "2025-04-03T12:00:00Z",
-        "updatedAt": "2025-04-03T12:00:00Z"
-    },
-    {
-        "user_id": "550e8400-e29b-41d4-a716-446655440006",
-        "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0852", 
-        "course_plan": "teacher",
-        "course_state": "active",
-        "course_start": "2025-04-10",
-        "course_end": "2025-07-10",
-        "createdAt": "2025-04-03T12:00:00Z",
-        "updatedAt": "2025-04-03T12:00:00Z"
-    },
-    
-
-    {
-        "user_id": "550e8400-e29b-41d4-a716-446655440001", 
-        "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0854", 
-        "course_plan": "basic",
-        "course_state": "active",
-        "course_start": "2025-04-10",
-        "course_end": "2025-07-10",
-        "createdAt": "2025-04-03T12:00:00Z",
-        "updatedAt": "2025-04-03T12:00:00Z"
-    },
-    {
-        "user_id": "550e8400-e29b-41d4-a716-446655440004", 
-        "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0855", 
-        "course_plan": "premium",
-        "course_state": "active",
-        "course_start": "2025-04-10",
-        "course_end": "2025-07-10",
-        "createdAt": "2025-04-03T12:00:00Z",
-        "updatedAt": "2025-04-03T12:00:00Z"
-    }
-]
+      ],
+    "enrollments":
+      [
+        {
+          "enrollment_id": "77f6e934-22d7-456f-8de6-1aacf1b32100",
+          "user_id": "550e8400-e29b-41d4-a716-446655440006", 
+          "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+          "plan_type": "mensual",
+          "start_date": "2025-04-01T00:00:00Z",
+          "end_date": "2025-04-30T00:00:00Z",
+          "status": "active",
+          "progress": 10
+        },
+        {
+          "enrollment_id": "77f6e934-22d7-456f-8de6-1aacf1b32101",
+          "user_id": "550e8400-e29b-41d4-a716-446655440005", 
+          "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0852",
+          "plan_type": "semestral",
+          "start_date": "2025-03-01T00:00:00Z",
+          "end_date": "2025-08-31T00:00:00Z",
+          "status": "active",
+          "progress": 25
+        }
+      ]
+      
 }
-

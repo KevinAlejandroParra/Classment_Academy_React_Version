@@ -1,4 +1,4 @@
-const { Course, School, UserCourse, User } = require('../models');
+const { Course, School, Enrollment, User } = require('../models');
 const asyncHandler = require('../middleware/asyncHandler');
 
 // Obtener todos los cursos
@@ -28,8 +28,16 @@ exports.getCourseById = asyncHandler(async (req, res) => {
       },
       {
         model: User,
-        as: 'students',
+        as: 'teachers',
         through: { attributes: [] } // No incluir atributos de la tabla intermedia
+      },
+      {
+        model: User,
+        as: 'students',
+        through: {
+          model: Enrollment,
+          attributes: ['plan_type', 'status', 'start_date', 'end_date', 'progress']
+        }
       }
     ]
   });
@@ -180,12 +188,12 @@ exports.deleteCourse = asyncHandler(async (req, res) => {
     throw error;
   }
   
-  // Verificar si hay usuarios inscritos en este curso
-  const enrolledUsers = await UserCourse.findAll({
+  // Verificar si hay usuarios inscritos usando Enrollment
+  const enrollments = await Enrollment.count({
     where: { course_id: id }
   });
   
-  if (enrolledUsers.length > 0) {
+  if (enrollments > 0) {
     const error = new Error('No se puede eliminar el curso porque tiene usuarios inscritos');
     error.statusCode = 400;
     throw error;

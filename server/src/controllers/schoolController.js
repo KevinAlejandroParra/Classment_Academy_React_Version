@@ -1,4 +1,4 @@
-const { School, Course, User, UserSchool } = require('../models');
+const { School, Course, User, UserSchoolRole } = require('../models');
 const asyncHandler = require('../middleware/asyncHandler');
 
 // Obtener todas las escuelas
@@ -56,30 +56,29 @@ exports.createSchool = asyncHandler(async (req, res) => {
   const { school_name, school_description, school_phone, school_address, school_image, school_email } = req.body;
   const coordinator_id = req.user.user_id;
 
-  // Verificar que el usuario es un coordinador
+  // Verificar que el usuario es un admin
   const coordinator = await User.findByPk(coordinator_id);
-  if (!coordinator || coordinator.role_id !== 4) {
-    const error = new Error('Solo los coordinadores pueden crear escuelas');
+  if (!coordinator || ![2, 4].includes(coordinator.role_id)) { // 2: admin, 4: coordinador
+    const error = new Error('Solo los administradores o coordinadores pueden crear escuelas');
     error.statusCode = 403;
     throw error;
   }
 
-  // Crear la escuela
+  // Crear la escuela (sin teacher_id)
   const school = await School.create({
     school_name,
     school_description,
     school_phone,
     school_address,
     school_image,
-    school_email,
-    teacher_id: coordinator_id
+    school_email
   });
 
-  // Crear la relación entre el coordinador y la escuela
-  await UserSchool.create({
+  // Crear la relación en user_school_roles
+  await UserSchoolRole.create({
     user_id: coordinator_id,
     school_id: school.school_id,
-    is_owner: true
+    role_id: coordinator.role_id // 2 o 4 según corresponda
   });
 
   return res.status(201).json({
@@ -161,7 +160,7 @@ exports.deleteSchool = asyncHandler(async (req, res) => {
   });
 });
 
-// Obtener escuelas del coordinador
+// Obtener escuelas del admin
 exports.getCoordinatorSchools = asyncHandler(async (req, res) => {
   const coordinator_id = req.user.user_id;
 

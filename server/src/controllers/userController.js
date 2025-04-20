@@ -1,4 +1,4 @@
-const { User, UserSchool, Course, School } = require("../models");
+const { User, Course, School, Enrollment} = require("../models");
 const jwt = require("jsonwebtoken"); 
 const bcrypt = require("bcrypt"); 
 const nodemailer = require("nodemailer");
@@ -366,6 +366,7 @@ class UserController {
                 {
                     user_id: foundUser.user_id,
                     email: foundUser.user_email,
+                    role_id: foundUser.role_id,
                 },
                 process.env.JWT_SECRET || "fullsecret",
                 { expiresIn: "24h" }
@@ -520,31 +521,23 @@ class UserController {
 
     static async getUserCourses(req, res) {
         try {
-            const userId = req.params.id;
-            const user = await User.findByPk(userId, {
+            const userId = req.user?.user_id;
+            const enrollments = await Enrollment.findAll({
+                where: { user_id: userId },
                 include: [{
                     model: Course,
-                    as: 'courses',
+                    as: 'course',
                     include: [{
                         model: School,
                         as: 'school'
-                    }],
-                    through: {
-                        attributes: ['course_plan', 'course_state', 'course_start', 'course_end']
-                    }
-                }]
+                    }]
+                }],
+                attributes: ['enrollment_id', 'plan_type', 'status', 'start_date', 'end_date', 'progress']
             });
-
-            if (!user) {
-                return res.status(404).json({
-                    success: false,
-                    message: "Usuario no encontrado"
-                });
-            }
-
+    
             return res.status(200).json({
                 success: true,
-                data: user.courses,
+                data: enrollments,
                 message: "Cursos del usuario obtenidos correctamente"
             });
         } catch (error) {
@@ -560,8 +553,12 @@ class UserController {
     static async getUserSchools(req, res) {
         try {
             const userId = req.params.id;
-            // Primero obtenemos el usuario para saber su rol
-            const user = await User.findByPk(userId);
+            
+            // 1. Verificar que el usuario existe
+            const user = await User.findByPk(userId, {
+                attributes: ['user_id', 'role_id']
+            });
+            
             if (!user) {
                 return res.status(404).json({
                     success: false,
@@ -571,34 +568,82 @@ class UserController {
     
             let schools = [];
     
-            if (user.role_id === 1) { // Estudiante - obtiene escuelas a través de cursos
-                const userWithCourses = await User.findByPk(userId, {
+           // obtener escuelas a través de cursos matriculados
+            if (user.role_id === 1) { // Rol de estudiante
+                const enrollments = await enrollments.findAll({
+                    where: { 
+                        user_id: userId,
+                        status: 'active' // Solo cursos activos
+                    },
                     include: [{
                         model: Course,
-                        as: 'courses',
+                        attributes: ['course_id', 'course_name'],
                         include: [{
                             model: School,
-                            as: 'school'
+                            attributes: ['school_id', 'school_name', 'school_image', 'school_email']
                         }]
-                    }]
+                    }],
+                    attributes: ['enrollment_id', 'start_date', 'end_date']
                 });
     
-                schools = Array.from(
-                    new Map(
-                        userWithCourses.courses.map(course => [course.school.school_id, course.school])
-                    ).values()
-                );
-            } else { // Profesor o coordinador - obtiene escuelas directamente
-                const userSchools = await UserSchool.findAll({
+                // Procesar para eliminar duplicados y enriquecer datos
+                const schoolsMap = new Map();
+                
+                enrollments.forEach(enrollment => {
+                    if (enrollment.Course && enrollment.Course.School) {
+                        const school = enrollment.Course.School.get({ plain: true });
+                        
+                        if (!schoolsMap.has(school.school_id)) {
+                            // Agregar información adicional útil
+                            school.enrollments = [{
+                                enrollment_id: enrollment.enrollment_id,
+                                course_id: enrollment.Course.course_id,
+                                course_name: enrollment.Course.course_name,
+                                start_date: enrollment.start_date,
+                                end_date: enrollment.end_date
+                            }];
+                            schoolsMap.set(school.school_id, school);
+                        } else {
+                            // Si la escuela ya existe, solo agregamos el nuevo curso
+                            const existingSchool = schoolsMap.get(school.school_id);
+                            existingSchool.enrollments.push({
+                                enrollment_id: enrollment.enrollment_id,
+                                course_id: enrollment.Course.course_id,
+                                course_name: enrollment.Course.course_name,
+                                start_date: enrollment.start_date,
+                                end_date: enrollment.end_date
+                            });
+                        }
+                    }
+                });
+    
+                schools = Array.from(schoolsMap.values());
+            } 
+            // Lógica para profesores, coordinadores y administradores
+            else if ([2, 3, 4].includes(user.role_id)) { // 2: admin, 3: profesor, 4: coordinador
+                const userSchoolRoles = await UserSchoolRole.findAll({
                     where: { user_id: userId },
                     include: [{
                         model: School,
-                        as: 'school'
-                    }]
+                        attributes: ['school_id', 'school_name', 'school_image', 'school_email', 'school_phone'],
+                        include: [{
+                            model: Course,
+                            attributes: ['course_id', 'course_name'],
+                            required: false // LEFT JOIN
+                        }]
+                    }],
+                    attributes: ['role_id']
                 });
     
-                schools = userSchools.map(us => us.school);
+                schools = userSchoolRoles.map(usr => {
+                    const school = usr.School.get({ plain: true });
+                    school.user_role_id = usr.role_id; // Rol específico en esta escuela
+                    return school;
+                });
             }
+    
+            // 4. Ordenar escuelas alfabéticamente
+            schools.sort((a, b) => a.school_name.localeCompare(b.school_name));
     
             return res.status(200).json({
                 success: true,
@@ -606,7 +651,7 @@ class UserController {
                 message: "Escuelas del usuario obtenidas correctamente"
             });
         } catch (error) {
-            console.error("Error al obtener escuelas del usuario:", error);
+            console.error("Error en getUserSchools:", error);
             return res.status(500).json({
                 success: false,
                 message: "Error al obtener las escuelas del usuario",

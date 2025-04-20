@@ -9,10 +9,6 @@ module.exports = {
                 primaryKey: true,
                 allowNull: false,
             },
-            teacher_id: {
-                type: Sequelize.UUID,
-                allowNull: false,
-            },
             school_name: {
                 type: Sequelize.STRING,
                 allowNull: false,

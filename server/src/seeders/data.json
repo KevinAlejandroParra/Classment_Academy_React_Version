@@ -9,7 +9,7 @@
             "user_email": "luisparra5380@gmail.com",
             "user_password": "$2a$10$zFS0MvbkAHNF1RMUjxHoJenSERwRPRcRwJxVaOwgAbdLb6QqFErB2",
             "user_phone": 3209202177,
-            "user_image": "http://localhost:3000/images/users/default.jpg",
+            "user_image": "http://localhost:3000/images/users/user-50e8400-e29b-41d4-a716-446655440000.jpg",
             "user_birth": "2006-10-13",
             "user_state": "activo",
             "role_id": 1,
@@ -34,8 +34,8 @@
         },
         {
             "user_id": "550e8400-e29b-41d4-a716-446655440002",
-            "user_name": "Ana",
-            "user_lastname": "Martínez",
+            "user_name": "Patrona Ana",
+            "user_lastname": "Martínez GONZALES",
             "user_document_type": "CC",
             "user_document": 1004004004,
             "user_email": "ana.martinez@email.com",
@@ -44,7 +44,7 @@
             "user_image": "http://localhost:3000/images/users/default.jpg",
             "user_birth": "1992-12-10",
             "user_state": "activo",
-            "role_id": 4,
+            "role_id": 3,
             "createdAt": "2025-04-03T12:00:00Z",
             "updatedAt": "2025-04-03T12:00:00Z"
         },
@@ -76,7 +76,7 @@
             "user_image": "http://localhost:3000/images/users/default.jpg",
             "user_birth": "1991-05-15",
             "user_state": "activo",
-            "role_id": 3,
+            "role_id": 4,
             "createdAt": "2025-04-03T12:00:00Z",
             "updatedAt": "2025-04-03T12:00:00Z"
         },
@@ -92,7 +92,7 @@
             "user_image": "http://localhost:3000/images/users/default.jpg",
             "user_birth": "1985-07-20",
             "user_state": "activo",
-            "role_id": 4,
+            "role_id": 2,
             "createdAt": "2025-04-03T12:00:00Z",
             "updatedAt": "2025-04-03T12:00:00Z"
         },

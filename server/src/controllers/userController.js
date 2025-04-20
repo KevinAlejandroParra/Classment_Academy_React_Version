@@ -1,4 +1,4 @@
-const { User, Course, School, Enrollment} = require("../models");
+const { User, School, Course, Enrollment, UserSchoolRole } = require("../models");
 const jwt = require("jsonwebtoken"); 
 const bcrypt = require("bcrypt"); 
 const nodemailer = require("nodemailer");
@@ -522,24 +522,149 @@ class UserController {
     static async getUserCourses(req, res) {
         try {
             const userId = req.user?.user_id;
-            const enrollments = await Enrollment.findAll({
-                where: { user_id: userId },
-                include: [{
-                    model: Course,
-                    as: 'course',
+            const user = await User.findByPk(userId, {
+                attributes: ["user_id", "role_id"],
+            });
+    
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Usuario no encontrado",
+                });
+            }
+    
+            let coursesData = [];
+    
+            // Lógica para estudiantes (rol 1)
+            if (user.role_id === 1) {
+                const enrollments = await Enrollment.findAll({
+                    where: { user_id: userId },
+                    include: [{
+                        model: Course,
+                        as: 'course',
+                        include: [{
+                            model: School,
+                            as: 'school'
+                        }]
+                    }],
+                    attributes: ['enrollment_id', 'plan_type', 'status', 'start_date', 'end_date', 'progress']
+                });
+    
+                coursesData = enrollments.map(enrollment => {
+                    const e = enrollment.get({ plain: true });
+                    const course = e.course || {};
+                    const school = course.school || {};
+    
+                    return {
+                        enrollment_id: e.enrollment_id,
+                        plan_type: e.plan_type,
+                        status: e.status,
+                        start_date: e.start_date,
+                        end_date: e.end_date,
+                        progress: e.progress,
+                        course_id: course.course_id,
+                        course_name: course.course_name,
+                        course_description: course.course_description,
+                        course_image: course.course_image,
+                        school: {
+                            school_id: school.school_id,
+                            school_name: school.school_name,
+                            school_image: school.school_image,
+                            school_email: school.school_email
+                        },
+                        access_type: 'student' // Indica que es un curso como estudiante
+                    };
+                });
+            }
+            // Lógica para profesores y administradores (roles 2 y 3)
+            else if ([2, 3].includes(user.role_id)) {
+                // 1. Obtener todas las escuelas donde el usuario tiene roles
+                const userSchoolRoles = await UserSchoolRole.findAll({
+                    where: { user_id: userId },
                     include: [{
                         model: School,
-                        as: 'school'
+                        as: "school",
+                        include: [{
+                            model: Course,
+                            as: "courses",
+                            include: [{
+                                model: School,
+                                as: 'school'
+                            }]
+                        }]
                     }]
-                }],
-                attributes: ['enrollment_id', 'plan_type', 'status', 'start_date', 'end_date', 'progress']
-            });
+                });
+    
+                // 2. Recopilar todos los cursos de esas escuelas
+                userSchoolRoles.forEach(usr => {
+                    const school = usr.school.get({ plain: true });
+                    if (school.courses && school.courses.length > 0) {
+                        school.courses.forEach(course => {
+                            coursesData.push({
+                                course_id: course.course_id,
+                                course_name: course.course_name,
+                                course_description: course.course_description,
+                                course_image: course.course_image,
+                                school: {
+                                    school_id: school.school_id,
+                                    school_name: school.school_name,
+                                    school_image: school.school_image,
+                                    school_email: school.school_email
+                                },
+                                access_type: usr.role_id === 2 ? 'teacher' : 'admin', // Tipo de acceso
+                                user_role_id: usr.role_id, // Rol específico en esta escuela
+                                school_role: usr.role_id // Podríamos añadir más info del rol si es necesario
+                            });
+                        });
+                    }
+                });
+    
+                // 3. Opcional: Si es profesor, también podríamos buscar cursos específicamente asignados
+                if (user.role_id === 2) {
+                    const teacherCourses = await TeacherCourse.findAll({
+                        where: { user_id: userId },
+                        include: [{
+                            model: Course,
+                            as: 'course',
+                            include: [{
+                                model: School,
+                                as: 'school'
+                            }]
+                        }]
+                    });
+    
+                    teacherCourses.forEach(tc => {
+                        const course = tc.course.get({ plain: true });
+                        const school = course.school || {};
+                        
+                        // Evitar duplicados
+                        if (!coursesData.some(c => c.course_id === course.course_id)) {
+                            coursesData.push({
+                                course_id: course.course_id,
+                                course_name: course.course_name,
+                                course_description: course.course_description,
+                                course_image: course.course_image,
+                                school: {
+                                    school_id: school.school_id,
+                                    school_name: school.school_name,
+                                    school_image: school.school_image,
+                                    school_email: school.school_email
+                                },
+                                access_type: 'teacher',
+                                user_role_id: 2,
+                                is_direct_teacher: true // Indica que es profesor directo de este curso
+                            });
+                        }
+                    });
+                }
+            }
     
             return res.status(200).json({
                 success: true,
-                data: enrollments,
+                data: coursesData,
                 message: "Cursos del usuario obtenidos correctamente"
             });
+    
         } catch (error) {
             console.error("Error al obtener cursos del usuario:", error);
             return res.status(500).json({
@@ -552,104 +677,143 @@ class UserController {
 
     static async getUserSchools(req, res) {
         try {
-            const userId = req.params.id;
-            
+            const userId = req.user.user_id;
+
             // 1. Verificar que el usuario existe
             const user = await User.findByPk(userId, {
-                attributes: ['user_id', 'role_id']
+                attributes: ["user_id", "role_id"],
             });
-            
+
             if (!user) {
                 return res.status(404).json({
                     success: false,
-                    message: "Usuario no encontrado"
+                    message: "Usuario no encontrado para obtener escuelas",
                 });
             }
-    
+
             let schools = [];
-    
-           // obtener escuelas a través de cursos matriculados
-            if (user.role_id === 1) { // Rol de estudiante
-                const enrollments = await enrollments.findAll({
-                    where: { 
+
+            // obtener escuelas a través de cursos matriculados
+            if (user.role_id === 1) {
+                const enrollmentRecords = await Enrollment.findAll({
+                    where: {
                         user_id: userId,
-                        status: 'active' // Solo cursos activos
+                        status: "active",
                     },
-                    include: [{
-                        model: Course,
-                        attributes: ['course_id', 'course_name'],
-                        include: [{
-                            model: School,
-                            attributes: ['school_id', 'school_name', 'school_image', 'school_email']
-                        }]
-                    }],
-                    attributes: ['enrollment_id', 'start_date', 'end_date']
+                    include: [
+                        {
+                            model: Course,
+                            as: "course",
+                            attributes: ["course_id", "course_name"],
+                            include: [
+                                {
+                                    model: School,
+                                    as: "school",
+                                    attributes: [
+                                        "school_id",
+                                        "school_name",
+                                        "school_description",
+                                        "school_phone",
+                                        "school_image",
+                                        "school_email",
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                    attributes: ["enrollment_id", "start_date", "end_date"],
                 });
-    
-                // Procesar para eliminar duplicados y enriquecer datos
+
+                // Mapear escuelas únicas
                 const schoolsMap = new Map();
-                
-                enrollments.forEach(enrollment => {
-                    if (enrollment.Course && enrollment.Course.School) {
-                        const school = enrollment.Course.School.get({ plain: true });
-                        
+
+                enrollmentRecords.forEach((enrollment) => {
+                    const course = enrollment.course;
+                    if (course && course.school) {
+                        const school = course.school;
                         if (!schoolsMap.has(school.school_id)) {
-                            // Agregar información adicional útil
-                            school.enrollments = [{
-                                enrollment_id: enrollment.enrollment_id,
-                                course_id: enrollment.Course.course_id,
-                                course_name: enrollment.Course.course_name,
-                                start_date: enrollment.start_date,
-                                end_date: enrollment.end_date
-                            }];
-                            schoolsMap.set(school.school_id, school);
-                        } else {
-                            // Si la escuela ya existe, solo agregamos el nuevo curso
-                            const existingSchool = schoolsMap.get(school.school_id);
-                            existingSchool.enrollments.push({
-                                enrollment_id: enrollment.enrollment_id,
-                                course_id: enrollment.Course.course_id,
-                                course_name: enrollment.Course.course_name,
-                                start_date: enrollment.start_date,
-                                end_date: enrollment.end_date
+                            const plainSchool = school.get ? school.get({ plain: true }) : school;
+                          
+                            schoolsMap.set(school.school_id, {
+                              ...plainSchool,
+                              enrollments: []
                             });
-                        }
+                          }
+                          
+
+                        schoolsMap.get(school.school_id).enrollments.push({
+                            enrollment_id: enrollment.enrollment_id,
+                            course_id: course.course_id,
+                            course_name: course.course_name,
+                            start_date: enrollment.start_date,
+                            end_date: enrollment.end_date,
+                        });
                     }
                 });
-    
-                schools = Array.from(schoolsMap.values());
-            } 
+
+                schools = Array.from(schoolsMap.values()).map((school) => {
+                    const plainSchool = school.get ? school.get({ plain: true }) : school;
+                    return {
+                      ...plainSchool,
+                      enrollments: school.enrollments || []
+                    };
+                  });
+                  
+            }
             // Lógica para profesores, coordinadores y administradores
-            else if ([2, 3, 4].includes(user.role_id)) { // 2: admin, 3: profesor, 4: coordinador
+            else if ([2, 3 ].includes(user.role_id)) {
+                // 2: profesor, 3: administrador,
                 const userSchoolRoles = await UserSchoolRole.findAll({
                     where: { user_id: userId },
-                    include: [{
-                        model: School,
-                        attributes: ['school_id', 'school_name', 'school_image', 'school_email', 'school_phone'],
-                        include: [{
-                            model: Course,
-                            attributes: ['course_id', 'course_name'],
-                            required: false // LEFT JOIN
-                        }]
-                    }],
-                    attributes: ['role_id']
+                    include: [
+                        {
+                            model: School,
+                            as: "school",
+                            attributes: [
+                                "school_id",
+                                "school_name",
+                                "school_image",
+                                "school_email",
+                                "school_phone",
+                                "school_description"
+                                
+                            ],
+                            include: [
+                                {
+                                    model: Course,
+                                    as: "courses",
+                                    attributes: ["course_id", "course_name"],
+                                    required: false,
+                                },
+                            ],
+                        },
+                    ],
+                    attributes: ["role_id"],
                 });
-    
-                schools = userSchoolRoles.map(usr => {
-                    const school = usr.School.get({ plain: true });
+
+                schools = userSchoolRoles.map((usr) => {
+                    const school = usr.school.get({ plain: true });
                     school.user_role_id = usr.role_id; // Rol específico en esta escuela
                     return school;
                 });
             }
-    
+
             // 4. Ordenar escuelas alfabéticamente
             schools.sort((a, b) => a.school_name.localeCompare(b.school_name));
-    
+
+            // Convertir a objetos puros (sin dataValues, etc.)
             return res.status(200).json({
                 success: true,
-                data: schools,
+                data: schools.map(school => {
+                  const plainSchool = school.get ? school.get({ plain: true }) : school;
+                  if (plainSchool.enrollments && Array.isArray(plainSchool.enrollments)) {
+                    plainSchool.enrollments = plainSchool.enrollments.map(enr => ({ ...enr }));
+                  }
+                  return plainSchool;
+                }),
                 message: "Escuelas del usuario obtenidas correctamente"
-            });
+              });
+              
         } catch (error) {
             console.error("Error en getUserSchools:", error);
             return res.status(500).json({

@@ -1,29 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const schoolController = require('../controllers/schoolController');
-const { verifyToken } = require('../middleware/auth');
+const { verifyToken, checkRole } = require('../middleware/auth');
 
-
-
-// Obtener todas las escuelas
+// Rutas públicas
 router.get('/', schoolController.getAllSchools);
-
-// Rutas protegidas que requieren autenticación
-router.use(verifyToken);
-
-// Obtener escuelas del coordinador
-router.get('/coordinator', schoolController.getCoordinatorSchools);
-
-// Obtener una escuela específica
 router.get('/:id', schoolController.getSchoolById);
 
-// Crear una nueva escuela (solo coordinadores)
-router.post('/', schoolController.createSchool);
+// Rutas protegidas
+router.use(verifyToken);
 
-// Actualizar una escuela (solo el coordinador propietario)
-router.put('/:id', schoolController.updateSchool);
+// Solo coordinadores y administradores pueden gestionar escuelas
+router.post('/', checkRole([2, 4]), schoolController.createSchool);
+router.put('/:id', checkRole([2, 4]), schoolController.updateSchool);
+router.delete('/:id', checkRole([2, 4]), schoolController.deleteSchool);
 
-// Eliminar una escuela (solo el coordinador propietario)
-router.delete('/:id', schoolController.deleteSchool);
+// Obtener escuelas del coordinador
+router.get('/coordinator/schools', checkRole([4]), schoolController.getCoordinatorSchools);
 
 module.exports = router;

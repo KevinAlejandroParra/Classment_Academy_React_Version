@@ -1,15 +1,16 @@
 const { Router } = require("express");
-const UserController = require("../controllers/userController.js");
-const { verifyToken, checkRole } = require("../middleware/auth.js");
+const UserController = require("../controllers/userController");
+const { verifyToken, checkRole } = require("../middleware/auth");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
-const userRoutes = Router();
+
+const router = Router();
+
 // Configuración de multer
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const folder = path.join(__dirname, "..", "..", "public", "images", "users");
-
     if (!fs.existsSync(folder)) {
       fs.mkdirSync(folder, { recursive: true });
     }
@@ -29,24 +30,30 @@ const fileFilter = (req, file, cb) => {
 };
 
 const upload = multer({ storage, fileFilter });
-// CRUD
-userRoutes.get("/users", UserController.getUsers);
-userRoutes.get("/users/:id", UserController.getUser);
-userRoutes.put("/users/:id", upload.single("imagen"), UserController.updateUser);
-userRoutes.post("/users", UserController.createUser);
-userRoutes.delete("/users/:id", UserController.deleteUser);
-userRoutes.post("/login", UserController.login);
-userRoutes.post("/forgot-password", UserController.forgotPassword);
-userRoutes.post("/reset-password", UserController.resetPassword);
-userRoutes.get("/auth/me", verifyToken, UserController.validateToken);
-userRoutes.get("/users/:id/courses", UserController.getUserCourses);
-userRoutes.get("/users/:id/schools", UserController.getUserSchools);
 
-// Obtener todos los coordinadores
-userRoutes.get('/coordinators', verifyToken, checkRole([3, 4]), UserController.getCoordinators);
-userRoutes.get('/coordinators/:id', verifyToken, checkRole([3, 4]), UserController.getCoordinatorById);
+// Rutas autenticación
+router.post("/login", UserController.login);
+router.put("/users/:id", upload.single("imagen"), UserController.updateUser);
+router.post("/forgot-password", UserController.forgotPassword);
+router.post("/reset-password", UserController.resetPassword);
 
-// Cambiar estado de un usuario
-userRoutes.put('/:id/toggle-state', verifyToken, checkRole([4]), UserController.toggleUserState);
+// Rutas protegidas
+router.use(verifyToken);
 
-module.exports = userRoutes;
+// Rutas CRUD básicas
+router.get("/users", checkRole([2, 3, 4]), UserController.getUsers); // Solo admins pueden listar usuarios
+router.get("/users/:id", checkRole([2, 3, 4]), UserController.getUser);
+router.post("/users", checkRole([2, 4]), UserController.createUser); // Solo admins/coordinadores pueden crear usuarios
+router.delete("/users/:id", checkRole([2, 4]), UserController.deleteUser);
+
+// Rutas específicas
+router.get("/auth/me", UserController.validateToken); // Obtiene el perfil del usuario autenticado
+router.get("/my-courses", UserController.getUserCourses); // Cursos del usuario autenticado
+router.get("/my-schools", UserController.getUserSchools); // Escuelas del usuario autenticado
+
+// Gestión de coordinadores (solo para administradores)
+router.get('/coordinators', checkRole([2]), UserController.getCoordinators);
+router.get('/coordinators/:id', checkRole([2]), UserController.getCoordinatorById);
+router.put('/coordinators/:id/toggle-state', checkRole([2]), UserController.toggleUserState);
+
+module.exports = router;

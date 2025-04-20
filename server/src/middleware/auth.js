@@ -38,7 +38,7 @@ const checkRole = (roles) => {
         });
       }
 
-      // Roles: 1 = estudiante, 3 = administrador, 4 = coordinador
+      
       if (!roles.includes(user.role_id)) {
         return res.status(403).json({
           success: false,

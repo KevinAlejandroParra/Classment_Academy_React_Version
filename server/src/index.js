@@ -5,9 +5,8 @@ const schoolRoutes = require("./routes/school.routes.js");
 const courseRoutes = require("./routes/course.routes.js");
 const errorHandler = require("./middleware/errorHandler.js");
 const path = require('path');
-const studentRoutes = require('./routes/student.routes');
-
-
+const enrollmentRoutes = require('./routes/enrollment.routes');
+const courseTeacherRoutes = require('./routes/courseTeacher.routes');
 const app = express();
 
 // Configuración de CORS
@@ -23,10 +22,11 @@ app.use("/images", express.static(path.join(__dirname, "..", "public", "images")
 // Rutas existentes
 app.use("/api", userRoutes);
 
-// Nuevas rutas para escuelas y cursos
+// Nuevas rutas para 
 app.use('/api/schools', schoolRoutes);
 app.use('/api/courses', courseRoutes);
-app.use('/api/students', studentRoutes);
+app.use('/api/enrollments', enrollmentRoutes);
+app.use ('/api/courseteacher', courseTeacherRoutes);
 
 // Manejo de rutas no encontradas
 app.use((req, res) => {

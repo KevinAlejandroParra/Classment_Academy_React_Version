@@ -17,56 +17,83 @@ const connection = new Sequelize(config.database, config.username, config.passwo
     }
 })();
 
+// Importar modelos
 const UserModel = require("./user.js");
 const RoleModel = require("./role.js");
 const CourseModel = require("./course.js");
 const SchoolModel = require("./school.js");
-const UserCourseModel = require("./usercourse.js");
-const UserSchoolModel = require("./userschool.js");
 
+const UserSchoolRoleModel = require("./userSchoolRole.js");
+const CourseTeacherModel = require("./courseTeacher.js");
+const EnrollmentModel = require("./enrollment.js");
+
+// Inicializar modelos
 const User = UserModel(connection, DataTypes);
 const Role = RoleModel(connection, DataTypes);
 const Course = CourseModel(connection, DataTypes);
 const School = SchoolModel(connection, DataTypes);
-const UserCourse = UserCourseModel(connection, DataTypes);
-const UserSchool = UserSchoolModel(connection, DataTypes);
 
+const UserSchoolRole = UserSchoolRoleModel(connection, DataTypes);
+const CourseTeacher = CourseTeacherModel(connection, DataTypes);
+const Enrollment = EnrollmentModel(connection, DataTypes);
+
+// Asociaciones
+
+// Roles
 Role.hasMany(User, { as: "users", foreignKey: "role_id" });
 User.belongsTo(Role, { as: "role", foreignKey: "role_id" });
 
+// Escuelas y Cursos
 School.hasMany(Course, { as: "courses", foreignKey: "school_id" });
 Course.belongsTo(School, { as: "school", foreignKey: "school_id" });
 
-Course.belongsToMany(User, { through: UserCourse, as: "students", foreignKey: "course_id" });
-User.belongsToMany(Course, { through: UserCourse, as: "courses", foreignKey: "user_id" });
-
-// Relaciones para UserSchool
-User.belongsToMany(School, { 
-    through: UserSchool, 
-    as: "managedSchools", 
+// user_school_roles
+User.belongsToMany(School, {
+    through: UserSchoolRole,
+    as: "schools",
     foreignKey: "user_id",
     otherKey: "school_id"
 });
-School.belongsToMany(User, { 
-    through: UserSchool, 
-    as: "coordinators", 
+School.belongsToMany(User, {
+    through: UserSchoolRole,
+    as: "users",
     foreignKey: "school_id",
     otherKey: "user_id"
 });
+UserSchoolRole.belongsTo(User, { foreignKey: "user_id", as: "user" });
+UserSchoolRole.belongsTo(School, { foreignKey: "school_id", as: "school" });
+UserSchoolRole.belongsTo(Role, { foreignKey: "role_id", as: "role" });
 
-// Relaciones para UserSchool
-UserSchool.belongsTo(School, { foreignKey: 'school_id', as: 'school' });
-School.hasMany(UserSchool, { foreignKey: 'school_id' });
+// course_teachers
+Course.belongsToMany(User, {
+    through: CourseTeacher,
+    as: "teachers",
+    foreignKey: "course_id",
+    otherKey: "teacher_id"
+});
+User.belongsToMany(Course, {
+    through: CourseTeacher,
+    as: "coursesTaught",
+    foreignKey: "teacher_id",
+    otherKey: "course_id"
+});
+CourseTeacher.belongsTo(Course, { foreignKey: "course_id", as: "course" });
+CourseTeacher.belongsTo(User, { foreignKey: "teacher_id", as: "teacher" });
 
-UserSchool.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
-User.hasMany(UserSchool, { foreignKey: 'user_id' });
+// enrollments
+User.hasMany(Enrollment, { foreignKey: "user_id", as: "enrollments" });
+Enrollment.belongsTo(User, { foreignKey: "user_id", as: "user" });
+
+Course.hasMany(Enrollment, { foreignKey: "course_id", as: "enrollments" });
+Enrollment.belongsTo(Course, { foreignKey: "course_id", as: "course" });
 
 module.exports = {
     User,
     Role,
     Course,
     School,
-    UserCourse,
-    UserSchool,
+    UserSchoolRole,
+    CourseTeacher,
+    Enrollment,
     connection,
 };

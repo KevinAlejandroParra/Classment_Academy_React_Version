@@ -10,10 +10,6 @@ module.exports = (sequelize, DataTypes) => {
                 defaultValue: DataTypes.UUIDV4,
                 primaryKey: true,
             },
-            teacher_id: {
-                type: DataTypes.UUID,
-                allowNull: false,
-            },
             school_name: {
                 type: DataTypes.STRING,
                 allowNull: false,

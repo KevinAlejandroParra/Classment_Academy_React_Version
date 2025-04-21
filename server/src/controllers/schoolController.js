@@ -98,11 +98,10 @@ exports.updateSchool = asyncHandler(async (req, res) => {
   const updateData = req.body;
 
   // Verificar que el usuario es el coordinador de la escuela
-  const userSchool = await UserSchool.findOne({
+  const userSchool = await UserSchoolRole.findOne({
     where: {
       school_id: id,
-      user_id: coordinator_id,
-      is_owner: true
+      user_id: coordinator_id
     }
   });
 
@@ -134,7 +133,7 @@ exports.deleteSchool = asyncHandler(async (req, res) => {
   const coordinator_id = req.user.user_id;
 
   // Verificar que el usuario es el coordinador de la escuela
-  const userSchool = await UserSchool.findOne({
+  const userSchool = await UserSchoolRole.findOne({
     where: {
       school_id: id,
       user_id: coordinator_id,

@@ -341,7 +341,7 @@ const Register: React.FC = () => {
           options: [
             { value: "1", label: "Estudiante" },
             { value: "2", label: "Profesor" },
-            { value: "4", label: "Coordinador" },
+            { value: "3", label: "Coordinador" },
           ],
         },
         {

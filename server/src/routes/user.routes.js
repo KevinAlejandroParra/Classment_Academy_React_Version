@@ -43,6 +43,7 @@ const upload = multer({ storage, fileFilter });
  *       401:
  *         description: Credenciales incorrectas
  */
+router.post("/users",  UserController.createUser);
 router.post("/login", UserController.login);
 
 /**
@@ -98,7 +99,6 @@ router.use(verifyToken);
  *       403:
  *         description: No autorizado
  */
-router.get("/users", checkRole([2, 3, 4]), UserController.getUsers);
 
 /**
  * @swagger

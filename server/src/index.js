@@ -8,6 +8,8 @@ const path = require('path');
 const enrollmentRoutes = require('./routes/enrollment.routes');
 const courseTeacherRoutes = require('./routes/courseTeacher.routes');
 const app = express();
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
 
 // Configuración de CORS
 app.use(
@@ -17,6 +19,9 @@ app.use(
     })
 );
 app.use(express.json());
+
+// Swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Archivos estáticos
 app.use("/images", express.static(path.join(__dirname, "..", "public", "images")));
@@ -41,7 +46,8 @@ app.use((req, res) => {
 // Middleware de manejo de errores
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Servidor corriendo en puerto ${PORT}`);
+// Iniciar el servidor
+app.listen(5000, () => {
+    console.log(`Servidor corriendo en puerto 5000`);
+    console.log(`http://localhost:5000/api-docs`);
 });

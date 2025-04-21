@@ -33,9 +33,9 @@ const upload = multer({ storage, fileFilter });
 
 // Rutas autenticación
 router.post("/login", UserController.login);
-router.put("/users/:id", upload.single("imagen"), UserController.updateUser);
 router.post("/forgot-password", UserController.forgotPassword);
 router.post("/reset-password", UserController.resetPassword);
+router.get("/me", UserController.validateToken);
 
 // Rutas protegidas
 router.use(verifyToken);
@@ -47,7 +47,6 @@ router.post("/users", checkRole([2, 4]), UserController.createUser); // Solo adm
 router.delete("/users/:id", checkRole([2, 4]), UserController.deleteUser);
 
 // Rutas específicas
-router.get("/auth/me", UserController.validateToken); // Obtiene el perfil del usuario autenticado
 router.get("/my-courses", UserController.getUserCourses); // Cursos del usuario autenticado
 router.get("/my-schools", UserController.getUserSchools); // Escuelas del usuario autenticado
 
@@ -55,5 +54,8 @@ router.get("/my-schools", UserController.getUserSchools); // Escuelas del usuari
 router.get('/coordinators', checkRole([2]), UserController.getCoordinators);
 router.get('/coordinators/:id', checkRole([2]), UserController.getCoordinatorById);
 router.put('/coordinators/:id/toggle-state', checkRole([2]), UserController.toggleUserState);
+
+// Inscripción en escuela
+router.post("/enroll/:schoolId", checkRole([1]), UserController.enrollInSchool);
 
 module.exports = router;

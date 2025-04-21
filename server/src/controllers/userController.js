@@ -4,13 +4,15 @@ const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const path = require("path");
 const asyncHandler = require("express-async-handler");
+const { v4: uuidv4 } = require('uuid');
+const emailConfig = require('../config/emailConfig');
 
 // Configurar el transporter de nodemailer
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD
+        pass: process.env.EMAIL_PASS
     }
 });
 
@@ -501,9 +503,8 @@ class UserController {
                 });
             }
 
-            // Actualizar contraseña
-            const salt = await bcrypt.genSalt(10);
-            user.user_password = await bcrypt.hash(newPassword, salt);
+            // Actualizar contraseña 
+            user.user_password = newPassword;
             await user.save();
 
             res.status(200).json({
@@ -952,6 +953,66 @@ class UserController {
             return res.status(500).json({
                 success: false,
                 message: "Error al cambiar el estado del usuario",
+                error: error.message
+            });
+        }
+    }
+
+    static async enrollInSchool(req, res) {
+        try {
+            const { schoolId } = req.params;
+            const userId = req.user.user_id;
+
+            // 1. Verificar que la escuela existe
+            const school = await School.findByPk(schoolId);
+            if (!school) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Escuela no encontrada'
+                });
+            }
+
+            // 2. Verificar que el usuario es un estudiante
+            const user = await User.findByPk(userId);
+            if (!user || user.role_id !== 1) {
+                return res.status(403).json({
+                    success: false,
+                    message: 'Solo los estudiantes pueden inscribirse en escuelas'
+                });
+            }
+
+            // 3. Verificar si ya está inscrito en la escuela
+            const existingRole = await UserSchoolRole.findOne({
+                where: {
+                    user_id: userId,
+                    school_id: schoolId
+                }
+            });
+
+            if (existingRole) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Ya estás inscrito en esta escuela'
+                });
+            }
+
+            // 4. Crear la relación usuario-escuela
+            await UserSchoolRole.create({
+                user_id: userId,
+                school_id: schoolId,
+                role_id: 1 // Rol de estudiante
+            });
+
+            return res.status(201).json({
+                success: true,
+                message: 'Inscripción exitosa en la escuela'
+            });
+
+        } catch (error) {
+            console.error('Error en enrollInSchool:', error);
+            return res.status(500).json({
+                success: false,
+                message: 'Error al inscribirse en la escuela',
                 error: error.message
             });
         }

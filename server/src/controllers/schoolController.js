@@ -6,9 +6,9 @@ exports.getAllSchools = asyncHandler(async (req, res) => {
   const schools = await School.findAll({
     include: [{
       model: User,
-      as: 'coordinators',
+      as: 'users',
       through: {
-        attributes: ['is_owner']
+        attributes: ['role_id']
       },
       attributes: ['user_id', 'user_name', 'user_lastname', 'user_email']
     }]
@@ -33,7 +33,10 @@ exports.getSchoolById = asyncHandler(async (req, res) => {
       },
       {
         model: User,
-        as: 'coordinators',
+        as: 'users',
+        through: {
+          attributes: ['role_id']
+        },
         attributes: ['user_id', 'user_name', 'user_lastname', 'user_email']
       }
     ]
@@ -168,7 +171,7 @@ exports.getCoordinatorSchools = asyncHandler(async (req, res) => {
     include: [
       {
         model: User,
-        as: "coordinators",
+        as: "users",
         where: { user_id: coordinator_id },
         attributes: ["user_id", "user_name", "user_lastname", "user_email"]
       }

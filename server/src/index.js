@@ -17,16 +17,18 @@ app.use(
     })
 );
 app.use(express.json());
+
+// Archivos estáticos
 app.use("/images", express.static(path.join(__dirname, "..", "public", "images")));
 
-// Rutas existentes
-app.use("/api", userRoutes);
-
-// Nuevas rutas para 
+// Rutas públicas
 app.use('/api/schools', schoolRoutes);
 app.use('/api/courses', courseRoutes);
+
+// Rutas que pueden requerir autenticación
+app.use("/api/auth", userRoutes);
 app.use('/api/enrollments', enrollmentRoutes);
-app.use ('/api/courseteacher', courseTeacherRoutes);
+app.use('/api/courseteacher', courseTeacherRoutes);
 
 // Manejo de rutas no encontradas
 app.use((req, res) => {

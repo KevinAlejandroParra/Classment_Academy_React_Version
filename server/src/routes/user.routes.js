@@ -35,7 +35,7 @@ const upload = multer({ storage, fileFilter });
 router.post("/login", UserController.login);
 router.post("/forgot-password", UserController.forgotPassword);
 router.post("/reset-password", UserController.resetPassword);
-router.get("/auth/me", UserController.validateToken);
+router.get("/auth/me", verifyToken, UserController.validateToken);
 
 // Rutas protegidas
 router.use(verifyToken);

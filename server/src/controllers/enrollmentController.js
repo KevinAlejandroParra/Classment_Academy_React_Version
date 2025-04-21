@@ -79,8 +79,8 @@ class EnrollmentController {
                 user_id: studentId,
                 course_id: courseId,
                 plan_type: req.body.plan_type || 'mensual',
-                start_date: new Date(),
-                end_date: EnrollmentController.calculateEndDate(req.body.plan_type),
+                start_date: req.body.start_date ? new Date(req.body.start_date) : new Date(),
+                end_date: req.body.end_date ? new Date(req.body.end_date) : EnrollmentController.calculateEndDate(req.body.plan_type),
                 status: 'active',
                 progress: 0
             });
@@ -95,7 +95,7 @@ class EnrollmentController {
                         course_name: course.course_name,
                         school: {
                             school_id: course.school.school_id,
-                            school_name: course.School.school_name
+                            school_name: course.school.school_name 
                         }
                     },
                     plan_type: enrollment.plan_type,

@@ -278,55 +278,61 @@ const ProfilePage = () => {
 
   const handleDeleteProfile = async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        router.push("/login");
-        return;
-      }
-
-      const response = await fetch(
-        `http://localhost:5000/api/users/${userData?.id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const token = localStorage.getItem("token");
+        if (!token) {
+            router.push("/login");
+            return;
         }
-      );
 
-      if (!response.ok) {
-        throw new Error("Error al eliminar el perfil");
-      }
-
-      const data = await response.json();
-
-      if (data.success) {
-        handleLogout();
-        Swal.fire({
-          icon: "success",
-          title: "Perfil eliminado",
-          text: "Tu perfil ha sido eliminado correctamente",
-          confirmButtonColor: "#FFD700",
-          background: "#1a1a1a",
-          color: "#fff",
+        const response = await fetch(`http://localhost:5000/api/users/${userData?.id}`, {
+            method: "PUT",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                user: {
+                    user_state: "inactivo",
+                },
+            }),
         });
-      } else {
-        throw new Error(data.message || "Error al eliminar el perfil");
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error desconocido");
-      console.error("Error al eliminar perfil:", err);
 
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: err instanceof Error ? err.message : "Error desconocido",
-        confirmButtonColor: "#FFD700",
-        background: "#1a1a1a",
-        color: "#fff",
-      });
+        if (!response.ok) {
+            throw new Error("Error al desactivar el perfil");
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+            // Cerrar sesión después de desactivar el perfil
+            handleLogout();
+
+            Swal.fire({
+                icon: "success",
+                title: "Perfil desactivado",
+                text: "Tu perfil ha sido desactivado correctamente",
+                confirmButtonColor: "#FFD700",
+                background: "#1a1a1a",
+                color: "#fff",
+            });
+        } else {
+            throw new Error(data.message || "Error al desactivar el perfil");
+        }
+    } catch (err) {
+        setError(err instanceof Error ? err.message : "Error desconocido");
+        console.error("Error al desactivar perfil:", err);
+
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: err instanceof Error ? err.message : "Error desconocido",
+            confirmButtonColor: "#FFD700",
+            background: "#1a1a1a",
+            color: "#fff",
+        });
     }
-  };
+};
+
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -355,7 +361,7 @@ const ProfilePage = () => {
   const confirmDeleteProfile = () => {
     Swal.fire({
       title: "¿Estás seguro?",
-      text: "Tu perfil será eliminado permanentemente",
+      text: "Tu perfil será desactivado, pero puedes volver a activarlo contactandote a servicio soporte",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#FFD700",

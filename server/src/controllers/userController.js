@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt"); 
 const nodemailer = require("nodemailer");
 const path = require("path");
-const asyncHandler = require("express-async-handler");
+const asyncHandler = require("../middleware/asyncHandler");
 const { v4: uuidv4 } = require('uuid');
 const emailConfig = require('../config/emailConfig');
 

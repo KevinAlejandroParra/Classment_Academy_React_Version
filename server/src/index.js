@@ -27,6 +27,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/images", express.static(path.join(__dirname, "..", "public", "images")));
 
 // Rutas públicas
+app.use('/api', userRoutes);
 app.use('/api/schools', schoolRoutes);
 app.use('/api/courses', courseRoutes);
 

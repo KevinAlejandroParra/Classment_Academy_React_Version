@@ -82,7 +82,7 @@ router.post("/reset-password", UserController.resetPassword);
  *       401:
  *         description: Token inválido o no proporcionado
  */
-router.get("/auth/me", UserController.validateToken);
+router.get("/auth/me", verifyToken, UserController.validateToken);
 
 // Rutas protegidas
 router.use(verifyToken);

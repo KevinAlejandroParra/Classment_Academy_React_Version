@@ -230,6 +230,42 @@
             "course_image": "/images/cursos/zumba.jpg",
             "createdAt": "2025-04-03T12:00:00Z",
             "updatedAt": "2025-04-03T12:00:00Z"
+        },
+        {
+            "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0856",
+            "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa8",
+            "course_name": "Taekwondo para Niños",
+            "course_description": "Clases de taekwondo para niños",
+            "course_price": 70000,
+            "course_places": 15,
+            "course_age": 10,
+            "course_image": "/images/cursos/taekwondo_ninos.jpg",
+            "createdAt": "2025-04-03T12:00:00Z",
+            "updatedAt": "2025-04-03T12:00:00Z"
+        },
+        {
+            "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0857",
+            "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa8",
+            "course_name": "Taekwondo para Adultos",
+            "course_description": "Clases de taekwondo para adultos",
+            "course_price": 90000,
+            "course_places": 15,
+            "course_age": 16,
+            "course_image": "/images/cursos/2.jpg",
+            "createdAt": "2025-04-03T12:00:00Z",
+            "updatedAt": "2025-04-03T12:00:00Z"
+        },
+        {
+            "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0858",
+            "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa8",
+            "course_name": "Taekwondo para Adolescentes",
+            "course_description": "Clases de taekwondo para adolescentes",
+            "course_price": 85000,
+            "course_places": 15,
+            "course_age": 14,
+            "course_image": "/images/cursos/karatekid.jpg",
+            "createdAt": "2025-04-03T12:00:00Z",
+            "updatedAt": "2025-04-03T12:00:00Z"
         }
     ],
     "user_school_roles": [
@@ -265,6 +301,36 @@
           "end_date": "2025-08-31T00:00:00Z",
           "status": "active",
           "progress": 25
+        },
+        {
+            "enrollment_id": "77f6e934-22d7-456f-8de6-1aacf1b32102",
+            "user_id": "550e8400-e29b-41d4-a716-446655440003", 
+            "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0857",
+            "plan_type": "Mensual",
+            "start_date": "2025-03-01T00:00:00Z",
+            "end_date": "2025-08-31T00:00:00Z",
+            "status": "active",
+            "progress": 50
+        },
+        {
+            "enrollment_id": "77f6e934-22d7-456f-8de6-1aacf1b32103",
+            "user_id": "550e8400-e29b-41d4-a716-446655440006", 
+            "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0858",
+            "plan_type": "Trimestral",
+            "start_date": "2025-03-01T00:00:00Z",
+            "end_date": "2025-08-31T00:00:00Z",
+            "status": "active",
+            "progress": 75
+        },
+        {
+            "enrollment_id": "77f6e934-22d7-456f-8de6-1aacf1b32104",
+            "user_id": "550e8400-e29b-41d4-a716-44665544002", 
+            "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0856",
+            "plan_type": "Mensual",
+            "start_date": "2025-03-01T00:00:00Z",
+            "end_date": "2025-08-31T00:00:00Z",
+            "status": "active",
+            "progress": 25
         }
       ]
       

@@ -74,7 +74,7 @@ const StudentDashboard = () => {
         const data = await response.json()
         if (!response.ok) throw new Error(data.message)
 
-        if (data.user.role !== 1) {
+        if (data.user.role_id !== 1) {
           router.push("/")
           return
         }

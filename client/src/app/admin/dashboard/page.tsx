@@ -70,7 +70,7 @@ const AdminDashboard = () => {
         if (!response.ok) throw new Error(data.message)
 
         // Verificar si el usuario es administrador (role_id: 3)
-        if (data.user.role !== 3) {
+        if (data.user.role_id !== 3) {
           router.push("/")
           return
         }

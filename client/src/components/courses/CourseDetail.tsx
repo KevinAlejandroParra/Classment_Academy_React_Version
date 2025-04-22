@@ -230,12 +230,14 @@ export default function CourseDetail() {
             const schoolsData = await schoolsResponse.json()
             
             if (schoolsData.success) {
-              const schoolFound = schoolsData.data.find((s: any) => s.school_id === courseFound.school.school_id)
+              const schoolFound = schoolsData.data.find((s: any) => s.school_id === courseFound.school.school_id);
               if (schoolFound && schoolFound.users && schoolFound.users.length > 0) {
                 // Buscar el administrador (role_id = 3)
-                const admin = schoolFound.users.find((user: SchoolAdmin) => user.UserSchoolRol.role_id === 3)
+                const admin = schoolFound.users.find((user: SchoolAdmin) => 
+                  user.UserSchoolRol && user.UserSchoolRol.role_id === 3
+                );
                 if (admin) {
-                  setSchoolAdmin(admin)
+                  setSchoolAdmin(admin);
                 }
               }
             }

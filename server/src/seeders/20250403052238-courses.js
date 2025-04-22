@@ -1,5 +1,5 @@
 "use strict";
-const { courses, schools, user_school_roles, enrollments, classes, attendances } = require("./data.json");
+const { courses, schools, user_school_roles, enrollments, classes, attendances , course_teachers} = require("./data.json");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {

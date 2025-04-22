@@ -68,6 +68,21 @@ UserSchoolRole.belongsTo(User, { foreignKey: "user_id", as: "user" });
 UserSchoolRole.belongsTo(School, { foreignKey: "school_id", as: "school" });
 UserSchoolRole.belongsTo(Role, { foreignKey: "role_id", as: "role" });
 
+// students (a través de enrollments)
+Course.belongsToMany(User, {
+    through: Enrollment,
+    as: 'students',
+    foreignKey: 'course_id',
+    otherKey: 'user_id'
+  });
+  
+  User.belongsToMany(Course, {
+    through: Enrollment,
+    as: 'enrolledCourses',
+    foreignKey: 'user_id',
+    otherKey: 'course_id'
+  });
+
 // course_teachers
 Course.belongsToMany(User, {
     through: CourseTeacher,

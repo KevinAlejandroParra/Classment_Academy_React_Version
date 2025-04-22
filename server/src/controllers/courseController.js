@@ -6,7 +6,7 @@ exports.getAllCourses = asyncHandler(async (req, res) => {
   const courses = await Course.findAll({
     include: [{ 
       model: School, 
-      as: 'school' // Usando el alias definido en las asociaciones
+      as: 'school' 
     }]
   });
   
@@ -20,6 +20,13 @@ exports.getAllCourses = asyncHandler(async (req, res) => {
 exports.getCourseById = asyncHandler(async (req, res) => {
   const { id } = req.params;
   
+  
+  if (isNaN(id)) {
+    const error = new Error('ID de curso no válido');
+    error.statusCode = 400;
+    throw error;
+  }
+  
   const course = await Course.findByPk(id, {
     include: [
       { 
@@ -29,7 +36,7 @@ exports.getCourseById = asyncHandler(async (req, res) => {
       {
         model: User,
         as: 'teachers',
-        through: { attributes: [] } // No incluir atributos de la tabla intermedia
+        through: { attributes: [] } 
       },
       {
         model: User,
@@ -43,8 +50,12 @@ exports.getCourseById = asyncHandler(async (req, res) => {
   });
   
   if (!course) {
-    const error = new Error('Curso no encontrado');
+    const error = new Error(`Curso con ID ${id} no encontrado`);
     error.statusCode = 404;
+    error.details = {
+      requestedId: id,
+      availableCourses: await Course.findAll({ attributes: ['course_id'], raw: true })
+    };
     throw error;
   }
   
@@ -53,7 +64,48 @@ exports.getCourseById = asyncHandler(async (req, res) => {
     data: course
   });
 });
+// Obtener todos los cursos con sus profesores
+exports.getCoursesWithTeachers = asyncHandler(async (req, res) => {
+  const courses = await Course.findAll({
+    include: [
+      { 
+        model: School, 
+        as: 'school',
+        attributes: ['school_id', 'school_name']
+      },
+      {
+        model: User,
+        as: 'teachers',
+        through: { attributes: [] },
+        attributes: ['user_id', 'user_name', 'user_lastname', 'user_image', 'user_phone'],
+        where: { role_id: 2 } 
+      }
+    ],
+    attributes: [
+      'course_id', 
+      'course_name', 
+      'course_description', 
+      'course_price', 
+      'course_image',
+      'course_places',
+      'course_age'
+    ]
+  });
+  
+  const formattedCourses = courses.map(course => {
+    const courseJson = course.toJSON();
+    return {
+      ...courseJson,
+      profesor_encargado: courseJson.teachers.length > 0 ? courseJson.teachers[0] : null,
+      teachers: undefined
+    };
+  });
 
+  return res.status(200).json({
+    success: true,
+    data: formattedCourses
+  });
+});
 // Obtener cursos por escuela
 exports.getCoursesBySchoolId = asyncHandler(async (req, res) => {
   const { schoolId } = req.params;

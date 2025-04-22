@@ -165,9 +165,11 @@ const SchoolsPage = () => {
                     <p className="text-gray-400 text-sm">{school.school_description}</p>
                   </div>
                 </div>
-                <div className="space-y-2 text-gray-300">
+                <div className="text-gray-300 space-y-2">
                   <p>
-                    <strong>Coordinador:</strong> {school.coordinators[0]?.user_name} {school.coordinators[0]?.user_lastname}
+                    <strong>Coordinador:</strong> {school.coordinators && school.coordinators[0] ? 
+                      `${school.coordinators[0].user_name} ${school.coordinators[0].user_lastname}` : 
+                      'No asignado'}
                   </p>
                   <p>
                     <strong>Email:</strong> {school.school_email}

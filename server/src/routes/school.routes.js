@@ -69,7 +69,7 @@ router.use(verifyToken);
  *       500:
  *         description: Error interno del servidor
  */
-router.post('/', checkRole([2, 4]), schoolController.createSchool);
+router.post('/', checkRole([3, 4]), schoolController.createSchool);
 
 /**
  * @swagger
@@ -108,13 +108,13 @@ router.post('/', checkRole([2, 4]), schoolController.createSchool);
  *       500:
  *         description: Error interno del servidor
  */
-router.put('/:id', checkRole([2, 4]), schoolController.updateSchool);
+router.put('/:id', checkRole([3, 4]), schoolController.updateSchool);
 
 /**
  * @swagger
  * /school/{id}:
  *   delete:
- *     description: Elimina una escuela por su ID (solo coordinadores y administradores)
+ *     description: Elimina una escuela por su ID (solo administradores)
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -134,7 +134,7 @@ router.put('/:id', checkRole([2, 4]), schoolController.updateSchool);
  *       500:
  *         description: Error interno del servidor
  */
-router.delete('/:id', checkRole([2, 4]), schoolController.deleteSchool);
+router.delete('/:id', checkRole([3]), schoolController.deleteSchool);
 
 /**
  * @swagger

@@ -113,6 +113,22 @@ const buttonTap = {
   scale: 0.98,
 };
 
+const API_BASE_URL = "http://localhost:5000";
+
+// Función para manejar URLs de imágenes
+const getImageUrl = (url: string | null | undefined): string => {
+  if (!url) return "/placeholder.svg";
+  
+  // Si la URL ya es absoluta, la devolvemos tal cual
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  
+  // Si la URL no comienza con /, añadimos uno
+  const path = url.startsWith('/') ? url : `/${url}`;
+  return `${API_BASE_URL}${path}`;
+};
+
 const ProfilePage = () => {
   const router = useRouter();
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -413,11 +429,7 @@ const ProfilePage = () => {
               <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-[rgb(var(--primary-rgb))]">
                 {userData.image ? (
                   <Image
-                    src={
-                      userData.image.startsWith("http")
-                        ? userData.image
-                        : `http://localhost:5000/${userData.image}`
-                    }
+                    src={getImageUrl(userData.image)}
                     alt={`${userData.name} ${userData.lastname}`}
                     fill
                     className="object-cover"
@@ -568,13 +580,7 @@ const ProfilePage = () => {
                         <div className="flex items-start gap-3">
                           <div className="relative w-16 h-16 flex-shrink-0">
                             <Image
-                              src={
-                                school.school_image
-                                  ? school.school_image.startsWith("http")
-                                    ? school.school_image
-                                    : `http://localhost:5000${school.school_image}`
-                                  : "/images/default-school.png"
-                              }
+                              src={getImageUrl(school.school_image)}
                               alt={school.school_name || "Escuela"}
                               fill
                               className="object-cover rounded-md"
@@ -643,13 +649,7 @@ const ProfilePage = () => {
                         <div className="flex items-start gap-3">
                           <div className="relative w-16 h-16 flex-shrink-0">
                             <Image
-                              src={
-                                course.course_image
-                                  ? course.course_image.startsWith("http")
-                                    ? course.course_image
-                                    : `http://localhost:5000${course.course_image}`
-                                  : "/images/default-course.png"
-                              }
+                              src={getImageUrl(course.course_image)}
                               alt={course.course_name || "Curso"}
                               fill
                               className="object-cover rounded-md"
@@ -771,11 +771,7 @@ const ProfilePage = () => {
                   />
                 ) : userData?.image ? (
                   <Image
-                    src={
-                      userData.image.startsWith("http")
-                        ? userData.image
-                        : `http://localhost:5000/${userData.image}`
-                    }
+                    src={getImageUrl(userData.image)}
                     alt="Foto de perfil"
                     width={128}
                     height={128}

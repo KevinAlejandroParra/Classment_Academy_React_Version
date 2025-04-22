@@ -4,28 +4,37 @@ const { courses, schools, user_school_roles, enrollments, classes, attendances }
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
-        /**
-         * Add seed commands here.
-         */
-        await queryInterface.bulkInsert("Courses", courses, {});
-        await queryInterface.bulkInsert("Schools", schools, {});
-        await queryInterface.bulkInsert("user_school_roles",user_school_roles , {});
-        await queryInterface.bulkInsert("enrollments",enrollments , {});
-        await queryInterface.bulkInsert("Classes",classes , {});
-        await queryInterface.bulkInsert("Attendances",attendances , {});
-
+        try {
+            // Primero las escuelas
+            await queryInterface.bulkInsert("Schools", schools, {});
+            
+            // Luego los cursos
+            await queryInterface.bulkInsert("Courses", courses, {});
+            
+            // Después las relaciones usuario-escuela-rol
+            await queryInterface.bulkInsert("user_school_roles", user_school_roles, {});
+            
+            // Luego las matrículas
+            await queryInterface.bulkInsert("Enrollments", enrollments, {});
+            
+            // Después las clases
+            await queryInterface.bulkInsert("Classes", classes, {});
+            
+            // Finalmente las asistencias
+            await queryInterface.bulkInsert("Attendances", attendances, {});
+        } catch (error) {
+            console.error('Error en el seeding:', error);
+            throw error;
+        }
     },
 
     async down(queryInterface, Sequelize) {
-        /**
-         * Add commands to revert seed here.
-         */
+        // Eliminar en orden inverso
+        await queryInterface.bulkDelete("Attendances", null, {});
+        await queryInterface.bulkDelete("Classes", null, {});
+        await queryInterface.bulkDelete("Enrollments", null, {});
+        await queryInterface.bulkDelete("user_school_roles", null, {});
         await queryInterface.bulkDelete("Courses", null, {});
         await queryInterface.bulkDelete("Schools", null, {});
-        await queryInterface.bulkDelete("UserSchoolRol", null, {});
-        await queryInterface.bulkDelete("Enrollments", null, {});
-        await queryInterface.bulkDelete("Classes", null, {});
-        await queryInterface.bulkDelete("Attendances", null, {});
-        
     },
 };

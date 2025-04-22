@@ -166,7 +166,7 @@ router.delete("/users/:id", checkRole([2, 4]), UserController.deleteUser);
  *       401:
  *         description: Usuario no autenticado
  */
-router.get("/my-courses", UserController.getUserCourses);
+router.get("/my-courses", checkRole([3]), UserController.getUserCourses);
 
 /**
  * @swagger
@@ -179,7 +179,7 @@ router.get("/my-courses", UserController.getUserCourses);
  *       401:
  *         description: Usuario no autenticado
  */
-router.get("/my-schools", UserController.getUserSchools);
+router.get("/my-schools", checkRole([3, 4]), UserController.getUserSchools);
 
 /**
  * @swagger
@@ -192,7 +192,7 @@ router.get("/my-schools", UserController.getUserSchools);
  *       403:
  *         description: No autorizado
  */
-router.get('/coordinators', checkRole([2, 4]), UserController.getCoordinators);
+router.get('/coordinators', checkRole([3, 4]), UserController.getCoordinators);
 
 /**
  * @swagger
@@ -212,7 +212,7 @@ router.get('/coordinators', checkRole([2, 4]), UserController.getCoordinators);
  *       404:
  *         description: Coordinador no encontrado
  */
-router.get('/coordinators/:id', checkRole([2, 4]), UserController.getCoordinatorById);
+router.get('/coordinators/:id', checkRole([3, 4]), UserController.getCoordinatorById);
 
 /**
  * @swagger
@@ -232,7 +232,7 @@ router.get('/coordinators/:id', checkRole([2, 4]), UserController.getCoordinator
  *       404:
  *         description: Coordinador no encontrado
  */
-router.put('/coordinators/:id/toggle-state', checkRole([2, 4]), UserController.toggleUserState);
+router.put('/coordinators/:id/toggle-state', checkRole([3, 4]), UserController.toggleUserState);
 
 /**
  * @swagger
@@ -253,5 +253,38 @@ router.put('/coordinators/:id/toggle-state', checkRole([2, 4]), UserController.t
  *         description: Inscripción fallida
  */
 router.post("/enroll/:schoolId", checkRole([1]), UserController.enrollInSchool);
+
+/**
+ * @swagger
+ * /user/administrators:
+ *   get:
+ *     description: Obtiene todos los administradores (solo reguladores)
+ *     responses:
+ *       200:
+ *         description: Lista de administradores
+ *       403:
+ *         description: No autorizado
+ */
+router.get('/administrators', checkRole([4]), UserController.getAdministrators);
+
+/**
+ * @swagger
+ * /user/administrators/{id}/toggle-state:
+ *   put:
+ *     description: Cambia el estado de un administrador (solo reguladores)
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: El ID del administrador a actualizar
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Estado de administrador actualizado con éxito
+ *       404:
+ *         description: Administrador no encontrado
+ */
+router.put('/administrators/:id/toggle-state', checkRole([4]), UserController.toggleAdminState);
 
 module.exports = router;

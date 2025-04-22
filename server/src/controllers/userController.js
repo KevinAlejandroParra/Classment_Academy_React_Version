@@ -1016,6 +1016,85 @@ class UserController {
             });
         }
     }
+
+    // Obtener todos los administradores
+    static async getAdministrators(req, res) {
+        try {
+            const administrators = await User.findAll({
+                where: { role_id: 3 },
+                include: [{
+                    model: School,
+                    as: 'schools',
+                    attributes: ['school_id', 'school_name', 'school_description', 'school_email', 'school_phone', 'school_address'],
+                    through: {
+                        attributes: []
+                    }
+                }],
+                attributes: [
+                    'user_id',
+                    'user_name',
+                    'user_lastname',
+                    'user_email',
+                    'user_phone',
+                    'user_state'
+                ]
+            });
+
+            return res.status(200).json({
+                success: true,
+                data: administrators
+            });
+        } catch (error) {
+            console.error("Error al obtener administradores:", error);
+            return res.status(500).json({
+                success: false,
+                message: "Error al obtener los administradores",
+                error: error.message
+            });
+        }
+    }
+
+    // Cambiar estado de un administrador
+    static async toggleAdminState(req, res) {
+        try {
+            const { id } = req.params;
+            
+            const user = await User.findByPk(id);
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Administrador no encontrado'
+                });
+            }
+
+            // Solo permitir cambiar estado de administradores
+            if (user.role_id !== 3) {
+                return res.status(403).json({
+                    success: false,
+                    message: 'Solo se puede cambiar el estado de administradores'
+                });
+            }
+
+            const newState = user.user_state === 'activo' ? 'inactivo' : 'activo';
+            await user.update({ user_state: newState });
+
+            return res.status(200).json({
+                success: true,
+                message: `Estado del administrador actualizado a ${newState}`,
+                data: {
+                    user_id: user.user_id,
+                    user_state: newState
+                }
+            });
+        } catch (error) {
+            console.error("Error al cambiar el estado del administrador:", error);
+            return res.status(500).json({
+                success: false,
+                message: "Error al cambiar el estado del administrador",
+                error: error.message
+            });
+        }
+    }
 }
 
 module.exports = UserController;

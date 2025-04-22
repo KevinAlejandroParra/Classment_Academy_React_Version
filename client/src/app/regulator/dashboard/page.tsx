@@ -4,53 +4,40 @@ import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
-  faCog,
-  faUsers,
-  faChartBar,
   faHome,
   faUser,
   faSignOut,
+  faToggleOn,
+  faToggleOff,
+  faSchool,
 } from "@fortawesome/free-solid-svg-icons"
 import { Particles } from "@/components/particles"
 import Link from "next/link"
 import Swal from "sweetalert2"
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2,
-    },
-  },
+interface School {
+  school_id: string
+  school_name: string
+  school_description: string
+  school_email: string
+  school_phone: string
+  school_address: string
 }
 
-const itemVariants = {
-  hidden: { y: 20, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: {
-      type: "spring",
-      stiffness: 100,
-      damping: 10,
-    },
-  },
-}
-
-const buttonHover = {
-  scale: 1.02,
-  transition: { type: "spring", stiffness: 400, damping: 10 },
-}
-
-const buttonTap = {
-  scale: 0.98,
+interface Administrator {
+  user_id: string
+  user_name: string
+  user_lastname: string
+  user_email: string
+  user_phone: string
+  user_state: string
+  schools: School[]
 }
 
 const RegulatorDashboard = () => {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
+  const [administrators, setAdministrators] = useState<Administrator[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -71,14 +58,13 @@ const RegulatorDashboard = () => {
         const data = await response.json()
         if (!response.ok) throw new Error(data.message)
 
-        // Verificar si el usuario es regulador (role_id: 4)
         if (data.user.role_id !== 4) {
           router.push("/")
           return
         }
 
         setUser(data.user)
-        setIsLoading(false)
+        fetchAdministrators(token)
       } catch (error) {
         console.error("Error:", error)
         router.push("/login")
@@ -87,6 +73,84 @@ const RegulatorDashboard = () => {
 
     checkAuth()
   }, [router])
+
+  const fetchAdministrators = async (token: string) => {
+    try {
+      const response = await fetch("http://localhost:5000/api/administrators", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.message)
+
+      setAdministrators(data.data)
+      setIsLoading(false)
+    } catch (error) {
+      console.error("Error al cargar administradores:", error)
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se pudieron cargar los administradores",
+        confirmButtonColor: "rgb(var(--primary-rgb))",
+        background: "#1a1a1a",
+        color: "#fff",
+      })
+    }
+  }
+
+  const handleToggleState = async (adminId: string, currentState: string) => {
+    try {
+      const token = localStorage.getItem("token")
+      if (!token) {
+        router.push("/login")
+        return
+      }
+
+      const response = await fetch(`http://localhost:5000/api/administrators/${adminId}/toggle-state`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ state: currentState })
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.message)
+      }
+
+      const data = await response.json()
+
+      setAdministrators(admins =>
+        admins.map(admin =>
+          admin.user_id === adminId
+            ? { ...admin, user_state: data.data.user_state }
+            : admin
+        )
+      )
+
+      Swal.fire({
+        icon: "success",
+        title: "Estado actualizado",
+        text: data.message,
+        confirmButtonColor: "rgb(var(--primary-rgb))",
+        background: "#1a1a1a",
+        color: "#fff",
+      })
+    } catch (error: any) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "No se pudo actualizar el estado del administrador",
+        confirmButtonColor: "rgb(var(--primary-rgb))",
+        background: "#1a1a1a",
+        color: "#fff",
+      })
+    }
+  }
 
   const handleLogout = () => {
     Swal.fire({
@@ -108,27 +172,6 @@ const RegulatorDashboard = () => {
     })
   }
 
-  const menuItems = [
-    {
-      title: "Gestión de Administradores y Escuelas",
-      icon: faCog,
-      description: "Gestionar los administradores y escuelas del sistema	",
-      path: "/regulator/coordinators",
-    },
-    {
-      title: "Gestión de Usuarios",
-      icon: faUsers,
-      description: "Administrar todos los usuarios del sistema",
-      path: "/regulator/users",
-    },
-    {
-      title: "Monitoreo",
-      icon: faChartBar,
-      description: "Ver estadísticas y logs del sistema",
-      path: "/regulator/monitoring",
-    },
-  ]
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -139,8 +182,8 @@ const RegulatorDashboard = () => {
 
   return (
     <motion.div
-      initial="hidden"
-      animate="visible"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       className="min-h-screen w-full relative overflow-hidden bg-black"
     >
       <Particles />
@@ -161,8 +204,8 @@ const RegulatorDashboard = () => {
             <motion.button
               onClick={() => router.push("/profile")}
               className="flex items-center gap-3 px-4 py-2 bg-[rgba(var(--primary-rgb),0.1)] text-[rgb(var(--primary-rgb))] rounded-lg hover:bg-[rgba(var(--primary-rgb),0.2)] transition-colors border border-[rgba(var(--primary-rgb),0.2)]"
-              whileHover={buttonHover}
-              whileTap={buttonTap}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               <FontAwesomeIcon icon={faUser} />
               <span>{user?.user_name} {user?.user_lastname}</span>
@@ -170,8 +213,8 @@ const RegulatorDashboard = () => {
             <motion.button
               onClick={handleLogout}
               className="flex items-center gap-3 px-4 py-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500/20 transition-colors border border-red-500/20"
-              whileHover={buttonHover}
-              whileTap={buttonTap}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               <FontAwesomeIcon icon={faSignOut} />
             </motion.button>
@@ -181,30 +224,79 @@ const RegulatorDashboard = () => {
 
       {/* Main content */}
       <main className="container mx-auto px-4 pt-24 pb-12">
-        <motion.div
-          variants={containerVariants}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
-          {menuItems.map((item, index) => (
+        <div className="grid grid-cols-1 gap-6">
+          {administrators.map((admin) => (
             <motion.div
-              key={index}
-              variants={itemVariants}
-              whileHover={{ y: -5 }}
-              className="backdrop-blur-xl bg-black/10 p-6 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)] cursor-pointer"
-              onClick={() => router.push(item.path)}
+              key={admin.user_id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="backdrop-blur-xl bg-black/10 p-6 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)]"
             >
-              <div className="flex items-center gap-4 mb-4">
-                <div className="bg-[rgb(var(--primary-rgb))] p-4 rounded-lg">
-                  <FontAwesomeIcon icon={item.icon} className="text-2xl text-black" />
+              <div className="flex justify-between items-start mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="bg-[rgb(var(--primary-rgb))] p-4 rounded-lg">
+                    <FontAwesomeIcon icon={faUser} className="text-2xl text-black" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-white">
+                      {admin.user_name} {admin.user_lastname}
+                    </h3>
+                    <p className="text-gray-400">{admin.user_email}</p>
+                    <p className="text-gray-400">{admin.user_phone}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-white">{item.title}</h3>
-                  <p className="text-gray-400 text-sm">{item.description}</p>
+                <motion.button
+                  onClick={() => handleToggleState(admin.user_id, admin.user_state)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                    admin.user_state === "activo"
+                      ? "bg-green-500/10 text-green-500 hover:bg-green-500/20 border border-green-500/20"
+                      : "bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/20"
+                  }`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <FontAwesomeIcon
+                    icon={admin.user_state === "activo" ? faToggleOn : faToggleOff}
+                    className="text-xl"
+                  />
+                  <span>{admin.user_state === "activo" ? "Habilitado" : "Deshabilitado"}</span>
+                </motion.button>
+              </div>
+
+              <div className="mt-4">
+                <h4 className="text-lg font-semibold text-[rgb(var(--primary-rgb))] mb-3">
+                  Escuelas Asignadas
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {admin.schools && admin.schools.length > 0 ? (
+                    admin.schools.map((school) => (
+                      <div
+                        key={school.school_id}
+                        className="bg-black/20 p-4 rounded-lg border border-[rgba(var(--primary-rgb),0.2)]"
+                      >
+                        <div className="flex items-center gap-3 mb-2">
+                          <FontAwesomeIcon
+                            icon={faSchool}
+                            className="text-[rgb(var(--primary-rgb))]"
+                          />
+                          <h5 className="text-white font-medium">{school.school_name}</h5>
+                        </div>
+                        <p className="text-gray-400 text-sm mb-2">{school.school_description}</p>
+                        <div className="text-gray-400 text-sm">
+                          <p>{school.school_email}</p>
+                          <p>{school.school_phone}</p>
+                          <p>{school.school_address}</p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-400 col-span-full">No hay escuelas asignadas</p>
+                  )}
                 </div>
               </div>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
       </main>
     </motion.div>
   )

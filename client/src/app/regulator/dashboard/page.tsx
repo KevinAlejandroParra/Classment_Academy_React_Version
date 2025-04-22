@@ -113,7 +113,7 @@ const RegulatorDashboard = () => {
       title: "Gestión de Administradores y Escuelas",
       icon: faCog,
       description: "Gestionar los administradores y escuelas del sistema	",
-      path: "/regulator/system",
+      path: "/regulator/coordinators",
     },
     {
       title: "Gestión de Usuarios",

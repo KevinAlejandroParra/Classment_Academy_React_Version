@@ -231,7 +231,13 @@ const SchoolsPage = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <FontAwesomeIcon icon={faUser} className="text-[rgb(var(--primary-rgb))]" />
-                    <span>Coordinador: {school.coordinators[0]?.user_name} {school.coordinators[0]?.user_lastname}</span>
+                    <span>
+                      Coordinador: {
+                        school.coordinators && school.coordinators.length > 0
+                          ? `${school.coordinators[0].user_name} ${school.coordinators[0].user_lastname}`
+                          : "No asignado"
+                      }
+                    </span>
                   </div>
                 </div>
 

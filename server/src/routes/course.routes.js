@@ -2,6 +2,33 @@ const express = require('express');
 const router = express.Router();
 const courseController = require('../controllers/courseController');
 const { verifyToken, checkRole } = require('../middleware/auth');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+// Configuración de multer para cursos
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const folder = path.join(__dirname, "..", "..", "public", "images", "cursos");
+    if (!fs.existsSync(folder)) {
+      fs.mkdirSync(folder, { recursive: true });
+    }
+    cb(null, folder);
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+    const fileName = `curso-${Date.now()}${ext}`;
+    cb(null, fileName);
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  const allowed = /jpeg|jpg|png|gif/;
+  const isValid = allowed.test(file.mimetype);
+  isValid ? cb(null, true) : cb(new Error("Tipo de archivo no permitido"), false);
+};
+
+const upload = multer({ storage, fileFilter });
 
 /**
  * @swagger
@@ -88,7 +115,7 @@ router.use(verifyToken);
  *       403:
  *         description: No autorizado para crear un curso
  */
-router.post('/', checkRole([3, 4]), courseController.createCourse);
+router.post('/', checkRole([3, 4]), upload.single('imagen'), courseController.createCourse);
 
 /**
  * @swagger
@@ -116,7 +143,7 @@ router.post('/', checkRole([3, 4]), courseController.createCourse);
  *       403:
  *         description: No autorizado para actualizar el curso
  */
-router.put('/:id', checkRole([3, 4]), courseController.updateCourse);
+router.put('/:id', checkRole([3, 4]), upload.single('imagen'), courseController.updateCourse);
 
 /**
  * @swagger

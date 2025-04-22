@@ -374,10 +374,10 @@ const AdminDashboard = () => {
       path: "/admin/students",
     },
     {
-      title: "Reportes y Estadísticas",
+      title: "Gestión de Cursos",
       icon: faChartBar,
-      description: "Ver reportes de rendimiento y estadísticas del sistema",
-      path: "/admin/reports",
+      description: "Modifica y Elimina los cursos de las escuelas",
+      path: "/admin/courses",
     },
   ]
 

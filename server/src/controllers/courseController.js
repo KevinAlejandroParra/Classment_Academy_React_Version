@@ -84,18 +84,17 @@ exports.getCoursesBySchoolId = asyncHandler(async (req, res) => {
 // Crear un nuevo curso
 exports.createCourse = asyncHandler(async (req, res) => {
   const {
-    school_id,
     course_name,
     course_description,
     course_price,
     course_places,
     course_age,
-    course_image
+    school_id
   } = req.body;
   
   // Validar campos requeridos
   if (!school_id || !course_name || !course_description || !course_price || 
-      !course_places || !course_age || !course_image) {
+      !course_places || !course_age) {
     const error = new Error('Todos los campos son requeridos');
     error.statusCode = 400;
     throw error;
@@ -107,6 +106,16 @@ exports.createCourse = asyncHandler(async (req, res) => {
   if (!school) {
     const error = new Error('Escuela no encontrada');
     error.statusCode = 404;
+    throw error;
+  }
+
+  // Procesar la imagen si se subió una
+  let course_image = null;
+  if (req.file) {
+    course_image = `/images/cursos/${req.file.filename}`;
+  } else {
+    const error = new Error('La imagen del curso es requerida');
+    error.statusCode = 400;
     throw error;
   }
   
@@ -131,13 +140,12 @@ exports.createCourse = asyncHandler(async (req, res) => {
 exports.updateCourse = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const {
-    school_id,
     course_name,
     course_description,
     course_price,
     course_places,
     course_age,
-    course_image
+    school_id
   } = req.body;
   
   const course = await Course.findByPk(id);
@@ -158,14 +166,20 @@ exports.updateCourse = asyncHandler(async (req, res) => {
       throw error;
     }
   }
+
+  // Procesar la imagen si se subió una nueva
+  let course_image = course.course_image;
+  if (req.file) {
+    course_image = `/images/cursos/${req.file.filename}`;
+  }
   
   await course.update({
-    school_id,
-    course_name,
-    course_description,
-    course_price,
-    course_places,
-    course_age,
+    school_id: school_id || course.school_id,
+    course_name: course_name || course.course_name,
+    course_description: course_description || course.course_description,
+    course_price: course_price || course.course_price,
+    course_places: course_places || course.course_places,
+    course_age: course_age || course.course_age,
     course_image
   });
   

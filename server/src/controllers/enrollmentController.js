@@ -132,6 +132,67 @@ class EnrollmentController {
         }
         return endDate;
     }
+
+    // Método para obtener matrículas por usuario
+    static getEnrollmentsByUser = asyncHandler(async (req, res) => {
+        try {
+            const { userId } = req.params;
+            
+            console.log(`Buscando matrículas para el usuario ID: ${userId}`);
+            
+            // Validación de parámetros
+            if (!userId) {
+                console.error('ID de usuario no proporcionado');
+                return res.status(400).json({ 
+                    success: false, 
+                    message: 'Se requiere el ID del usuario' 
+                });
+            }
+
+            // Verificamos que el usuario exista primero
+            const user = await User.findByPk(userId);
+            if (!user) {
+                console.error(`Usuario con ID ${userId} no encontrado`);
+                return res.status(404).json({ 
+                    success: false, 
+                    message: 'Usuario no encontrado' 
+                });
+            }
+
+            // Buscar todas las matrículas del usuario con información de curso
+            const enrollments = await Enrollment.findAll({
+                where: { user_id: userId },
+                include: [
+                    {
+                        model: Course,
+                        as: 'course',
+                        attributes: ['course_id', 'course_name', 'course_description', 'course_image'],
+                    }
+                ],
+                order: [
+                    ['status', 'ASC'],  // Primero los activos
+                    ['start_date', 'DESC']  // Los más recientes primero
+                ]
+            });
+            
+            console.log(`Se encontraron ${enrollments.length} matrículas para el usuario ${userId}`);
+            
+            // Respuesta exitosa
+            return res.status(200).json({ 
+                success: true, 
+                count: enrollments.length,
+                data: enrollments 
+            });
+            
+        } catch (error) {
+            console.error('Error al obtener matrículas del usuario:', error);
+            return res.status(500).json({
+                success: false,
+                message: 'Error al obtener matrículas del usuario',
+                error: error.message
+            });
+        }
+    });
 }
 
 module.exports = EnrollmentController;

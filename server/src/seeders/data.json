@@ -81,6 +81,38 @@
             "updatedAt": "2025-04-03T12:00:00Z"
         },
         {
+            "user_id": "550e8400-e29b-41d4-a716-446655440007",
+            "user_name": "Sofía",
+            "user_lastname": "Ramírez",
+            "user_document_type": "CC",
+            "user_document": 1022334457,
+            "user_email": "sofia@email.com",
+            "user_password": "$2a$10$xsMhIclPh1kWAFD4gm35D.EPlJyMALzhgMmha4tcw.N9N33REPXMG",
+            "user_phone": 3101234569,
+            "user_image": "http://localhost:5000/images/users/default.jpg",
+            "user_birth": "1992-11-25",
+            "user_state": "activo",
+            "role_id": 1, 
+            "createdAt": "2025-04-03T12:00:00Z",
+            "updatedAt": "2025-04-03T12:00:00Z"
+          },
+          {
+            "user_id": "550e8400-e29b-41d4-a716-446655440008",
+            "user_name": "Diego",
+            "user_lastname": "Martínez",
+            "user_document_type": "CC",
+            "user_document": 1022334458,
+            "user_email": "diego@email.com",
+            "user_password": "$2a$10$xsMhIclPh1kWAFD4gm35D.EPlJyMALzhgMmha4tcw.N9N33REPXMG",
+            "user_phone": 3101234570,
+            "user_image": "http://localhost:5000/images/users/default.jpg",
+            "user_birth": "1988-08-15",
+            "user_state": "activo",
+            "role_id": 2, 
+            "createdAt": "2025-04-03T12:00:00Z",
+            "updatedAt": "2025-04-03T12:00:00Z"
+          },
+        {
             "user_id": "550e8400-e29b-41d4-a716-446655440005",
             "user_name": "Felipe",
             "user_lastname": "Gómez",
@@ -271,55 +303,112 @@
     "enrollments":
       [
         {
-          "enrollment_id": "77f6e934-22d7-456f-8de6-1aacf1b32100",
-          "user_id": "550e8400-e29b-41d4-a716-446655440006", 
-          "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0851",
-          "plan_type": "mensual",
-          "start_date": "2025-04-01T00:00:00Z",
-          "end_date": "2025-04-30T00:00:00Z",
-          "status": "active",
-          "progress": 10
-        },
-        {
-          "enrollment_id": "77f6e934-22d7-456f-8de6-1aacf1b32101",
-          "user_id": "550e8400-e29b-41d4-a716-446655440005", 
-          "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0852",
-          "plan_type": "semestral",
-          "start_date": "2025-03-01T00:00:00Z",
-          "end_date": "2025-08-31T00:00:00Z",
-          "status": "active",
-          "progress": 25
-        },
-        {
-            "enrollment_id": "77f6e934-22d7-456f-8de6-1aacf1b32102",
-            "user_id": "550e8400-e29b-41d4-a716-446655440003", 
-            "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0857",
-            "plan_type": "Mensual",
-            "start_date": "2025-03-01T00:00:00Z",
-            "end_date": "2025-08-31T00:00:00Z",
+            "enrollment_id": "77f6e934-22d7-456f-8de6-1aacf1b32105",
+            "user_id": "550e8400-e29b-41d4-a716-446655440007", 
+            "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+            "plan_type": "mensual",
+            "start_date": "2025-05-01T00:00:00Z",
+            "end_date": "2025-05-31T00:00:00Z",
             "status": "active",
-            "progress": 50
-        },
-        {
-            "enrollment_id": "77f6e934-22d7-456f-8de6-1aacf1b32103",
-            "user_id": "550e8400-e29b-41d4-a716-446655440006", 
-            "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0858",
-            "plan_type": "Trimestral",
-            "start_date": "2025-03-01T00:00:00Z",
-            "end_date": "2025-08-31T00:00:00Z",
+            "progress": 0
+          },
+          {
+            "enrollment_id": "77f6e934-22d7-456f-8de6-1aacf1b32106",
+            "user_id": "550e8400-e29b-41d4-a716-446655440007", 
+            "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0852",
+            "plan_type": "trimestral",
+            "start_date": "2025-05-01T00:00:00Z",
+            "end_date": "2025-07-31T00:00:00Z",
             "status": "active",
-            "progress": 75
-        },
-        {
-            "enrollment_id": "77f6e934-22d7-456f-8de6-1aacf1b32104",
-            "user_id": "550e8400-e29b-41d4-a716-44665544002", 
-            "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0856",
-            "plan_type": "Mensual",
-            "start_date": "2025-03-01T00:00:00Z",
-            "end_date": "2025-08-31T00:00:00Z",
-            "status": "active",
-            "progress": 25
-        }
-      ]
+            "progress": 5
+          }
+      ],
+        "classes": [
+          {
+            "class_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+            "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0851", 
+            "teacher_id": "550e8400-e29b-41d4-a716-446655440003", 
+            "class_date": "2025-05-10T14:00:00Z",
+            "class_title": "Introducción al entrenamiento personal",
+            "class_description": "Sesión introductoria para nuevos estudiantes",
+            "duration": 60,
+            "createdAt": "2025-04-20T12:00:00Z",
+            "updatedAt": "2025-04-20T12:00:00Z"
+          },
+          {
+            "class_id": "b2c3d4e5-f6a7-8901-2345-67890abcdef1",
+            "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0852", 
+            "teacher_id": "550e8400-e29b-41d4-a716-446655440005", 
+            "class_date": "2025-05-11T16:00:00Z",
+            "class_title": "Entrenamiento funcional básico",
+            "class_description": "Ejercicios básicos para principiantes",
+            "duration": 90,
+            "createdAt": "2025-04-20T12:00:00Z",
+            "updatedAt": "2025-04-20T12:00:00Z"
+          },
+          {
+            "class_id": "c3d4e5f6-a7b8-9012-3456-7890abcdef12",
+            "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0857", 
+            "teacher_id": "550e8400-e29b-41d4-a716-446655440006",
+            "class_date": "2025-05-12T18:00:00Z",
+            "class_title": "Técnicas básicas de taekwondo",
+            "class_description": "Aprende las posturas y golpes básicos",
+            "duration": 120,
+            "createdAt": "2025-04-20T12:00:00Z",
+            "updatedAt": "2025-04-20T12:00:00Z"
+          }
+        ],
+        
+            "course_teachers": [
+              {
+                "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0851", 
+                "teacher_id": "550e8400-e29b-41d4-a716-446655440003", 
+                "createdAt": "2025-04-01T12:00:00Z",
+                "updatedAt": "2025-04-01T12:00:00Z"
+              },
+              {
+                "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0852", 
+                "teacher_id": "550e8400-e29b-41d4-a716-446655440005", 
+                "createdAt": "2025-04-01T12:00:00Z",
+                "updatedAt": "2025-04-01T12:00:00Z"
+              },
+              {
+                "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0857", 
+                "teacher_id": "550e8400-e29b-41d4-a716-446655440006", 
+                "createdAt": "2025-04-01T12:00:00Z",
+                "updatedAt": "2025-04-01T12:00:00Z"
+              }
+            ],
+                "attendances": [
+                  {
+                    "attendance_id": "d4e5f6a7-b8c9-0123-4567-89abcdef0123",
+                    "class_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef", 
+                    "user_id": "550e8400-e29b-41d4-a716-446655440000", 
+                    "status": "present",
+                    "notes": "Participó activamente en la sesión",
+                    "createdAt": "2025-05-10T15:00:00Z",
+                    "updatedAt": "2025-05-10T15:00:00Z"
+                  },
+                  {
+                    "attendance_id": "e5f6a7b8-c9d0-1234-5678-9abcdef01234",
+                    "class_id": "b2c3d4e5-f6a7-8901-2345-67890abcdef1",
+                    "user_id": "550e8400-e29b-41d4-a716-446655440000", 
+                    "status": "late",
+                    "notes": "Llegó 15 minutos tarde",
+                    "createdAt": "2025-05-11T16:15:00Z",
+                    "updatedAt": "2025-05-11T16:15:00Z"
+                  },
+                  {
+                    "attendance_id": "f6a7b8c9-d0e1-2345-6789-abcdef012345",
+                    "class_id": "c3d4e5f6-a7b8-9012-3456-7890abcdef12", 
+                    "user_id": "550e8400-e29b-41d4-a716-446655440000", 
+                    "status": "absent",
+                    "notes": "No asistió, sin justificación",
+                    "createdAt": "2025-05-12T18:30:00Z",
+                    "updatedAt": "2025-05-12T18:30:00Z"
+                  }
+                ]
+              
+
+      }
       
-}

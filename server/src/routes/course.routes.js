@@ -46,6 +46,22 @@ router.get('/school/:schoolId', courseController.getCoursesBySchoolId);
 
 /**
  * @swagger
+ * /courses/with-teachers:
+ *   get:
+ *     description: Obtiene todos los cursos con sus profesores encargados
+ *     responses:
+ *       200:
+ *         description: Lista de cursos con profesores
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/CourseWithTeachers'
+ */
+router.get('/with-teachers', courseController.getCoursesWithTeachers);
+/**
+ * @swagger
  * /courses/{id}:
  *   get:
  *     description: Obtiene un curso por su ID
@@ -65,6 +81,7 @@ router.get('/school/:schoolId', courseController.getCoursesBySchoolId);
  *               $ref: '#/components/schemas/Course'
  */
 router.get('/:id', courseController.getCourseById);
+
 
 // Rutas protegidas
 router.use(verifyToken);

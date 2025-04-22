@@ -1,5 +1,5 @@
 "use strict";
-const { courses, schools, user_school_roles, enrollments } = require("./data.json");
+const { courses, schools, user_school_roles, enrollments, classes, attendances } = require("./data.json");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -11,6 +11,8 @@ module.exports = {
         await queryInterface.bulkInsert("Schools", schools, {});
         await queryInterface.bulkInsert("user_school_roles",user_school_roles , {});
         await queryInterface.bulkInsert("enrollments",enrollments , {});
+        await queryInterface.bulkInsert("Classes",classes , {});
+        await queryInterface.bulkInsert("Attendances",attendances , {});
 
     },
 
@@ -22,6 +24,8 @@ module.exports = {
         await queryInterface.bulkDelete("Schools", null, {});
         await queryInterface.bulkDelete("UserSchoolRol", null, {});
         await queryInterface.bulkDelete("Enrollments", null, {});
+        await queryInterface.bulkDelete("Classes", null, {});
+        await queryInterface.bulkDelete("Attendances", null, {});
         
     },
 };

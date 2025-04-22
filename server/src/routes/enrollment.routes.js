@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const enrollmentController = require('../controllers/enrollmentController');
+const EnrollmentController = require('../controllers/enrollmentController');
 const { verifyToken, checkRole } = require('../middleware/auth');
 
 // autenticación
@@ -30,6 +30,9 @@ router.use(verifyToken);
  *       500:
  *         description: Error interno del servidor
  */
-router.post('/courses/:courseId/enroll', checkRole([1]), enrollmentController.enrollStudentInCourse);
+router.post('/courses/:courseId/enroll', checkRole([1]), EnrollmentController.enrollStudentInCourse);
+router.get('/user/:userId', checkRole([1]), EnrollmentController.getEnrollmentsByUser);
+
+
 
 module.exports = router;

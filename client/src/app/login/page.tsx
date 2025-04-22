@@ -81,10 +81,10 @@ const Login: React.FC = () => {
             router.push("/student/dashboard")
             break
           case 3: // Administrador
-            router.push("/admin/dashboard")
-            break
-          case 4: // Coordinador
             router.push("/coordinator/dashboard")
+            break
+          case 4: // Regulador (Desarrolladores)
+            router.push("/admin/dashboard")
             break
           default:
             router.push("/")

@@ -39,10 +39,10 @@ const RouteGuard: React.FC<RouteGuardProps> = ({ children, allowedRoles }) => {
               router.push("/student/dashboard")
               break
             case 3:
-              router.push("/admin/dashboard")
+              router.push("/coordinator/dashboard")
               break
             case 4:
-              router.push("/coordinator/dashboard")
+              router.push("/admin/dashboard")
               break
             default:
               router.push("/")

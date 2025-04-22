@@ -22,6 +22,8 @@ const UserModel = require("./user.js");
 const RoleModel = require("./role.js");
 const CourseModel = require("./course.js");
 const SchoolModel = require("./school.js");
+const ClassModel = require("./class.js");
+const AttendanceModel = require("./attendance.js");
 
 const UserSchoolRoleModel = require("./userSchoolRole.js");
 const CourseTeacherModel = require("./courseTeacher.js");
@@ -32,6 +34,8 @@ const User = UserModel(connection, DataTypes);
 const Role = RoleModel(connection, DataTypes);
 const Course = CourseModel(connection, DataTypes);
 const School = SchoolModel(connection, DataTypes);
+const Class = ClassModel(connection, DataTypes);
+const Attendance = AttendanceModel(connection, DataTypes);
 
 const UserSchoolRole = UserSchoolRoleModel(connection, DataTypes);
 const CourseTeacher = CourseTeacherModel(connection, DataTypes);
@@ -87,6 +91,20 @@ Enrollment.belongsTo(User, { foreignKey: "user_id", as: "user" });
 Course.hasMany(Enrollment, { foreignKey: "course_id", as: "enrollments" });
 Enrollment.belongsTo(Course, { foreignKey: "course_id", as: "course" });
 
+// Asociaciones para Class
+Course.hasMany(Class, { as: "classes", foreignKey: "course_id" });
+Class.belongsTo(Course, { as: "course", foreignKey: "course_id" });
+
+User.hasMany(Class, { as: "taughtClasses", foreignKey: "teacher_id" });
+Class.belongsTo(User, { as: "teacher", foreignKey: "teacher_id" });
+
+// Asociaciones para Attendance
+Class.hasMany(Attendance, { as: "attendances", foreignKey: "class_id" });
+Attendance.belongsTo(Class, { as: "class", foreignKey: "class_id" });
+
+User.hasMany(Attendance, { as: "attendances", foreignKey: "user_id" });
+Attendance.belongsTo(User, { as: "student", foreignKey: "user_id" });
+
 module.exports = {
     User,
     Role,
@@ -95,5 +113,7 @@ module.exports = {
     UserSchoolRole,
     CourseTeacher,
     Enrollment,
+    Class,
+    Attendance,
     connection,
 };

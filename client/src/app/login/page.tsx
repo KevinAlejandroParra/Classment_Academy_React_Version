@@ -76,7 +76,7 @@ const Login: React.FC = () => {
         setIsAuthenticated(true)
         
         // Redirigir según el rol
-        switch (data.user.role) {
+        switch (data.user.role_id) {
           case 1: // Estudiante
             router.push("/student/dashboard")
             break

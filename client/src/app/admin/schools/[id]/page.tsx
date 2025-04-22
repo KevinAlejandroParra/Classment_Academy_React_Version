@@ -149,21 +149,27 @@ const SchoolDetailsPage = ({ params }: Props) => {
             <div className="space-y-4">
               <h3 className="text-xl font-semibold text-white mb-4">Información del Coordinador</h3>
               <div className="space-y-2 text-gray-300">
-                <p>
-                  <strong>Nombre:</strong> {school.coordinators[0]?.user_name} {school.coordinators[0]?.user_lastname}
-                </p>
-                <p>
-                  <strong>Email:</strong> {school.coordinators[0]?.user_email}
-                </p>
+                {school.coordinators && school.coordinators[0] ? (
+                  <>
+                    <p>
+                      <strong>Nombre:</strong> {school.coordinators[0].user_name} {school.coordinators[0].user_lastname}
+                    </p>
+                    <p>
+                      <strong>Email:</strong> {school.coordinators[0].user_email}
+                    </p>
+                  </>
+                ) : (
+                  <p>No hay coordinador asignado</p>
+                )}
               </div>
             </div>
           </div>
 
-          {school.courses && school.courses.length > 0 && (
-            <div className="mt-8">
-              <h3 className="text-xl font-semibold text-white mb-4">Cursos</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {school.courses.map((course) => (
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold text-white mb-4">Cursos</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {school.courses && school.courses.length > 0 ? (
+                school.courses.map((course) => (
                   <div
                     key={course.course_id}
                     className="p-4 rounded-lg bg-black/20 border border-[rgba(var(--primary-rgb),0.2)]"
@@ -171,10 +177,12 @@ const SchoolDetailsPage = ({ params }: Props) => {
                     <h4 className="text-lg font-semibold text-white">{course.course_name}</h4>
                     <p className="text-gray-400 mt-2">{course.course_description}</p>
                   </div>
-                ))}
-              </div>
+                ))
+              ) : (
+                <p className="text-gray-400">No hay cursos disponibles</p>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </main>
     </motion.div>

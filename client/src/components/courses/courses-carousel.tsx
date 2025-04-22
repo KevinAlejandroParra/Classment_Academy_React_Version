@@ -283,16 +283,18 @@ export function CoursesCarousel() {
                       />
                       <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black to-transparent"></div>
                     </figure>
-                    <div className="card-body p-4">
+                    <div className="card-body p-6">
                       <h2 className="card-title text-xl font-semibold mb-2 text-[rgb(var(--foreground-rgb))]">
                         {curso.course_name}
                       </h2>
                       <p className="text-lg mb-2 text-[rgba(var(--foreground-rgb),0.8)] line-clamp-2">
                         {curso.course_description}
                       </p>
-                      <p className="text-sm mb-2 text-[rgba(var(--foreground-rgb),0.6)]">
-                        Escuela: {curso.school.school_name}
-                      </p>
+                      {curso.school && (
+                        <p className="text-sm mb-2 text-[rgba(var(--foreground-rgb),0.6)]">
+                          Escuela: {curso.school.school_name}
+                        </p>
+                      )}
                       <p className="text-lg font-bold mb-2 text-[rgb(var(--primary-rgb))]">${curso.course_price}</p>
                       <div className="card-actions justify-end pt-2 pb-2">
                         <Link

@@ -92,7 +92,7 @@ const CoordinatorDashboard = () => {
         const data = await response.json()
         if (!response.ok) throw new Error(data.message)
 
-        if (data.user.role !== 4) {
+        if (data.user.role_id !== 4) {
           router.push("/")
           return
         }

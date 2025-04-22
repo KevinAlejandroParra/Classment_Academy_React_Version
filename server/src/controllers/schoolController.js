@@ -57,17 +57,17 @@ exports.getSchoolById = asyncHandler(async (req, res) => {
 // Crear una nueva escuela
 exports.createSchool = asyncHandler(async (req, res) => {
   const { school_name, school_description, school_phone, school_address, school_image, school_email } = req.body;
-  const coordinator_id = req.user.user_id;
+  const user_id = req.user.user_id;
+  const role_id = req.user.role_id;
 
-  // Verificar que el usuario es un admin
-  const coordinator = await User.findByPk(coordinator_id);
-  if (!coordinator || ![2, 4].includes(coordinator.role_id)) { // 2: admin, 4: coordinador
-    const error = new Error('Solo los administradores o coordinadores pueden crear escuelas');
+  // Verificar que el usuario es un admin o coordinador
+  if (![3, 4].includes(role_id)) {
+    const error = new Error('Solo los administradores y coordinadores pueden crear escuelas');
     error.statusCode = 403;
     throw error;
   }
 
-  // Crear la escuela (sin teacher_id)
+  // Crear la escuela
   const school = await School.create({
     school_name,
     school_description,
@@ -77,12 +77,14 @@ exports.createSchool = asyncHandler(async (req, res) => {
     school_email
   });
 
-  // Crear la relación en user_school_roles
-  await UserSchoolRole.create({
-    user_id: coordinator_id,
-    school_id: school.school_id,
-    role_id: coordinator.role_id // 2 o 4 según corresponda
-  });
+  // Si es coordinador, crear la relación en user_school_roles
+  if (role_id === 4) {
+    await UserSchoolRole.create({
+      user_id: user_id,
+      school_id: school.school_id,
+      role_id: role_id
+    });
+  }
 
   return res.status(201).json({
     success: true,
@@ -94,21 +96,25 @@ exports.createSchool = asyncHandler(async (req, res) => {
 // Actualizar una escuela existente
 exports.updateSchool = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const coordinator_id = req.user.user_id;
+  const user_id = req.user.user_id;
+  const role_id = req.user.role_id;
   const updateData = req.body;
 
-  // Verificar que el usuario es el coordinador de la escuela
-  const userSchool = await UserSchoolRole.findOne({
-    where: {
-      school_id: id,
-      user_id: coordinator_id
-    }
-  });
+  // Si no es admin, verificar que sea el coordinador de la escuela
+  if (role_id !== 3) {
+    const userSchool = await UserSchoolRole.findOne({
+      where: {
+        school_id: id,
+        user_id: user_id,
+        role_id: 4
+      }
+    });
 
-  if (!userSchool) {
-    const error = new Error('No tienes permisos para modificar esta escuela');
-    error.statusCode = 403;
-    throw error;
+    if (!userSchool) {
+      const error = new Error('No tienes permisos para modificar esta escuela');
+      error.statusCode = 403;
+      throw error;
+    }
   }
 
   const school = await School.findByPk(id);
@@ -130,19 +136,12 @@ exports.updateSchool = asyncHandler(async (req, res) => {
 // Eliminar una escuela
 exports.deleteSchool = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const coordinator_id = req.user.user_id;
+  const user_id = req.user.user_id;
+  const role_id = req.user.role_id;
 
-  // Verificar que el usuario es el coordinador de la escuela
-  const userSchool = await UserSchoolRole.findOne({
-    where: {
-      school_id: id,
-      user_id: coordinator_id,
-      is_owner: true
-    }
-  });
-
-  if (!userSchool) {
-    const error = new Error('No tienes permisos para eliminar esta escuela');
+  // Solo el admin puede eliminar escuelas
+  if (role_id !== 3) {
+    const error = new Error('Solo los administradores pueden eliminar escuelas');
     error.statusCode = 403;
     throw error;
   }

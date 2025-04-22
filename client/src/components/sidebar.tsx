@@ -77,14 +77,44 @@ export function Sidebar() {
     }
   }
 
-  const navItems: NavItem[] = [
-    { name: "INICIO", href: "/", icon: faHome },
-    { name: "PERFIL", href: "/profile", icon: faUser },
-    { name: "ESCUELAS", href: "/student/schools", icon: faSchool },
-    { name: "CURSOS", href: "/courses", icon: faBook },
-    { name: "PANEL DE CONTROL", href: getDashboardPath(), icon: faInfoCircle },
-    { name: "CONTACTO", href: "/contact", icon: faEnvelope },
-  ]
+  const getNavItems = () => {
+    const commonItems = [
+      { name: "INICIO", href: "/", icon: faHome },
+      { name: "PERFIL", href: "/profile", icon: faUser },
+    ]
+
+    if (!user) return commonItems
+
+    switch (user.role_id) {
+      case 1: // Estudiante
+        return [
+          ...commonItems,
+          { name: "ESCUELAS", href: "/student/schools", icon: faSchool },
+          { name: "MIS CURSOS", href: "/student/dashboard", icon: faBook },
+          { name: "CONTACTO", href: "/contact", icon: faEnvelope },
+        ]
+      case 3: // Administrador
+        return [
+          ...commonItems,
+          { name: "MI ESCUELA", href: "/admin/schools", icon: faSchool },
+          { name: "MIS CURSOS", href: "/admin/courses", icon: faBook },
+          { name: "PANEL DE CONTROL", href: "/admin/dashboard", icon: faInfoCircle },
+          { name: "CONTACTO", href: "/contact", icon: faEnvelope },
+        ]
+      case 4: // Regulador
+        return [
+          ...commonItems,
+          { name: "ESCUELAS", href: "/regulator/schools", icon: faSchool },
+          { name: "CURSOS", href: "/regulator/courses", icon: faBook },
+          { name: "PANEL DE CONTROL", href: "/regulator/dashboard", icon: faInfoCircle },
+          { name: "CONTACTO", href: "/contact", icon: faEnvelope },
+        ]
+      default:
+        return commonItems
+    }
+  }
+
+  const navItems = getNavItems()
 
   // Detectar si es móvil
   useEffect(() => {

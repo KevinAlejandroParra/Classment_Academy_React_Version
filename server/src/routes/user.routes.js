@@ -192,7 +192,7 @@ router.get("/my-schools", UserController.getUserSchools);
  *       403:
  *         description: No autorizado
  */
-router.get('/coordinators', checkRole([2]), UserController.getCoordinators);
+router.get('/coordinators', checkRole([2, 4]), UserController.getCoordinators);
 
 /**
  * @swagger
@@ -212,7 +212,7 @@ router.get('/coordinators', checkRole([2]), UserController.getCoordinators);
  *       404:
  *         description: Coordinador no encontrado
  */
-router.get('/coordinators/:id', checkRole([2]), UserController.getCoordinatorById);
+router.get('/coordinators/:id', checkRole([2, 4]), UserController.getCoordinatorById);
 
 /**
  * @swagger
@@ -232,7 +232,7 @@ router.get('/coordinators/:id', checkRole([2]), UserController.getCoordinatorByI
  *       404:
  *         description: Coordinador no encontrado
  */
-router.put('/coordinators/:id/toggle-state', checkRole([2]), UserController.toggleUserState);
+router.put('/coordinators/:id/toggle-state', checkRole([2, 4]), UserController.toggleUserState);
 
 /**
  * @swagger

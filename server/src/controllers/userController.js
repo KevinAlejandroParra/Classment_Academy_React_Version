@@ -419,7 +419,7 @@ class UserController {
                     document: user.user_document,
                     phone: user.user_phone,
                     birthdate: user.user_birth,
-                    role: user.role_id,
+                    role_id: user.role_id,
                     name: user.user_name,
                     lastname: user.user_lastname,
                     image: user.user_image,
@@ -831,7 +831,7 @@ class UserController {
                 where: { role_id: 4 },
                 include: [{
                     model: School,
-                    as: 'managedSchools',
+                    as: 'schools',
                     attributes: ['school_id', 'school_name'],
                     through: {
                         attributes: []

@@ -72,7 +72,7 @@ const RegulatorDashboard = () => {
         if (!response.ok) throw new Error(data.message)
 
         // Verificar si el usuario es regulador (role_id: 4)
-        if (data.user.role !== 4) {
+        if (data.user.role_id !== 4) {
           router.push("/")
           return
         }

@@ -65,7 +65,7 @@ export function Sidebar() {
 
   const getDashboardPath = () => {
     if (!user) return "/login"
-    switch (user.role) {
+    switch (user.role_id) {
       case 1:
         return "/student/dashboard"
       case 3:

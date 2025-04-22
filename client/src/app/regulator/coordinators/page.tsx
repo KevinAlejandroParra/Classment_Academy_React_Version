@@ -19,7 +19,7 @@ interface Coordinator {
   user_email: string
   user_phone: string
   user_state: string
-  managedSchools: Array<{
+  schools: Array<{
     school_id: string
     school_name: string
   }>
@@ -49,7 +49,9 @@ const CoordinatorsPage = () => {
         const data = await response.json()
         if (!response.ok) throw new Error(data.message)
 
-        if (data.user.role !== 3) {
+        // Verificar que el usuario sea regulador (role_id: 4)
+        if (!data.user || data.user.role_id !== 4) {
+          console.log("Usuario no autorizado:", data.user)
           router.push("/")
           return
         }
@@ -160,7 +162,7 @@ const CoordinatorsPage = () => {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <Link
-              href="/admin/dashboard"
+              href="/regulator/dashboard"
               className="p-2 rounded-full bg-[rgb(var(--primary-rgb))] text-black shadow-lg"
             >
               <FontAwesomeIcon icon={faHome} className="w-5 h-5" />
@@ -208,7 +210,7 @@ const CoordinatorsPage = () => {
                 </p>
                 <p>
                   <strong>Escuelas asignadas:</strong>{" "}
-                  {coordinator.managedSchools?.length || 0}
+                  {coordinator.schools?.length || 0}
                 </p>
               </div>
 

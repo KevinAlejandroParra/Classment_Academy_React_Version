@@ -71,7 +71,7 @@ export function Sidebar() {
       case 3:
         return "/admin/dashboard"
       case 4:
-        return "/coordinator/dashboard"
+        return "/regulator/dashboard"
       default:
         return "/"
     }

@@ -172,13 +172,12 @@ class UserController {
                     }
                 });
             }
-            // Si es coordinador (role_id: 4) y tiene school_id
+            // Si es regulador (role_id: 4) 
         if (userJSON.role_id === 4 && userJSON.school_id) {
             await user.addManagedSchools(userJSON.school_id, {
                 through: {
                     is_teacher: false,
                     is_owner: false,
-                    is_coordinator: true
                 }
             });
         }

@@ -272,3 +272,35 @@ exports.deleteCourse = asyncHandler(async (req, res) => {
     message: 'Curso eliminado exitosamente'
   });
 });
+
+// Obtener estudiantes inscritos en un curso
+exports.getStudentsByCourseId = asyncHandler(async (req, res) => {
+  const { courseId } = req.params;
+
+  // Verificar si el curso existe
+  const course = await Course.findByPk(courseId, {
+    include: [
+      {
+        model: User,
+        as: 'students',
+        through: {
+          model: Enrollment,
+          attributes: ['plan_type', 'status', 'start_date', 'end_date', 'progress']
+        },
+        attributes: ['user_id', 'user_name', 'user_lastname', 'user_image']
+      }
+    ]
+  });
+
+  if (!course) {
+    return res.status(404).json({
+      success: false,
+      message: 'Curso no encontrado'
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    data: course.students // Devuelve la lista de estudiantes
+  });
+});

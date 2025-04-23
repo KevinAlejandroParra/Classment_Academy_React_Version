@@ -19,6 +19,9 @@ module.exports = {
             
             // Después las clases
             await queryInterface.bulkInsert("Classes", classes, {});
+
+            // Después los profesores
+            await queryInterface.bulkInsert("course_teachers", course_teachers, {});
             
             // Finalmente las asistencias
             await queryInterface.bulkInsert("Attendances", attendances, {});
@@ -36,5 +39,6 @@ module.exports = {
         await queryInterface.bulkDelete("user_school_roles", null, {});
         await queryInterface.bulkDelete("Courses", null, {});
         await queryInterface.bulkDelete("Schools", null, {});
+        await queryInterface.bulkDelete("course_teachers", null, {});
     },
 };

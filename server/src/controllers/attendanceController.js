@@ -39,7 +39,9 @@ exports.recordAttendance = asyncHandler(async (req, res) => {
     returning: true
   });
 
-  res.status(created ? 201 : 200).json(attendance);
+  res
+  .status(created ? 201 : 200)
+  .json({ success: true, data: attendance })
 });
 
 // Obtener asistencia de una clase
@@ -118,3 +120,13 @@ exports.getStudentAttendance = asyncHandler(async (req, res) => {
 
   res.json(attendance);
 });
+
+const handleNoteChange = (userId, note) => {
+  setStudents(prevStudents => 
+    prevStudents.map(student => 
+      student.user_id === userId 
+        ? { ...student, notes: note }
+        : student
+    )
+  );
+};

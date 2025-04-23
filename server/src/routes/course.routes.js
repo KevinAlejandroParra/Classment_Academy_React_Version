@@ -109,6 +109,8 @@ router.get('/with-teachers', courseController.getCoursesWithTeachers);
  */
 router.get('/:id', courseController.getCourseById);
 
+// Obtener estudiantes inscritos en un curso
+router.get('/:courseId/students', courseController.getStudentsByCourseId);
 
 // Rutas protegidas
 router.use(verifyToken);

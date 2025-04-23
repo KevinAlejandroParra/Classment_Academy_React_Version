@@ -46,6 +46,7 @@ const upload = multer({ storage, fileFilter });
 router.post("/users",  UserController.createUser);
 router.post("/login", UserController.login);
 
+
 /**
  * @swagger
  * /user/forgot-password:
@@ -166,7 +167,7 @@ router.delete("/users/:id", checkRole([2, 4]), UserController.deleteUser);
  *       401:
  *         description: Usuario no autenticado
  */
-router.get("/my-courses", checkRole([3]), UserController.getUserCourses);
+router.get("/my-courses", UserController.getUserCourses);
 
 /**
  * @swagger
@@ -179,7 +180,9 @@ router.get("/my-courses", checkRole([3]), UserController.getUserCourses);
  *       401:
  *         description: Usuario no autenticado
  */
-router.get("/my-schools", checkRole([3, 4]), UserController.getUserSchools);
+router.get("/my-schools", UserController.getUserSchools);
+router.put("/users/:id", upload.single("imagen"), UserController.updateUser);
+
 
 /**
  * @swagger

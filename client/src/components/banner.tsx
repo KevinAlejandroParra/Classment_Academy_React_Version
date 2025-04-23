@@ -92,10 +92,10 @@ export function Banner() {
               </Link>
 
               <Link
-                href="/school"
+                href="/login"
                 className="inline-flex items-center justify-center rounded-full border-2 border-[rgb(var(--primary-rgb))] text-[rgb(var(--foreground-rgb))] font-bold py-3 px-8 min-w-[160px] h-12 text-base transition-transform hover:scale-105 hover:bg-[rgba(var(--primary-rgb),0.1)] hover:shadow-lg"
               >
-                Soy escuela
+                Tengo cuenta
               </Link>
             </motion.div>
           </motion.div>

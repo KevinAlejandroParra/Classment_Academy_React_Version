@@ -93,6 +93,12 @@ export function Sidebar() {
           { name: "MIS CURSOS", href: "/student/dashboard", icon: faBook },
           { name: "CONTACTO", href: "/contact", icon: faEnvelope },
         ]
+      case 2: // Profesor
+        return [
+          ...commonItems,
+          { name: "MI DASHBOARD", href: "/teacher/dashboard", icon: faBook },
+          { name: "CONTACTO", href: "/contact", icon: faEnvelope },
+        ]
       case 3: // Administrador
         return [
           ...commonItems,

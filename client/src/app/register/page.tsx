@@ -243,7 +243,8 @@ const Register: React.FC = () => {
           role_id: Number.parseInt(formData.role_id),
           user_birth: formattedDate,
           user_image: "images/users/default.jpg",
-          school_id: formData.role_id === "2" ? formData.school_id : undefined
+          // Solo incluir school_id si el rol no es profesor
+          school_id: formData.role_id !== "2" ? formData.school_id : undefined
         }
       };
 
@@ -353,7 +354,7 @@ const Register: React.FC = () => {
             value: school.school_id,
             label: school.school_name
           })),
-          showIf: formData.role_id === "2", // Solo mostrar si el rol es profesor
+          showIf: formData.role_id === "3", // Solo mostrar si el rol es coordinador
           required: true
         }
       ],

@@ -3,6 +3,9 @@ const cors = require("cors");
 const userRoutes = require("./routes/user.routes.js");
 const schoolRoutes = require("./routes/school.routes.js");
 const courseRoutes = require("./routes/course.routes.js");
+const teacherRoutes = require("./routes/teacher.js")
+const classRoutes = require("./routes/classRoutes.js")
+const attendanceRoutes = require("./routes/attendanceRoutes.js")
 const errorHandler = require("./middleware/errorHandler.js");
 const path = require('path');
 const enrollmentRoutes = require('./routes/enrollment.routes');
@@ -29,6 +32,7 @@ app.use("/images", express.static(path.join(__dirname, "..", "public", "images")
 // Rutas públicas
 app.use('/api/schools', schoolRoutes);
 app.use('/api/courses', courseRoutes);
+app.use('/api/class', classRoutes);
 app.use('/api', userRoutes);
 
 
@@ -36,6 +40,9 @@ app.use('/api', userRoutes);
 app.use("/api/auth", userRoutes);
 app.use('/api/enrollments', enrollmentRoutes);
 app.use('/api/courseteacher', courseTeacherRoutes);
+app.use('/api/attendance', attendanceRoutes);
+app.use('/api/teacher', teacherRoutes);
+
 
 // Manejo de rutas no encontradas
 app.use((req, res) => {

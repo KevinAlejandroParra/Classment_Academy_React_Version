@@ -362,22 +362,17 @@
             "course_teachers": [
               {
                 "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0851", 
-                "teacher_id": "550e8400-e29b-41d4-a716-446655440003", 
-                "createdAt": "2025-04-01T12:00:00Z",
-                "updatedAt": "2025-04-01T12:00:00Z"
+                "teacher_id": "550e8400-e29b-41d4-a716-446655440003"
               },
               {
                 "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0852", 
-                "teacher_id": "550e8400-e29b-41d4-a716-446655440005", 
-                "createdAt": "2025-04-01T12:00:00Z",
-                "updatedAt": "2025-04-01T12:00:00Z"
+                "teacher_id": "550e8400-e29b-41d4-a716-446655440003"
               },
               {
-                "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0857", 
-                "teacher_id": "550e8400-e29b-41d4-a716-446655440006", 
-                "createdAt": "2025-04-01T12:00:00Z",
-                "updatedAt": "2025-04-01T12:00:00Z"
+                "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0855", 
+                "teacher_id": "550e8400-e29b-41d4-a716-446655440005"
               }
+
             ],
                 "attendances": [
                   {

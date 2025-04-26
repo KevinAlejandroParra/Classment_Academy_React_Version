@@ -18,18 +18,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.CHAR(36),
         allowNull: false
       },
-      plan_type: {
-        type: DataTypes.ENUM("anual", "mensual", "semestral", "trimestral"),
-        allowNull: false
-      },
-      start_date: {
-        type: DataTypes.DATE,
-        allowNull: false
-      },
-      end_date: {
-        type: DataTypes.DATE,
-        allowNull: false
-      },
       status: {
         type: DataTypes.ENUM("active", "completed", "cancelled", "pending"),
         allowNull: false,
@@ -38,6 +26,10 @@ module.exports = (sequelize, DataTypes) => {
       progress: {
         type: DataTypes.INTEGER,
         defaultValue: 0
+      },
+      course_price: {
+        type: DataTypes.FLOAT,
+        allowNull: false
       }
     },
     {

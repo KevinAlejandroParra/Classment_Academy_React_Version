@@ -24,10 +24,12 @@ const CourseModel = require("./course.js");
 const SchoolModel = require("./school.js");
 const ClassModel = require("./class.js");
 const AttendanceModel = require("./attendance.js");
+const PaymentModel = require("./payment.js");
 
 const UserSchoolRoleModel = require("./userSchoolRole.js");
 const CourseTeacherModel = require("./courseTeacher.js");
 const EnrollmentModel = require("./enrollment.js");
+const payment = require("./payment.js");
 
 // Inicializar modelos
 const User = UserModel(connection, DataTypes);
@@ -36,7 +38,7 @@ const Course = CourseModel(connection, DataTypes);
 const School = SchoolModel(connection, DataTypes);
 const Class = ClassModel(connection, DataTypes);
 const Attendance = AttendanceModel(connection, DataTypes);
-
+const Payment = PaymentModel(connection, DataTypes);
 const UserSchoolRole = UserSchoolRoleModel(connection, DataTypes);
 const CourseTeacher = CourseTeacherModel(connection, DataTypes);
 const Enrollment = EnrollmentModel(connection, DataTypes);
@@ -74,14 +76,14 @@ Course.belongsToMany(User, {
     as: 'students',
     foreignKey: 'course_id',
     otherKey: 'user_id'
-  });
+});
   
-  User.belongsToMany(Course, {
+User.belongsToMany(Course, {
     through: Enrollment,
     as: 'enrolledCourses',
     foreignKey: 'user_id',
     otherKey: 'course_id'
-  });
+});
 
 // course_teachers
 Course.belongsToMany(User, {
@@ -106,19 +108,26 @@ Enrollment.belongsTo(User, { foreignKey: "user_id", as: "user" });
 Course.hasMany(Enrollment, { foreignKey: "course_id", as: "enrollments" });
 Enrollment.belongsTo(Course, { foreignKey: "course_id", as: "course" });
 
-// Asociaciones para Class
+// Class
 Course.hasMany(Class, { as: "classes", foreignKey: "course_id" });
 Class.belongsTo(Course, { as: "course", foreignKey: "course_id" });
 
 User.hasMany(Class, { as: "taughtClasses", foreignKey: "teacher_id" });
 Class.belongsTo(User, { as: "teacher", foreignKey: "teacher_id" });
 
-// Asociaciones para Attendance
+// Attendance
 Class.hasMany(Attendance, { as: "attendances", foreignKey: "class_id" });
 Attendance.belongsTo(Class, { as: "class", foreignKey: "class_id" });
 
 User.hasMany(Attendance, { as: "attendances", foreignKey: "user_id" });
 Attendance.belongsTo(User, { as: "student", foreignKey: "user_id" });
+
+// Payment
+User.hasMany(Payment, { foreignKey: "user_id", as: "payments" });
+Payment.belongsTo(User, { foreignKey: "user_id", as: "user" });
+
+Course.hasMany(Payment, { foreignKey: "course_id", as: "payments" });
+Payment.belongsTo(Course, { foreignKey: "course_id", as: "course" });
 
 module.exports = {
     User,
@@ -130,5 +139,6 @@ module.exports = {
     Enrollment,
     Class,
     Attendance,
+    Payment,
     connection,
 };

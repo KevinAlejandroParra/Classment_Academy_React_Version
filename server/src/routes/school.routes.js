@@ -3,14 +3,21 @@ const router = express.Router();
 const schoolController = require('../controllers/schoolController');
 const { verifyToken, checkRole } = require('../middleware/auth');
 
+// Rutas protegidas
+router.use(verifyToken);
+
 /**
  * @swagger
  * /school:
  *   get:
- *     description: Obtiene todas las escuelas (ruta pública)
+ *     description: Obtiene todas las escuelas (requiere autenticación)
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Lista de todas las escuelas
+ *       401:
+ *         description: No autorizado
  *       500:
  *         description: Error interno del servidor
  */
@@ -37,9 +44,6 @@ router.get('/', schoolController.getAllSchools);
  *         description: Error interno del servidor
  */
 router.get('/:id', schoolController.getSchoolById);
-
-// Rutas protegidas
-router.use(verifyToken);
 
 /**
  * @swagger

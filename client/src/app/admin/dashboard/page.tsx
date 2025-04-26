@@ -368,10 +368,10 @@ const AdminDashboard = () => {
       path: "/admin/schools",
     },
     {
-      title: "Gestión de Estudiantes",
-      icon: faUserGraduate,
-      description: "Administrar estudiantes, ver progreso y gestionar inscripciones",
-      path: "/admin/students",
+      title: "Gestión de Profesores",
+      icon: faUserGear,
+      description: "Administrar profesores, crear nuevos y asignarlos a cursos",
+      path: "/admin/teachers",
     },
     {
       title: "Gestión de Cursos",

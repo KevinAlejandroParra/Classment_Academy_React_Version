@@ -3,21 +3,57 @@ const asyncHandler = require('../middleware/asyncHandler');
 
 // Obtener todas las escuelas
 exports.getAllSchools = asyncHandler(async (req, res) => {
-  const schools = await School.findAll({
-    include: [{
-      model: User,
-      as: 'users',
-      through: {
-        attributes: ['role_id']
-      },
-      attributes: ['user_id', 'user_name', 'user_lastname', 'user_email']
-    }]
-  });
-  
-  return res.status(200).json({
-    success: true,
-    data: schools
-  });
+  if (!req.user) {
+    const error = new Error('Usuario no autenticado');
+    error.statusCode = 401;
+    throw error;
+  }
+
+  const user_id = req.user.user_id;
+  const role_id = req.user.role_id;
+
+  console.log('User ID:', user_id);
+  console.log('Role ID:', role_id);
+
+  let schools;
+
+  try {
+    // Si es admin (role_id 3), solo mostrar sus escuelas
+    if (role_id === 3) {
+      schools = await School.findAll({
+        include: [{
+          model: User,
+          as: 'users',
+          where: { user_id: user_id },
+          through: {
+            attributes: ['role_id']
+          },
+          attributes: ['user_id', 'user_name', 'user_lastname', 'user_email']
+        }]
+      });
+    } else {
+      schools = await School.findAll({
+        include: [{
+          model: User,
+          as: 'users',
+          through: {
+            attributes: ['role_id']
+          },
+          attributes: ['user_id', 'user_name', 'user_lastname', 'user_email']
+        }]
+      });
+    }
+
+    console.log('Schools found:', schools.length);
+    
+    return res.status(200).json({
+      success: true,
+      data: schools
+    });
+  } catch (error) {
+    console.error('Error in getAllSchools:', error);
+    throw error;
+  }
 });
 
 // Obtener una escuela por ID con sus cursos

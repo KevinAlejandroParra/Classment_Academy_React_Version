@@ -16,16 +16,8 @@ module.exports = {
         type: Sequelize.UUID,
         allowNull: false
       },
-      plan_type: {
-        type: Sequelize.ENUM('anual','mensual','semestral','trimestral'),
-        allowNull: false
-      },
-      start_date: {
-        type: Sequelize.DATE,
-        allowNull: false
-      },
-      end_date: {
-        type: Sequelize.DATE,
+      course_price: {
+        type: Sequelize.FLOAT,
         allowNull: false
       },
       status: {
@@ -42,8 +34,8 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,
         allowNull: false,
-    },
-    updatedAt: {
+      },
+      updatedAt: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,
         onUpdate: Sequelize.NOW,
@@ -51,33 +43,31 @@ module.exports = {
       }
     });
 
-     // FK: user_id → users
-     await queryInterface.addConstraint('enrollments', {
-        fields: ['user_id'],
-        type: 'foreign key',
-        name: 'fk_enrollments_user',
-        references: {
-          table: 'users',
-          field: 'user_id'
-        },
-        onDelete: 'cascade'
-      });
-  
-      // FK: course_id → courses
-      await queryInterface.addConstraint('enrollments', {
-        fields: ['course_id'],
-        type: 'foreign key',
-        name: 'fk_enrollments_course',
-        references: {
-          table: 'courses',
-          field: 'course_id'
-        },
-        onDelete: 'cascade'
-      });
-    },
-  
-    down: async (queryInterface) => {
-      // Es buena práctica eliminar los ENUMs también al hacer rollback
-      await queryInterface.dropTable('enrollments');
-    }
-  };
+    // Agregar las llaves foráneas después de crear la tabla
+    await queryInterface.addConstraint('enrollments', {
+      fields: ['user_id'],
+      type: 'foreign key',
+      name: 'fk_enrollments_user',
+      references: {
+        table: 'users',
+        field: 'user_id'
+      },
+      onDelete: 'cascade'
+    });
+
+    await queryInterface.addConstraint('enrollments', {
+      fields: ['course_id'],
+      type: 'foreign key',
+      name: 'fk_enrollments_course',
+      references: {
+        table: 'courses',
+        field: 'course_id'
+      },
+      onDelete: 'cascade'
+    });
+  },
+
+  down: async (queryInterface) => {
+    await queryInterface.dropTable('enrollments');
+  }
+};

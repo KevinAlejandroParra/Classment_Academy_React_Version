@@ -78,9 +78,7 @@ class EnrollmentController {
                 enrollment_id: uuidv4(),
                 user_id: studentId,
                 course_id: courseId,
-                plan_type: req.body.plan_type || 'mensual',
-                start_date: req.body.start_date ? new Date(req.body.start_date) : new Date(),
-                end_date: req.body.end_date ? new Date(req.body.end_date) : EnrollmentController.calculateEndDate(req.body.plan_type),
+                course_price: course.course_price,
                 status: 'active',
                 progress: 0
             });
@@ -98,9 +96,7 @@ class EnrollmentController {
                             school_name: course.school.school_name 
                         }
                     },
-                    plan_type: enrollment.plan_type,
-                    start_date: enrollment.start_date,
-                    end_date: enrollment.end_date
+                    course_price: enrollment.course_price,
                 },
                 message: 'Inscripción al curso exitosa'
             });

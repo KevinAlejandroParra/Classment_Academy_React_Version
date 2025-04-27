@@ -244,10 +244,10 @@ const UserEnrollmentsPage = () => {
             <h2 className="text-xl font-bold text-white">Error al cargar los datos</h2>
             <p className="text-gray-300 text-center">{error}</p>
             <button 
-              onClick={() => router.push("/login")}
+              onClick={() => router.push("/")}
               className="button-primary mt-4"
             >
-              Volver al inicio de sesión
+              Volver al inicio
             </button>
           </div>
         </div>

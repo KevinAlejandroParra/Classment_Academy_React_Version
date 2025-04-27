@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
+import { useParams } from "next/navigation"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   faHome,
@@ -12,7 +13,6 @@ import {
   faEnvelope,
   faMapMarkerAlt,
   faBook,
-  faClock,
 } from "@fortawesome/free-solid-svg-icons"
 import Link from "next/link"
 import Swal from "sweetalert2"
@@ -35,7 +35,6 @@ interface School {
     course_id: string
     course_name: string
     course_description: string
-    course_duration: string
     teacher?: {
       user_id: string
       user_name: string
@@ -51,29 +50,23 @@ interface Props {
   }
 }
 
-const SchoolDetailsPage = ({ params }: Props) => {
+const SchoolDetailsPage = () => {
+  const params = useParams<{ id: string }>()
   const router = useRouter()
   const [school, setSchool] = useState<School | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  const id = params?.id 
   useEffect(() => {
-    fetchSchoolDetails()
-  }, [params.id])
+    if (id) {
+      fetchSchoolDetails()
+    }
+  }, [id])
 
   const fetchSchoolDetails = async () => {
     try {
-      const token = localStorage.getItem("token")
-      if (!token) {
-        router.push("/login")
-        return
-      }
-
-      const response = await fetch(`http://localhost:5000/api/schools/${params.id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      const response = await fetch(`http://localhost:5000/api/schools/${params.id}`)
 
       if (!response.ok) throw new Error("Error al cargar los detalles de la escuela")
 
@@ -253,16 +246,15 @@ const SchoolDetailsPage = ({ params }: Props) => {
         </div>
       </div>
 
-      {/* Main Content */}
       <main className="container mx-auto px-4 pt-24 pb-12">
         <div className="backdrop-blur-xl bg-black/10 p-8 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)] mb-8">
           <div className="flex items-center gap-6 mb-8">
-            <div className="bg-[rgb(var(--primary-rgb))] p-6 rounded-lg">
+            <div >
               {school.school_image ? (
                 <img
-                  src={school.school_image}
-                  alt={school.school_name}
-                  className="w-12 h-12 object-cover rounded"
+                src={`http://localhost:5000${school.school_image}`}
+                alt={school.school_name}
+                  className="w-24 h-24 object-cover rounded"
                 />
               ) : (
                 <FontAwesomeIcon icon={faSchool} className="text-4xl text-black" />
@@ -297,10 +289,12 @@ const SchoolDetailsPage = ({ params }: Props) => {
               <h3 className="text-xl font-semibold text-white mb-4">Información del Coordinador</h3>
               {school.coordinators && school.coordinators.length > 0 ? (
                 <div className="space-y-2 text-gray-300">
-                  <div className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faUser} className="text-[rgb(var(--primary-rgb))]" />
-                    <span>{school.coordinators[0].user_name} {school.coordinators[0].user_lastname}</span>
-                  </div>
+                  {school.coordinators.map((coordinator) => (
+                    <div key={coordinator.user_id} className="flex items-center gap-2">
+                      <FontAwesomeIcon icon={faUser} className="text-[rgb(var(--primary-rgb))]" />
+                      <span>{coordinator.user_name} {coordinator.user_lastname}</span>
+                    </div>
+                  ))}
                   <div className="flex items-center gap-2">
                     <FontAwesomeIcon icon={faEnvelope} className="text-[rgb(var(--primary-rgb))]" />
                     <span>{school.coordinators[0].user_email}</span>
@@ -312,12 +306,7 @@ const SchoolDetailsPage = ({ params }: Props) => {
             </div>
           </div>
 
-          <button
-            onClick={handleEnroll}
-            className="bg-[rgb(var(--primary-rgb))] text-black px-6 py-3 rounded-lg hover:bg-[rgba(var(--primary-rgb),0.9)] transition-colors"
-          >
-            Inscribirse en esta escuela
-          </button>
+
         </div>
 
         {/* Cursos */}
@@ -345,57 +334,18 @@ const SchoolDetailsPage = ({ params }: Props) => {
                   
                   <div className="space-y-3 mb-6">
                     <p className="text-gray-300">{course.course_description}</p>
-                    <div className="flex items-center gap-2 text-gray-300">
-                      <FontAwesomeIcon icon={faClock} className="text-[rgb(var(--primary-rgb))]" />
-                      <span>Duración: {course.course_duration}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-300">
-                      <FontAwesomeIcon icon={faUser} className="text-[rgb(var(--primary-rgb))]" />
-                      <span>
-                        {course.teacher ? (
-                          `Profesor: ${course.teacher.user_name} ${course.teacher.user_lastname}`
-                        ) : (
-                          "Este curso aún no cuenta con profesor asignado"
-                        )}
-                      </span>
-                    </div>
+
                   </div>
 
                   <div className="mt-auto flex gap-2">
-                    <button
-                      onClick={() => {
-                        Swal.fire({
-                          title: course.course_name,
-                          html: `
-                            <div class="text-left">
-                              <p class="mb-4">${course.course_description}</p>
-                              <p class="mb-2"><strong>Duración:</strong> ${course.course_duration}</p>
-                              <p class="mb-4">
-                                <strong>Profesor:</strong> ${
-                                  course.teacher 
-                                    ? `${course.teacher.user_name} ${course.teacher.user_lastname}<br>
-                                       <span class="text-sm">Email: ${course.teacher.user_email}</span>`
-                                    : "Este curso aún no cuenta con profesor asignado"
-                                }
-                              </p>
-                            </div>
-                          `,
-                          confirmButtonText: "Cerrar",
-                          confirmButtonColor: "rgb(var(--primary-rgb))",
-                          background: "#1a1a1a",
-                          color: "#fff",
-                        })
-                      }}
-                      className="flex-1 bg-[rgba(var(--primary-rgb),0.2)] text-[rgb(var(--primary-rgb))] px-4 py-2 rounded-lg hover:bg-[rgba(var(--primary-rgb),0.3)] transition-colors"
-                    >
-                      Ver detalles
-                    </button>
-                    <button
-                      onClick={() => handleCourseEnroll(course.course_id)}
-                      className="flex-1 bg-[rgb(var(--primary-rgb))] text-black px-4 py-2 rounded-lg hover:bg-[rgba(var(--primary-rgb),0.9)] transition-colors"
-                    >
-                      Inscribirse
-                    </button>
+                    <div className="flex justify-between items-center">
+                      <Link
+                        href={`/courses/${course.course_id}`}
+                        className="bg-[rgb(var(--primary-rgb))] text-black px-4 py-2 rounded-lg hover:bg-[rgba(var(--primary-rgb),0.9)] transition-colors flex-1 text-center"
+                      >
+                        Ver más detalles
+                      </Link>
+                    </div>
                   </div>
                 </motion.div>
               ))}

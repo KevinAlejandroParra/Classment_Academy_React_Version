@@ -74,27 +74,15 @@ const Login: React.FC = () => {
       if (response.ok) {
         const data = await response.json()
         setIsAuthenticated(true)
-        
-        // Redirigir según el rol
-        switch (data.user.role_id) {
-          case 1: // Estudiante
-            router.push("/student/dashboard")
-            break
-          case 3: // Administrador
-            router.push("/admin/dashboard")
-            break
-          case 4: // Regulador
-            router.push("/regulator/dashboard")
-            break
-          default:
-            router.push("/")
+        if (data.user.role_id) {
+          router.push("/")
         }
       } else {
         localStorage.removeItem("token")
         setIsAuthenticated(false)
       }
     } catch (error) {
-      console.error("Error al verificar autenticación:", error)
+      console.error("Error verifying authentication:", error)
       localStorage.removeItem("token")
       setIsAuthenticated(false)
     }
@@ -195,15 +183,10 @@ const Login: React.FC = () => {
       <Particles />
       {/* Home button */}
       <motion.div
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        transition={{ type: "spring", stiffness: 400, damping: 10 }}
+        className="fixed top-4 left-4 z-40 p-2 rounded-full bg-[rgb(var(--primary-rgb))] text-black shadow-lg"
       >
-        <Link
-          href="/"
-          className="fixed top-4 left-4 z-40 p-2 rounded-full bg-[rgb(var(--primary-rgb))] text-black shadow-lg"
-        >
-          <FontAwesomeIcon icon={faHome} className="w-5 h-5" /> 
+        <Link href="/">
+          <FontAwesomeIcon icon={faHome} className="w-5 h-5" />
         </Link>
       </motion.div>
 
@@ -212,7 +195,6 @@ const Login: React.FC = () => {
           variants={containerVariants}
           className="flex flex-col lg:flex-row items-center justify-between gap-12 max-w-6xl mx-auto"
         >
-          {/* Left side - Call to action */}
           <motion.div 
             variants={itemVariants}
             className="text-center lg:text-left text-white space-y-4 lg:w-2/5"
@@ -243,7 +225,7 @@ const Login: React.FC = () => {
             </motion.div>
           </motion.div>
 
-          {/* Right side - Login form */}
+          {/* formulario*/}
           <motion.div 
             variants={itemVariants}
             className="backdrop-blur-xl bg-black/10 p-8 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)] w-full max-w-md lg:w-3/5"

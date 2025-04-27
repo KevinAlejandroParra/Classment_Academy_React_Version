@@ -40,24 +40,19 @@ export function SchoolsCarousel() {
       console.log("Iniciando petición a la API de escuelas...")
 
       // Obtener el token del localStorage
-      const token = localStorage.getItem("token")
+    
       
       // Intentar hacer la petición con manejo de errores mejorado
       let response
       try {
         response = await fetch(`${API_BASE_URL}/api/schools`, {
           headers: {
-            ...(token && { 'Authorization': `Bearer ${token}` }),
             'Content-Type': 'application/json'
           }
         })
         console.log("Respuesta recibida:", response.status)
 
-        if (response.status === 401) {
-          console.log("Usuario no autenticado, redirigiendo al login...")
-          window.location.href = '/login'
-          return
-        }
+        
 
       } catch (fetchError) {
         console.error("Error al conectar con la API:", fetchError)

@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useParams } from "next/navigation"
 import { motion } from "framer-motion"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
@@ -38,6 +38,7 @@ interface School {
 
 const SchoolsPage = () => {
   const router = useRouter()
+  const { id } = useParams()
   const [schools, setSchools] = useState<School[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -48,16 +49,9 @@ const SchoolsPage = () => {
 
   const fetchSchools = async () => {
     try {
-      const token = localStorage.getItem("token")
-      if (!token) {
-        router.push("/login")
-        return
-      }
-
       const response = await fetch("http://localhost:5000/api/schools", {
         method: "GET",
         headers: {
-          "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       })
@@ -105,7 +99,7 @@ const SchoolsPage = () => {
         confirmButtonColor: "rgb(var(--primary-rgb))",
         cancelButtonColor: "#d33",
       })
-
+//BORARR ESTO
       if (result.isConfirmed) {
         const response = await fetch(`http://localhost:5000/api/students/enroll/${schoolId}`, {
           method: "POST",
@@ -169,7 +163,7 @@ const SchoolsPage = () => {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <Link
-              href="/student/dashboard"
+              href="/"
               className="p-2 rounded-full bg-[rgb(var(--primary-rgb))] text-black shadow-lg"
             >
               <FontAwesomeIcon icon={faHome} className="w-5 h-5" />
@@ -199,15 +193,15 @@ const SchoolsPage = () => {
                 className="backdrop-blur-xl bg-black/10 p-6 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)]"
               >
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="bg-[rgb(var(--primary-rgb))] p-4 rounded-lg">
+                  <div >
                     {school.school_image ? (
                       <img
-                        src={school.school_image}
+                        src={`http://localhost:5000${school.school_image}`}
                         alt={school.school_name}
-                        className="w-8 h-8 object-cover rounded"
+                        className="w-full h-auto object-cover rounded"
                       />
                     ) : (
-                      <FontAwesomeIcon icon={faSchool} className="text-2xl text-black" />
+                      <FontAwesomeIcon icon={faSchool} className="text-4xl text-black" />
                     )}
                   </div>
                   <div>
@@ -242,12 +236,7 @@ const SchoolsPage = () => {
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <button
-                    onClick={() => handleEnroll(school.school_id)}
-                    className="bg-[rgb(var(--primary-rgb))] text-black px-4 py-2 rounded-lg hover:bg-[rgba(var(--primary-rgb),0.9)] transition-colors"
-                  >
-                    Inscribirse
-                  </button>
+
                   <Link
                     href={`/student/schools/${school.school_id}`}
                     className="text-[rgb(var(--primary-rgb))] flex items-center gap-2 hover:text-[rgba(var(--primary-rgb),0.9)] transition-colors"

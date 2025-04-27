@@ -649,7 +649,7 @@ class UserController {
                                 },
                                 access_type: 'teacher',
                                 user_role_id: 2,
-                                is_direct_teacher: true // Indica que es profesor directo de este curso
+
                             });
                         }
                     });

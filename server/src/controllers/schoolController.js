@@ -2,47 +2,20 @@ const { School, Course, User, UserSchoolRole } = require('../models');
 const asyncHandler = require('../middleware/asyncHandler');
 
 // Obtener todas las escuelas
-exports.getAllSchools = asyncHandler(async (req, res) => {
-  if (!req.user) {
-    const error = new Error('Usuario no autenticado');
-    error.statusCode = 401;
-    throw error;
-  }
-
-  const user_id = req.user.user_id;
-  const role_id = req.user.role_id;
-
-  console.log('User ID:', user_id);
-  console.log('Role ID:', role_id);
-
+exports.getAllSchools = (async (req, res) => {
   let schools;
 
   try {
-    // Si es admin (role_id 3), solo mostrar sus escuelas
-    if (role_id === 3) {
-      schools = await School.findAll({
-        include: [{
-          model: User,
-          as: 'users',
-          where: { user_id: user_id },
-          through: {
-            attributes: ['role_id']
-          },
-          attributes: ['user_id', 'user_name', 'user_lastname', 'user_email']
-        }]
-      });
-    } else {
-      schools = await School.findAll({
-        include: [{
-          model: User,
-          as: 'users',
-          through: {
-            attributes: ['role_id']
-          },
-          attributes: ['user_id', 'user_name', 'user_lastname', 'user_email']
-        }]
-      });
-    }
+    schools = await School.findAll({
+      include: [{
+        model: User,
+        as: 'users',
+        through: {
+          attributes: ['role_id'] 
+        },
+        attributes: ['user_id', 'user_name', 'user_lastname', 'user_email']
+      }]
+    });
 
     console.log('Schools found:', schools.length);
     
@@ -65,10 +38,10 @@ exports.getSchoolById = asyncHandler(async (req, res) => {
       { 
         model: Course, 
         as: 'courses',
-        attributes: ['course_id', 'course_name', 'course_description', 'course_duration'],
+        attributes: ['course_id', 'course_name', 'course_description'],
         include: [{
           model: User,
-          as: 'teacher',
+          as: 'teachers',
           attributes: ['user_id', 'user_name', 'user_lastname', 'user_email']
         }]
       },

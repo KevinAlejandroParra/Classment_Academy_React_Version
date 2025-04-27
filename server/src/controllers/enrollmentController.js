@@ -184,7 +184,7 @@ class EnrollmentController {
             console.error('Error al obtener matrículas del usuario:', error);
             return res.status(500).json({
                 success: false,
-                message: 'Error al obtener matrículas del usuario',
+                message: 'para acceder a este recurso, primero inscribete a un curso',
                 error: error.message
             });
         }

@@ -8,7 +8,9 @@ const {
   Class,
   Enrollment,
   Attendance,
-  sequelize
+  sequelize,
+  School,
+  UserSchoolRole
 } = require('../models');
 const { Op } = require('sequelize');
 const teacherController = require('../controllers/teacherController');
@@ -21,6 +23,53 @@ const teacherController = require('../controllers/teacherController');
 
 
 router.get('/courses', verifyToken, teacherController.getCourses);
+
+/**
+ * @route   GET /api/teacher/schools
+ * @desc    Obtener escuelas donde el profesor está asignado
+ * @access  Private (solo docentes)
+ */
+router.get('/schools', verifyToken, async (req, res) => {
+  try {
+    const teacherId = req.user.user_id;
+
+    // Obtener las escuelas donde el profesor está asignado a través de UserSchoolRole
+    const userSchoolRoles = await UserSchoolRole.findAll({
+      where: { 
+        user_id: teacherId,
+        role_id: 2 // rol de profesor
+      },
+      include: [{
+        model: School,
+        as: 'school',
+        include: [{
+          model: Course,
+          as: 'courses'
+        }]
+      }]
+    });
+
+    const schools = userSchoolRoles.map(usr => {
+      const school = usr.school.get({ plain: true });
+      return {
+        ...school,
+        user_role_id: usr.role_id
+      };
+    });
+
+    res.json({
+      success: true,
+      data: schools
+    });
+  } catch (error) {
+    console.error('Error al obtener escuelas del profesor:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener las escuelas',
+      error: error.message
+    });
+  }
+});
 
 /**
  * @route   GET /api/courses/:courseId/students

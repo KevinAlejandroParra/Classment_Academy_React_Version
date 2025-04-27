@@ -168,54 +168,90 @@ const ProfilePage = () => {
           setUserData(userData.user);
           setEditForm(userData.user);
 
-          // Fetch cursos del usuario
-          const coursesResponse = await fetch(
-            "http://localhost:5000/api/my-courses",
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
+          // Fetch cursos del usuario según su rol
+          let coursesEndpoint = "";
+          if (userData.user.role_id === 1) {
+            coursesEndpoint = "http://localhost:5000/api/my-courses";
+          } else if (userData.user.role_id === 2) {
+            coursesEndpoint = "http://localhost:5000/api/teacher/courses";
+          } else if (userData.user.role_id === 3) {
+            coursesEndpoint = "http://localhost:5000/api/admin/courses";
+          }
 
-          if (coursesResponse.ok) {
-            const coursesData = await coursesResponse.json();
-            if (coursesData.success) {
-              setCourses(coursesData.data);
+          if (coursesEndpoint) {
+            try {
+              const coursesResponse = await fetch(coursesEndpoint, {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              });
+
+              if (coursesResponse.ok) {
+                const coursesData = await coursesResponse.json();
+                if (coursesData.success) {
+                  setCourses(coursesData.data || []);
+                }
+              } else {
+                console.error("Error al cargar cursos:", await coursesResponse.text());
+              }
+            } catch (error) {
+              console.error("Error al cargar cursos:", error);
             }
           }
 
           // Fetch escuelas del usuario
-          const schoolsResponse = await fetch(
-            "http://localhost:5000/api/my-schools",
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
+          try {
+            let schoolsEndpoint = "";
+            if (userData.user.role_id === 1) {
+              schoolsEndpoint = "http://localhost:5000/api/my-schools";
+            } else if (userData.user.role_id === 2) {
+              schoolsEndpoint = "http://localhost:5000/api/teacher/schools";
+            } else if (userData.user.role_id === 3) {
+              schoolsEndpoint = "http://localhost:5000/api/admin/schools";
             }
-          );
 
-          if (schoolsResponse.ok) {
-            const schoolsData = await schoolsResponse.json();
-            if (schoolsData.success) {
-              setSchools(schoolsData.data);
+            if (schoolsEndpoint) {
+              const schoolsResponse = await fetch(schoolsEndpoint, {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              });
+
+              if (schoolsResponse.ok) {
+                const schoolsData = await schoolsResponse.json();
+                if (schoolsData.success) {
+                  setSchools(schoolsData.data || []);
+                }
+              } else {
+                // Si falla, intentar con UserSchoolRole
+                const userSchoolRolesResponse = await fetch(
+                  `http://localhost:5000/api/users/${userData.user.user_id}/schools`,
+                  {
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  }
+                );
+
+                if (userSchoolRolesResponse.ok) {
+                  const schoolsData = await userSchoolRolesResponse.json();
+                  if (schoolsData.success) {
+                    setSchools(schoolsData.data || []);
+                  }
+                } else {
+                  console.error("Error al cargar escuelas:", await userSchoolRolesResponse.text());
+                }
+              }
             }
+          } catch (error) {
+            console.error("Error al cargar escuelas:", error);
           }
-        } else {
-          throw new Error("Datos de usuario no válidos");
         }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Error desconocido");
-        console.error("Error al cargar datos del usuario:", err);
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: err instanceof Error ? err.message : "Error desconocido",
-          confirmButtonColor: "#FFD700",
-          background: "#1a1a1a",
-          color: "#fff",
-        });
-      } finally {
+
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error al cargar datos:", error);
+        setError("Error al cargar los datos del perfil");
         setIsLoading(false);
       }
     };

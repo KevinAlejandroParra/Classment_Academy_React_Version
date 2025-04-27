@@ -34,8 +34,8 @@ app.use("/images", express.static(path.join(__dirname, "..", "public", "images")
 
 // Rutas públicas
 app.use('/api/schools', schoolRoutes);
-app.use('/api/teachers', profeRoutes);
 app.use('/api/courses', courseRoutes);
+app.use('/api/teachers', profeRoutes);
 app.use('/api/class', classRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api', userRoutes);

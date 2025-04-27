@@ -53,60 +53,56 @@ User.belongsTo(Role, { as: "role", foreignKey: "role_id" });
 School.hasMany(Course, { as: "courses", foreignKey: "school_id" });
 Course.belongsTo(School, { as: "school", foreignKey: "school_id" });
 
-// user_school_roles
+// Relación muchos-a-muchos entre User y School a través de UserSchoolRole
 User.belongsToMany(School, {
     through: UserSchoolRole,
-    as: "schools",
+    as: "schools", 
     foreignKey: "user_id",
     otherKey: "school_id"
 });
 School.belongsToMany(User, {
     through: UserSchoolRole,
-    as: "users",
+    as: "users", 
     foreignKey: "school_id",
     otherKey: "user_id"
 });
-UserSchoolRole.belongsTo(User, { foreignKey: "user_id", as: "user" });
-UserSchoolRole.belongsTo(School, { foreignKey: "school_id", as: "school" });
-UserSchoolRole.belongsTo(Role, { foreignKey: "role_id", as: "role" });
 
-// students (a través de enrollments)
+// Relación muchos-a-muchos entre Course y User (estudiantes) a través de Enrollment
 Course.belongsToMany(User, {
     through: Enrollment,
-    as: 'students',
+    as: 'students', 
     foreignKey: 'course_id',
     otherKey: 'user_id'
 });
   
 User.belongsToMany(Course, {
     through: Enrollment,
-    as: 'enrolledCourses',
+    as: 'enrolledCourses', 
     foreignKey: 'user_id',
     otherKey: 'course_id'
 });
 
-// course_teachers
+// Relación muchos-a-muchos entre Course y User (profesores) a través de CourseTeacher
 Course.belongsToMany(User, {
     through: CourseTeacher,
-    as: "teachers",
+    as: "teachers", 
     foreignKey: "course_id",
     otherKey: "teacher_id"
 });
 User.belongsToMany(Course, {
     through: CourseTeacher,
-    as: "coursesTaught",
+    as: "teachingCourses", 
     foreignKey: "teacher_id",
     otherKey: "course_id"
 });
+
+// Relaciones para modelos de unión
 CourseTeacher.belongsTo(Course, { foreignKey: "course_id", as: "course" });
 CourseTeacher.belongsTo(User, { foreignKey: "teacher_id", as: "teacher" });
 
-// enrollments
-User.hasMany(Enrollment, { foreignKey: "user_id", as: "enrollments" });
-Enrollment.belongsTo(User, { foreignKey: "user_id", as: "user" });
-
-Course.hasMany(Enrollment, { foreignKey: "course_id", as: "enrollments" });
-Enrollment.belongsTo(Course, { foreignKey: "course_id", as: "course" });
+UserSchoolRole.belongsTo(User, { foreignKey: "user_id", as: "user" });
+UserSchoolRole.belongsTo(School, { foreignKey: "school_id", as: "school" });
+UserSchoolRole.belongsTo(Role, { foreignKey: "role_id", as: "role" });
 
 // Class
 Course.hasMany(Class, { as: "classes", foreignKey: "course_id" });
@@ -119,7 +115,7 @@ Class.belongsTo(User, { as: "teacher", foreignKey: "teacher_id" });
 Class.hasMany(Attendance, { as: "attendances", foreignKey: "class_id" });
 Attendance.belongsTo(Class, { as: "class", foreignKey: "class_id" });
 
-User.hasMany(Attendance, { as: "attendances", foreignKey: "user_id" });
+User.hasMany(Attendance, { as: "studentAttendances", foreignKey: "user_id" }); // Cambiado el alias para evitar conflicto
 Attendance.belongsTo(User, { as: "student", foreignKey: "user_id" });
 
 // Payment

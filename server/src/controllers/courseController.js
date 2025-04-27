@@ -29,25 +29,11 @@ exports.getCourseById = asyncHandler(async (req, res) => {
   
   const course = await Course.findByPk(id, {
     include: [
-      { 
-        model: School, 
-        as: 'school' 
-      },
-      {
-        model: User,
-        as: 'teachers',
-        through: { attributes: [] } 
-      },
-      {
-        model: User,
-        as: 'students',
-        through: {
-          model: Enrollment,
-          attributes: ['plan_type', 'status', 'start_date', 'end_date', 'progress']
-        }
-      }
+      { model: School, as: "school" },
+      { model: User, as: "teachers", through: { attributes: [] } }, 
+      { model: User, as: "students", through: { model: Enrollment, attributes: ['plan_type', 'status', 'start_date', 'end_date', 'progress'] } }
     ]
-  });
+  })  
   
   if (!course) {
     const error = new Error(`Curso con ID ${id} no encontrado`);

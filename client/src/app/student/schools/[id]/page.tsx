@@ -145,6 +145,62 @@ const SchoolDetailsPage = ({ params }: Props) => {
     }
   }
 
+  const handleCourseEnroll = async (course_id: string) => {
+    try {
+      const token = localStorage.getItem("token")
+      if (!token) {
+        router.push("/login")
+        return
+      }
+
+      const result = await Swal.fire({
+        title: "¿Deseas inscribirte en este curso?",
+        text: "Este curso es parte de la escuela",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Sí, inscribirme",
+        cancelButtonText: "Cancelar",
+        background: "#1a1a1a",
+        color: "#fff",
+        confirmButtonColor: "rgb(var(--primary-rgb))",
+        cancelButtonColor: "#d33",
+      })
+
+      if (result.isConfirmed) {
+        const response = await fetch(`http://localhost:5000/api/enrollments/schools/${params.id}/courses/${course_id}/enroll`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        })
+
+        if (response.ok) {
+          Swal.fire({
+            icon: "success",
+            title: "¡Inscripción exitosa!",
+            text: "Ahora puedes acceder a este curso",
+            confirmButtonColor: "rgb(var(--primary-rgb))",
+            background: "#1a1a1a",
+            color: "#fff",
+          })
+        } else {
+          const errorData = await response.json()
+          throw new Error(errorData.message || "Error al inscribirse en el curso")
+        }
+      }
+    } catch (error: any) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "No se pudo completar la inscripción",
+        confirmButtonColor: "rgb(var(--primary-rgb))",
+        background: "#1a1a1a",
+        color: "#fff",
+      })
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center bg-black">
@@ -233,16 +289,20 @@ const SchoolDetailsPage = ({ params }: Props) => {
 
             <div className="space-y-4">
               <h3 className="text-xl font-semibold text-white mb-4">Información del Coordinador</h3>
-              <div className="space-y-2 text-gray-300">
-                <div className="flex items-center gap-2">
-                  <FontAwesomeIcon icon={faUser} className="text-[rgb(var(--primary-rgb))]" />
-                  <span>{school.coordinators[0]?.user_name} {school.coordinators[0]?.user_lastname}</span>
+              {school.coordinators && school.coordinators.length > 0 ? (
+                <div className="space-y-2 text-gray-300">
+                  <div className="flex items-center gap-2">
+                    <FontAwesomeIcon icon={faUser} className="text-[rgb(var(--primary-rgb))]" />
+                    <span>{school.coordinators[0].user_name} {school.coordinators[0].user_lastname}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <FontAwesomeIcon icon={faEnvelope} className="text-[rgb(var(--primary-rgb))]" />
+                    <span>{school.coordinators[0].user_email}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <FontAwesomeIcon icon={faEnvelope} className="text-[rgb(var(--primary-rgb))]" />
-                  <span>{school.coordinators[0]?.user_email}</span>
-                </div>
-              </div>
+              ) : (
+                <p className="text-gray-400">No hay coordinador asignado</p>
+              )}
             </div>
           </div>
 
@@ -266,7 +326,7 @@ const SchoolDetailsPage = ({ params }: Props) => {
                   key={course.course_id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="backdrop-blur-xl bg-black/20 p-6 rounded-xl shadow-lg border border-[rgba(var(--primary-rgb),0.3)]"
+                  className="backdrop-blur-xl bg-black/20 p-6 rounded-xl shadow-lg border border-[rgba(var(--primary-rgb),0.3)] flex flex-col"
                 >
                   <div className="flex items-center gap-4 mb-4">
                     <div className="bg-[rgb(var(--primary-rgb))] p-4 rounded-lg">
@@ -274,12 +334,30 @@ const SchoolDetailsPage = ({ params }: Props) => {
                     </div>
                     <div>
                       <h3 className="text-xl font-semibold text-white">{course.course_name}</h3>
-                      <p className="text-gray-400 text-sm">{course.course_description}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-300">
-                    <FontAwesomeIcon icon={faClock} className="text-[rgb(var(--primary-rgb))]" />
-                    <span>Duración: {course.course_duration}</span>
+                  
+                  <div className="space-y-3 mb-6">
+                    <p className="text-gray-300">{course.course_description}</p>
+                    <div className="flex items-center gap-2 text-gray-300">
+                      <FontAwesomeIcon icon={faClock} className="text-[rgb(var(--primary-rgb))]" />
+                      <span>Duración: {course.course_duration}</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-auto flex gap-2">
+                    <button
+                      onClick={() => router.push(`/student/courses/${course.course_id}`)}
+                      className="flex-1 bg-[rgba(var(--primary-rgb),0.2)] text-[rgb(var(--primary-rgb))] px-4 py-2 rounded-lg hover:bg-[rgba(var(--primary-rgb),0.3)] transition-colors"
+                    >
+                      Ver detalles
+                    </button>
+                    <button
+                      onClick={() => handleCourseEnroll(course.course_id)}
+                      className="flex-1 bg-[rgb(var(--primary-rgb))] text-black px-4 py-2 rounded-lg hover:bg-[rgba(var(--primary-rgb),0.9)] transition-colors"
+                    >
+                      Inscribirse
+                    </button>
                   </div>
                 </motion.div>
               ))}

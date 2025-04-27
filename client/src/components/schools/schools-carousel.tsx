@@ -32,7 +32,6 @@ export function SchoolsCarousel() {
   const navigationPrevRef = useRef<HTMLDivElement>(null)
   const navigationNextRef = useRef<HTMLDivElement>(null)
 
-  // Modificar la función fetchEscuelas para manejar mejor los errores
   const fetchEscuelas = async () => {
     try {
       setLoading(true)
@@ -40,11 +39,26 @@ export function SchoolsCarousel() {
 
       console.log("Iniciando petición a la API de escuelas...")
 
+      // Obtener el token del localStorage
+      const token = localStorage.getItem("token")
+      
       // Intentar hacer la petición con manejo de errores mejorado
       let response
       try {
-        response = await fetch(`${API_BASE_URL}/api/schools`)
+        response = await fetch(`${API_BASE_URL}/api/schools`, {
+          headers: {
+            ...(token && { 'Authorization': `Bearer ${token}` }),
+            'Content-Type': 'application/json'
+          }
+        })
         console.log("Respuesta recibida:", response.status)
+
+        if (response.status === 401) {
+          console.log("Usuario no autenticado, redirigiendo al login...")
+          window.location.href = '/login'
+          return
+        }
+
       } catch (fetchError) {
         console.error("Error al conectar con la API:", fetchError)
         throw new Error("No se pudo conectar con el servidor. Verifica tu conexión a internet.")

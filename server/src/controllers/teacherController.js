@@ -423,9 +423,16 @@ exports.getSchoolTeachers = asyncHandler(async (req, res) => {
     }]
   });
 
+  // Obtener los cursos de la escuela
+  const courses = await Course.findAll({
+    where: { school_id },
+    attributes: ['course_id', 'course_name', 'course_description']
+  });
+
   return res.status(200).json({
     success: true,
     data: teachers.map(tsr => tsr.user),
-    message: "Profesores de la escuela obtenidos correctamente"
+    courses,
+    message: "Profesores y cursos de la escuela obtenidos correctamente"
   });
 });

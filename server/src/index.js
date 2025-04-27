@@ -3,7 +3,8 @@ const cors = require("cors");
 const userRoutes = require("./routes/user.routes.js");
 const schoolRoutes = require("./routes/school.routes.js");
 const courseRoutes = require("./routes/course.routes.js");
-const teacherRoutes = require("./routes/teacher.js")
+const teacherRoutes = require("./routes/teacher.js");
+const profeRoutes = require("./routes/profe.routes.js");
 const classRoutes = require("./routes/classRoutes.js")
 const attendanceRoutes = require("./routes/attendanceRoutes.js")
 const errorHandler = require("./middleware/errorHandler.js");
@@ -31,6 +32,7 @@ app.use("/images", express.static(path.join(__dirname, "..", "public", "images")
 
 // Rutas públicas
 app.use('/api/schools', schoolRoutes);
+app.use('/api/teachers', profeRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/class', classRoutes);
 app.use('/api', userRoutes);

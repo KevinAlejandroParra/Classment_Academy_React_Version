@@ -71,7 +71,7 @@ class UserController {
 
     static async createUser(req, res) {
         try {
-            const { user: userJSON } = req.body;
+            const userJSON = req.body;
 
             // Validaciones adicionales
             if (!userJSON.user_name || !userJSON.user_lastname || !userJSON.user_email || 
@@ -164,23 +164,20 @@ class UserController {
 
             // Si es profesor (role_id: 2) y tiene school_id en el request
             if (userJSON.role_id === 2 && userJSON.school_id) {
-                await user.addManagedSchools(userJSON.school_id, { 
+                await user.addSchool(userJSON.school_id, { 
                     through: { 
-                        is_teacher: true,
-                        is_owner: false,
-                        is_coordinator: false
+                        role_id: 2, // rol de profesor
                     }
                 });
             }
             // Si es regulador (role_id: 4) 
-        if (userJSON.role_id === 4 && userJSON.school_id) {
-            await user.addManagedSchools(userJSON.school_id, {
-                through: {
-                    is_teacher: false,
-                    is_owner: false,
-                }
-            });
-        }
+            if (userJSON.role_id === 4 && userJSON.school_id) {
+                await user.addSchool(userJSON.school_id, {
+                    through: {
+                        role_id: 4, // rol de coordinador
+                    }
+                });
+            }
 
             // Eliminar la contraseña de la respuesta
             const userResponse = user.toJSON();

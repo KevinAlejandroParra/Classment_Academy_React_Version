@@ -1,4 +1,5 @@
-const { User, Course, CourseTeacher, Class, Enrollment, Attendance, sequelize } = require('../models');
+const { User, Course, CourseTeacher, Class, Enrollment, Attendance, sequelize, School, UserSchoolRole } = require('../models');
+const asyncHandler = require('../middleware/asyncHandler');
 
 // Obtener cursos asignados al profesor
 exports.getCourses = async (req, res) => {
@@ -46,6 +47,7 @@ exports.getCourses = async (req, res) => {
     });
   }
 };
+
 // Obtener estudiantes inscritos en un curso
 exports.getStudentsInCourse = async (req, res) => {
   try {
@@ -281,3 +283,156 @@ exports.createClass = async (req, res) => {
     });
   }
 };
+
+// Crear un nuevo profesor y asignarlo a una escuela
+exports.createTeacher = asyncHandler(async (req, res) => {
+  const { 
+    user_name, 
+    user_lastname, 
+    user_email, 
+    user_phone, 
+    school_id 
+  } = req.body;
+
+  // Verificar que el usuario que hace la petición es admin de la escuela
+  const adminSchoolRole = await UserSchoolRole.findOne({
+    where: {
+      user_id: req.user.user_id,
+      school_id: school_id,
+      role_id: 3 // rol de admin
+    }
+  });
+
+  if (!adminSchoolRole) {
+    const error = new Error('No tienes permisos para crear profesores en esta escuela');
+    error.statusCode = 403;
+    throw error;
+  }
+
+  // Crear el usuario con rol de profesor
+  const teacher = await User.create({
+    user_name,
+    user_lastname,
+    user_email,
+    user_phone,
+    role_id: 2 // rol de profesor
+  });
+
+  // Asignar el profesor a la escuela
+  await UserSchoolRole.create({
+    user_id: teacher.user_id,
+    school_id: school_id,
+    role_id: 2 // rol de profesor
+  });
+
+  return res.status(201).json({
+    success: true,
+    data: teacher,
+    message: "Profesor creado y asignado a la escuela correctamente"
+  });
+});
+
+// Asignar un profesor a un curso
+exports.assignTeacherToCourse = asyncHandler(async (req, res) => {
+  const { teacher_id, course_id, school_id } = req.body;
+
+  // Verificar que el usuario que hace la petición es admin de la escuela
+  const adminSchoolRole = await UserSchoolRole.findOne({
+    where: {
+      user_id: req.user.user_id,
+      school_id: school_id,
+      role_id: 3 // rol de admin
+    }
+  });
+
+  if (!adminSchoolRole) {
+    const error = new Error('No tienes permisos para asignar profesores en esta escuela');
+    error.statusCode = 403;
+    throw error;
+  }
+
+  // Verificar que el curso pertenece a la escuela
+  const course = await Course.findOne({
+    where: {
+      course_id: course_id,
+      school_id: school_id
+    }
+  });
+
+  if (!course) {
+    const error = new Error('El curso no pertenece a esta escuela');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  // Verificar que el profesor está asignado a la escuela
+  const teacherSchoolRole = await UserSchoolRole.findOne({
+    where: {
+      user_id: teacher_id,
+      school_id: school_id,
+      role_id: 2 // rol de profesor
+    }
+  });
+
+  if (!teacherSchoolRole) {
+    const error = new Error('El profesor no está asignado a esta escuela');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  // Asignar el profesor al curso
+  await CourseTeacher.create({
+    user_id: teacher_id,
+    course_id: course_id
+  });
+
+  return res.status(201).json({
+    success: true,
+    message: "Profesor asignado al curso correctamente"
+  });
+});
+
+// Obtener todos los profesores de una escuela
+exports.getSchoolTeachers = asyncHandler(async (req, res) => {
+  const { school_id } = req.params;
+
+  // Verificar que el usuario que hace la petición es admin de la escuela
+  const adminSchoolRole = await UserSchoolRole.findOne({
+    where: {
+      user_id: req.user.user_id,
+      school_id: school_id,
+      role_id: 3 // rol de admin
+    }
+  });
+
+  if (!adminSchoolRole) {
+    const error = new Error('No tienes permisos para ver los profesores de esta escuela');
+    error.statusCode = 403;
+    throw error;
+  }
+
+  const teachers = await UserSchoolRole.findAll({
+    where: {
+      school_id: school_id,
+      role_id: 2 // rol de profesor
+    },
+    include: [{
+      model: User,
+      as: 'user',
+      attributes: ['user_id', 'user_name', 'user_lastname', 'user_email', 'user_phone']
+    }]
+  });
+
+  // Obtener los cursos de la escuela
+  const courses = await Course.findAll({
+    where: { school_id },
+    attributes: ['course_id', 'course_name', 'course_description']
+  });
+
+  return res.status(200).json({
+    success: true,
+    data: teachers.map(tsr => tsr.user),
+    courses,
+    message: "Profesores y cursos de la escuela obtenidos correctamente"
+  });
+});

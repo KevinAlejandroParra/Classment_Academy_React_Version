@@ -189,6 +189,98 @@ class EnrollmentController {
             });
         }
     });
+
+    // Nuevo método para inscribirse en un curso de una escuela específica
+    static async enrollStudentInSchoolCourse(req, res) {
+        try {
+            const { schoolId, courseId } = req.params;
+            const studentId = req.user.user_id;
+
+            // 1. Verificar que el curso pertenece a la escuela
+            const course = await Course.findOne({
+                where: {
+                    course_id: courseId,
+                    school_id: schoolId
+                },
+                include: [{
+                    model: School,
+                    as: 'school',
+                    attributes: ['school_id', 'school_name']
+                }]
+            });
+
+            if (!course) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Curso no encontrado o no pertenece a la escuela especificada'
+                });
+            }
+
+            // 2. Verificar que el usuario es estudiante
+            const student = await User.findByPk(studentId);
+            if (!student || student.role_id !== 1) {
+                return res.status(403).json({
+                    success: false,
+                    message: 'Solo los estudiantes pueden inscribirse en cursos'
+                });
+            }
+
+            // 3. Verificar si ya está inscrito
+            const existingEnrollment = await Enrollment.findOne({
+                where: {
+                    user_id: studentId,
+                    course_id: courseId,
+                    status: 'active'
+                }
+            });
+
+            if (existingEnrollment) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Ya estás inscrito en este curso'
+                });
+            }
+
+            // 4. Crear la matrícula
+            const enrollment = await Enrollment.create({
+                enrollment_id: uuidv4(),
+                user_id: studentId,
+                course_id: courseId,
+                plan_type: 'mensual', // Plan por defecto
+                start_date: new Date(),
+                end_date: EnrollmentController.calculateEndDate('mensual'),
+                status: 'active',
+                progress: 0
+            });
+
+            // 5. Responder con datos relevantes
+            return res.status(201).json({
+                success: true,
+                data: {
+                    enrollment_id: enrollment.enrollment_id,
+                    course: {
+                        course_id: course.course_id,
+                        course_name: course.course_name,
+                        school: {
+                            school_id: course.school.school_id,
+                            school_name: course.school.school_name 
+                        }
+                    },
+                    start_date: enrollment.start_date,
+                    end_date: enrollment.end_date
+                },
+                message: 'Inscripción al curso exitosa'
+            });
+
+        } catch (error) {
+            console.error('Error en enrollStudentInSchoolCourse:', error);
+            return res.status(500).json({
+                success: false,
+                message: 'Error al inscribirse en el curso',
+                error: error.message
+            });
+        }
+    }
 }
 
 module.exports = EnrollmentController;

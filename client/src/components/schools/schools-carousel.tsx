@@ -305,7 +305,7 @@ export function SchoolsCarousel() {
                       </p>
                       <div className="card-actions justify-end pt-2 pb-2">
                         <Link
-                          href={`/escuela/${escuela.school_id}`}
+                          href={`/student/schools/${escuela.school_id}`}
                           className="inline-flex items-center justify-center rounded-full bg-[rgb(var(--primary-rgb))] text-black font-bold py-2 px-4 min-w-[120px] text-sm transition-transform hover:scale-105 hover:shadow-lg"
                         >
                           Ver Escuela

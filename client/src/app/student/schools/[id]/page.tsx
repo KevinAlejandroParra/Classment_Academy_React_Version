@@ -36,6 +36,12 @@ interface School {
     course_name: string
     course_description: string
     course_duration: string
+    teacher?: {
+      user_id: string
+      user_name: string
+      user_lastname: string
+      user_email: string
+    }
   }>
 }
 
@@ -343,11 +349,43 @@ const SchoolDetailsPage = ({ params }: Props) => {
                       <FontAwesomeIcon icon={faClock} className="text-[rgb(var(--primary-rgb))]" />
                       <span>Duración: {course.course_duration}</span>
                     </div>
+                    <div className="flex items-center gap-2 text-gray-300">
+                      <FontAwesomeIcon icon={faUser} className="text-[rgb(var(--primary-rgb))]" />
+                      <span>
+                        {course.teacher ? (
+                          `Profesor: ${course.teacher.user_name} ${course.teacher.user_lastname}`
+                        ) : (
+                          "Este curso aún no cuenta con profesor asignado"
+                        )}
+                      </span>
+                    </div>
                   </div>
 
                   <div className="mt-auto flex gap-2">
                     <button
-                      onClick={() => router.push(`/student/courses/${course.course_id}`)}
+                      onClick={() => {
+                        Swal.fire({
+                          title: course.course_name,
+                          html: `
+                            <div class="text-left">
+                              <p class="mb-4">${course.course_description}</p>
+                              <p class="mb-2"><strong>Duración:</strong> ${course.course_duration}</p>
+                              <p class="mb-4">
+                                <strong>Profesor:</strong> ${
+                                  course.teacher 
+                                    ? `${course.teacher.user_name} ${course.teacher.user_lastname}<br>
+                                       <span class="text-sm">Email: ${course.teacher.user_email}</span>`
+                                    : "Este curso aún no cuenta con profesor asignado"
+                                }
+                              </p>
+                            </div>
+                          `,
+                          confirmButtonText: "Cerrar",
+                          confirmButtonColor: "rgb(var(--primary-rgb))",
+                          background: "#1a1a1a",
+                          color: "#fff",
+                        })
+                      }}
                       className="flex-1 bg-[rgba(var(--primary-rgb),0.2)] text-[rgb(var(--primary-rgb))] px-4 py-2 rounded-lg hover:bg-[rgba(var(--primary-rgb),0.3)] transition-colors"
                     >
                       Ver detalles

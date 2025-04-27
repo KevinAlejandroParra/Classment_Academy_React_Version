@@ -63,6 +63,7 @@ export default function CoursesAdminPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [selectedSchool, setSelectedSchool] = useState<string>("");
 
   // Cargar cursos y escuelas
   useEffect(() => {
@@ -74,24 +75,24 @@ export default function CoursesAdminPage() {
           return;
         }
 
-        const [coursesRes, schoolsRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/api/courses`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          fetch(`${API_BASE_URL}/api/schools`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
+        // Primero cargar las escuelas
+        const schoolsRes = await fetch(`${API_BASE_URL}/api/schools`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-        if (!coursesRes.ok || !schoolsRes.ok) {
-          throw new Error("Error al cargar los datos");
+        if (!schoolsRes.ok) {
+          throw new Error("Error al cargar las escuelas");
         }
 
-        const coursesData = await coursesRes.json();
         const schoolsData = await schoolsRes.json();
+        const schoolsList = schoolsData.data || [];
+        setSchools(schoolsList);
 
-        setCourses(coursesData.data || []);
-        setSchools(schoolsData.data || []);
+        // Si hay escuelas, seleccionar la primera por defecto
+        if (schoolsList.length > 0 && !selectedSchool) {
+          setSelectedSchool(schoolsList[0].school_id);
+        }
+
       } catch (error) {
         console.error("Error:", error);
         Swal.fire({
@@ -109,6 +110,47 @@ export default function CoursesAdminPage() {
 
     fetchData();
   }, [router]);
+
+  // Efecto para cargar cursos cuando se selecciona una escuela
+  useEffect(() => {
+    const fetchCourses = async () => {
+      if (!selectedSchool) return;
+
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          router.push("/login");
+          return;
+        }
+
+        setLoading(true);
+        const coursesRes = await fetch(`${API_BASE_URL}/api/courses/school/${selectedSchool}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!coursesRes.ok) {
+          throw new Error("Error al cargar los cursos");
+        }
+
+        const coursesData = await coursesRes.json();
+        setCourses(coursesData.data || []);
+      } catch (error) {
+        console.error("Error:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Error al cargar los cursos",
+          confirmButtonColor: "#FFD700",
+          background: "#1a1a1a",
+          color: "#fff",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, [selectedSchool, router]);
 
   // Filtrar cursos por término de búsqueda
   const filteredCourses = courses.filter((course) =>

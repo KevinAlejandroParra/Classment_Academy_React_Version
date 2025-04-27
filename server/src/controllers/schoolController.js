@@ -65,12 +65,18 @@ exports.getSchoolById = asyncHandler(async (req, res) => {
       { 
         model: Course, 
         as: 'courses',
-        attributes: ['course_id', 'course_name', 'course_description']
+        attributes: ['course_id', 'course_name', 'course_description', 'course_duration'],
+        include: [{
+          model: User,
+          as: 'teacher',
+          attributes: ['user_id', 'user_name', 'user_lastname', 'user_email']
+        }]
       },
       {
         model: User,
         as: 'users',
         through: {
+          where: { role_id: 4 }, // Solo coordinadores
           attributes: ['role_id']
         },
         attributes: ['user_id', 'user_name', 'user_lastname', 'user_email']
@@ -83,10 +89,17 @@ exports.getSchoolById = asyncHandler(async (req, res) => {
     error.statusCode = 404;
     throw error;
   }
+
+  // Formatear la respuesta para incluir coordinadores
+  const formattedSchool = {
+    ...school.toJSON(),
+    coordinators: school.users || [],
+  };
+  delete formattedSchool.users;
   
   return res.status(200).json({
     success: true,
-    data: school
+    data: formattedSchool
   });
 });
 

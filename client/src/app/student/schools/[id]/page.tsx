@@ -56,10 +56,13 @@ const SchoolDetailsPage = ({ params }: Props) => {
   const [school, setSchool] = useState<School | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const schoolId = params?.id
 
   useEffect(() => {
-    fetchSchoolDetails()
-  }, [params.id])
+    if (schoolId) {
+      fetchSchoolDetails()
+    }
+  }, [schoolId])
 
   const fetchSchoolDetails = async () => {
     try {
@@ -69,7 +72,7 @@ const SchoolDetailsPage = ({ params }: Props) => {
         return
       }
 
-      const response = await fetch(`http://localhost:5000/api/schools/${params.id}`, {
+      const response = await fetch(`http://localhost:5000/api/school/${schoolId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -117,7 +120,7 @@ const SchoolDetailsPage = ({ params }: Props) => {
       })
 
       if (result.isConfirmed) {
-        const response = await fetch(`http://localhost:5000/api/students/enroll/${params.id}`, {
+        const response = await fetch(`http://localhost:5000/api/students/enroll/${schoolId}`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -173,7 +176,7 @@ const SchoolDetailsPage = ({ params }: Props) => {
       })
 
       if (result.isConfirmed) {
-        const response = await fetch(`http://localhost:5000/api/enrollments/schools/${params.id}/courses/${course_id}/enroll`, {
+        const response = await fetch(`http://localhost:5000/api/enrollments/schools/${schoolId}/courses/${course_id}/enroll`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,

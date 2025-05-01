@@ -18,7 +18,8 @@ module.exports = {
       },
       course_price: {
         type: Sequelize.FLOAT,
-        allowNull: false
+        allowNull: false,
+        defaultValue: 0
       },
       status: {
         type: Sequelize.ENUM('active','completed','cancelled','pending'),

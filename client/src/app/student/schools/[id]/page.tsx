@@ -72,9 +72,10 @@ const SchoolDetailsPage = ({ params }: Props) => {
         return
       }
 
-      const response = await fetch(`http://localhost:5000/api/school/${schoolId}`, {
+      const response = await fetch(`http://localhost:5000/api/schools/${schoolId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
       })
 

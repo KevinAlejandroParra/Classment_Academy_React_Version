@@ -158,6 +158,7 @@ class EnrollmentController {
             // Buscar todas las matrículas del usuario con información de curso
             const enrollments = await Enrollment.findAll({
                 where: { user_id: userId },
+                attributes: ['enrollment_id', 'status', 'progress', 'course_price'],
                 include: [
                     {
                         model: Course,
@@ -167,7 +168,7 @@ class EnrollmentController {
                 ],
                 order: [
                     ['status', 'ASC'],  // Primero los activos
-                    ['start_date', 'DESC']  // Los más recientes primero
+                    ['createdAt', 'DESC']  // Los más recientes primero
                 ]
             });
             

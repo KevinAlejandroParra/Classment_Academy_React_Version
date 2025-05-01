@@ -34,10 +34,26 @@ export default function CoursesList() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const token = localStorage.getItem("token")
+        if (!token) {
+          setError("No hay sesión activa")
+          return
+        }
+
         // Fetch both schools and courses
         const [schoolsRes, coursesRes] = await Promise.all([
-          fetch("http://localhost:5000/api/schools/"),
-          fetch("http://localhost:5000/api/courses/")
+          fetch("http://localhost:5000/api/schools/", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }),
+          fetch("http://localhost:5000/api/courses/", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          })
         ])
 
         const schoolsData = await schoolsRes.json()

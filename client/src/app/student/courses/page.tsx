@@ -37,13 +37,13 @@ interface Enrollment {
 
 // Actualizada para manejar diferentes estructuras de usuario
 interface User {
-  id?: string          // Nueva API
-  user_id?: string     // API antigua
+  id?: string          
+  user_id?: string     
   user_name?: string
   user_lastname?: string
-  first_name?: string  // Nueva API posible
-  last_name?: string   // Nueva API posible
-  name?: string        // Otra posible estructura 
+  first_name?: string  
+  last_name?: string  
+  name?: string        
   email: string
   role_id?: number
 }

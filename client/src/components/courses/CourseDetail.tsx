@@ -14,8 +14,7 @@ import {
   faEnvelope, 
   faSpinner, 
   faExclamationTriangle, 
-  faCheckCircle, 
-  faInfoCircle,
+  faCheckCircle,
   faSchool,
   faGraduationCap,
   faTimes,
@@ -25,6 +24,7 @@ import { Sidebar } from "@/components/sidebar"
 import { Particles } from "@/components/particles"
 import Image from "next/image"
 import Link from "next/link"
+import Swal from "sweetalert2"
 
 interface SchoolAdmin {
   user_id: string
@@ -61,142 +61,96 @@ const EnrollmentModal = ({
   isOpen, 
   onClose, 
   onSubmit, 
-  isLoading 
+  isLoading,
+  coursePrice 
 }: { 
   isOpen: boolean
   onClose: () => void
-  onSubmit: (data: { plan_type: string, start_date: string, end_date: string }) => void
+  onSubmit: () => void
   isLoading: boolean
+  coursePrice: string
 }) => {
-  const [planType, setPlanType] = useState("mensual")
-  const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0])
-  const [endDate, setEndDate] = useState("")
 
-  // Calcula la fecha de finalización en función del plan seleccionado
-  useEffect(() => {
-    if (startDate) {
-      const start = new Date(startDate)
-      const end = new Date(start)
-      
-      switch (planType) {
-        case "mensual":
-          end.setMonth(start.getMonth() + 1)
-          break
-        case "trimestral":
-          end.setMonth(start.getMonth() + 3)
-          break
-        case "semestral":
-          end.setMonth(start.getMonth() + 6)
-          break
-        case "anual":
-          end.setFullYear(start.getFullYear() + 1)
-          break
-      }
-      
-      setEndDate(end.toISOString().split('T')[0])
-    }
-  }, [planType, startDate])
+ // Función para formatear el precio
+ const formatPrice = (price: string) => {
+  return new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(Number(price))
+}
 
-  // Maneja el envío del formulario
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    onSubmit({
-      plan_type: planType,
-      start_date: startDate,
-      end_date: endDate
-    })
-  }
+if (!isOpen) return null
 
-  if (!isOpen) return null
+  
 
-  return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm">
-      <AnimatePresence>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.9 }}
-          className="bg-[rgb(var(--background-rgb))] rounded-xl p-6 w-full max-w-md border border-[rgba(var(--foreground-rgb),0.1)]"
-        >
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-bold">Inscripción al Curso</h3>
-            <button 
-              onClick={onClose} 
-              className="text-[rgb(var(--foreground-rgb))] opacity-70 hover:opacity-100"
-            >
-              <FontAwesomeIcon icon={faTimes} />
-            </button>
+return (
+  <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm">
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        className="bg-[rgb(var(--background-rgb))] rounded-xl p-6 w-full max-w-md border border-[rgba(var(--foreground-rgb),0.1)]"
+      >
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-xl font-bold">Confirmación de Pago</h3>
+          <button 
+            onClick={onClose} 
+            className="text-[rgb(var(--foreground-rgb))] opacity-70 hover:opacity-100"
+          >
+            <FontAwesomeIcon icon={faTimes} />
+          </button>
+        </div>
+        
+        <div className="mb-6 py-4 border-y border-[rgba(var(--foreground-rgb),0.1)]">
+          <div className="flex justify-between items-center">
+            <span className="text-sm opacity-80">Valor del curso:</span>
+            <span className="font-medium">{formatPrice(coursePrice)}</span>
           </div>
-          
-          <form onSubmit={handleSubmit}>
-            <div className="mb-6">
-              <label className="block text-sm font-medium mb-2">Tipo de Plan</label>
-              <select
-                value={planType}
-                onChange={(e) => setPlanType(e.target.value)}
-                className="w-full bg-[rgba(var(--foreground-rgb),0.03)] border border-[rgba(var(--foreground-rgb),0.1)] rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-rgb))]"
-                required
-              >
-                <option value="mensual">Mensual</option>
-                <option value="trimestral">Trimestral</option>
-                <option value="semestral">Semestral</option>
-                <option value="anual">Anual</option>
-              </select>
-            </div>
-            
-            <div className="mb-6">
-              <label className="block text-sm font-medium mb-2">Fecha de Inicio</label>
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="w-full bg-[rgba(var(--foreground-rgb),0.03)] border border-[rgba(var(--foreground-rgb),0.1)] rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--primary-rgb))]"
-                required
-              />
-            </div>
-            
-            <div className="mb-6">
-              <label className="block text-sm font-medium mb-2">Fecha de Finalización (calculada automáticamente)</label>
-              <input
-                type="date"
-                value={endDate}
-                className="w-full bg-[rgba(var(--foreground-rgb),0.03)] border border-[rgba(var(--foreground-rgb),0.1)] rounded-lg p-3 focus:outline-none cursor-not-allowed opacity-70"
-                disabled
-              />
-            </div>
-            
-            <div className="flex justify-end space-x-3">
-              <button
-                type="button"
-                onClick={onClose}
-                className="button-secondary"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                className="button-primary flex items-center justify-center gap-2"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <FontAwesomeIcon icon={faSpinner} spin />
-                    <span>Procesando...</span>
-                  </>
-                ) : (
-                  <>
-                    <FontAwesomeIcon icon={faGraduationCap} />
-                    <span>Confirmar Inscripción</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-        </motion.div>
-      </AnimatePresence>
-    </div>
-  )
+          <div className="flex justify-between items-center mt-2">
+            <span className="text-lg font-semibold">Total a pagar:</span>
+            <span className="text-lg font-bold text-[rgb(var(--primary-rgb))]">{formatPrice(coursePrice)}</span>
+          </div>
+        </div>
+        
+        <div className="mb-6">
+          <p className="text-sm opacity-80">
+            Al hacer clic en "Proceder al Pago", serás redirigido a Mercado Pago para completar la transacción de forma segura.
+          </p>
+        </div>
+        
+        <div className="flex justify-end space-x-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="button-secondary"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={onSubmit}
+            className="button-primary flex items-center justify-center gap-2"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <FontAwesomeIcon icon={faSpinner} spin />
+                <span>Procesando...</span>
+              </>
+            ) : (
+              <>
+                <FontAwesomeIcon icon={faMoneyBillWave} />
+                <span>Proceder al Pago</span>
+              </>
+            )}
+          </button>
+        </div>
+      </motion.div>
+    </AnimatePresence>
+  </div>
+)
 }
 
 export default function CourseDetail() {
@@ -274,7 +228,6 @@ export default function CourseDetail() {
   const handleOpenEnrollModal = () => {
     const token = localStorage.getItem("token")
     
-    // Si no hay token, redirigir al login
     if (!token) {
       router.push('/login?redirect=' + encodeURIComponent(`/courses/${courseId}`))
       return
@@ -284,45 +237,55 @@ export default function CourseDetail() {
   }
 
   // Manejar la inscripción en el curso
-  const handleEnroll = async (enrollmentData: { plan_type: string, start_date: string, end_date: string }) => {
-    // Reiniciar estados de inscripción
-    setEnrolling(true)
-    setEnrollSuccess(false)
-    setEnrollError(null)
-    
+  const handleEnroll = async () => {
+    setEnrolling(true);
+    setEnrollError(null);
+  
     try {
-      const token = localStorage.getItem("token")
+      const token = localStorage.getItem("token");
       
       if (!token) {
-        router.push('/login?redirect=' + encodeURIComponent(`/courses/${courseId}`))
-        return
+        router.push('/login?redirect=' + encodeURIComponent(`/courses/${courseId}`));
+        return;
       }
       
-      // Llamar a la API para inscribirse en la escuela
-      const response = await fetch(`http://localhost:5000/api/enrollments/courses/${courseId}/enroll`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(enrollmentData)
-      })
-      
-      const data = await response.json()
-      
-      if (response.ok) {
-        setEnrollSuccess(true)
-        setIsModalOpen(false)
-        // Podría mostrar un mensaje de éxito y tal vez redirigir después de un retraso
-        // setTimeout(() => router.push('/student/dashboard'), 3000)
-      } else {
-        setEnrollError(data.message || "Error al inscribirse en el curso")
+      if (course) {
+        const response = await fetch(`http://localhost:5000/api/payments/create-payment`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            courseId: courseId,
+            amount: course.course_price,
+            description: `Inscripción al curso: ${course.course_name}`
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          window.open(data.paymentUrl, '_blank');
+        } else {
+          throw new Error(data.message || "Error al procesar el pago");
+        }
       }
-    } catch (err) {
-      console.error(err)
-      setEnrollError("Error de conexión al servidor")
+    } catch (error) {
+      console.error('Error completo:', error);
+      setEnrollError(error.message);
+      
+      Swal.fire({
+        title: 'Error en el pago',
+        text: error.message || "Ocurrió un error al procesar tu pago",
+        icon: 'error',
+        background: "#1a1a1a",
+        color: "#ffffff",
+        iconColor: "rgb(var(--primary-rgb))",
+        confirmButtonColor: "rgb(var(--primary-rgb))",
+      });
     } finally {
-      setEnrolling(false)
+      setEnrolling(false);
     }
   }
 
@@ -380,6 +343,7 @@ export default function CourseDetail() {
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleEnroll}
         isLoading={enrolling}
+        coursePrice={course.course_price}
       />
       
       <div className="py-12 px-4 md:px-8 lg:px-12 ml-0 md:ml-16">
@@ -464,7 +428,6 @@ export default function CourseDetail() {
               <p className="text-[rgb(var(--foreground-rgb))] opacity-90">{course.course_description}</p>
             </motion.div>
             
-            {/* Detalles clave del curso */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

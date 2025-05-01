@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const cors = require("cors");
 const userRoutes = require("./routes/user.routes.js");
@@ -7,6 +8,7 @@ const teacherRoutes = require("./routes/teacher.js");
 const profeRoutes = require("./routes/profe.routes.js");
 const classRoutes = require("./routes/classRoutes.js")
 const attendanceRoutes = require("./routes/attendanceRoutes.js")
+const paymentRoutes = require("./routes/paymentRoutes.js")
 const errorHandler = require("./middleware/errorHandler.js");
 const path = require('path');
 const enrollmentRoutes = require('./routes/enrollment.routes');
@@ -35,6 +37,7 @@ app.use('/api/schools', schoolRoutes);
 app.use('/api/teachers', profeRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/class', classRoutes);
+app.use('/api/payments', paymentRoutes);
 app.use('/api', userRoutes);
 
 

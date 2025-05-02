@@ -29,14 +29,14 @@ module.exports = (sequelize, DataTypes) => {
       },
       course_price: {
         type: DataTypes.FLOAT,
-        allowNull: false
+        allowNull: false,
+        defaultValue: 0
       }
     },
     {
       sequelize,
       modelName: "Enrollment",
       timestamps: true
-
     }
   );
 

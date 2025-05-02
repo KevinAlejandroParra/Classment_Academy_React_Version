@@ -56,17 +56,29 @@ const SchoolDetailsPage = () => {
   const [school, setSchool] = useState<School | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const schoolId = params?.id
 
   const id = params?.id 
   useEffect(() => {
-    if (id) {
+    if (schoolId) {
       fetchSchoolDetails()
     }
-  }, [id])
+  }, [schoolId])
 
   const fetchSchoolDetails = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/schools/${params.id}`)
+      const token = localStorage.getItem("token")
+      if (!token) {
+        router.push("/login")
+        return
+      }
+
+      const response = await fetch(`http://localhost:5000/api/schools/${schoolId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      })
 
       if (!response.ok) throw new Error("Error al cargar los detalles de la escuela")
 
@@ -110,7 +122,7 @@ const SchoolDetailsPage = () => {
       })
 
       if (result.isConfirmed) {
-        const response = await fetch(`http://localhost:5000/api/students/enroll/${params.id}`, {
+        const response = await fetch(`http://localhost:5000/api/students/enroll/${schoolId}`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -166,7 +178,7 @@ const SchoolDetailsPage = () => {
       })
 
       if (result.isConfirmed) {
-        const response = await fetch(`http://localhost:5000/api/enrollments/schools/${params.id}/courses/${course_id}/enroll`, {
+        const response = await fetch(`http://localhost:5000/api/enrollments/schools/${schoolId}/courses/${course_id}/enroll`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,

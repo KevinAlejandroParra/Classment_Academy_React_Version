@@ -31,21 +31,9 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({ storage, fileFilter });
 
-// Rutas autenticación
-/**
- * @swagger
- * /user/login:
- *   post:
- *     description: Inicia sesión de un usuario
- *     responses:
- *       200:
- *         description: Login exitoso
- *       401:
- *         description: Credenciales incorrectas
- */
-router.post("/users",  UserController.createUser);
+// Rutas públicas (sin autenticación)
+router.post("/register", UserController.createUser); // Ruta para registro público
 router.post("/login", UserController.login);
-
 
 /**
  * @swagger
@@ -73,21 +61,11 @@ router.post("/forgot-password", UserController.forgotPassword);
  */
 router.post("/reset-password", UserController.resetPassword);
 
-/**
- * @swagger
- * /user/auth/me:
- *   get:
- *     description: Verifica el token y devuelve los detalles del usuario autenticado
- *     responses:
- *       200:
- *         description: Información del usuario autenticado
- *       401:
- *         description: Token inválido o no proporcionado
- */
+// Rutas protegidas (requieren autenticación)
 router.get("/auth/me", verifyToken, UserController.validateToken);
-
-// Rutas protegidas
-router.use(verifyToken);
+router.get("/users/:id", verifyToken, checkRole([2, 3, 4]), UserController.getUser);
+router.post("/users", verifyToken, checkRole([2, 4]), UserController.createUser); // Ruta para crear usuarios desde el panel admin
+router.delete("/users/:id", verifyToken, checkRole([2, 4]), UserController.deleteUser);
 
 /**
  * @swagger
@@ -103,26 +81,6 @@ router.use(verifyToken);
 
 /**
  * @swagger
- * /user/users/{id}:
- *   get:
- *     description: Obtiene los detalles de un usuario por ID (solo administradores, coordinadores)
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: El ID del usuario a obtener
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Detalles del usuario
- *       404:
- *         description: Usuario no encontrado
- */
-router.get("/users/:id", checkRole([2, 3, 4]), UserController.getUser);
-
-/**
- * @swagger
  * /user/users:
  *   post:
  *     description: Crea un nuevo usuario (solo administradores y coordinadores)
@@ -133,28 +91,6 @@ router.get("/users/:id", checkRole([2, 3, 4]), UserController.getUser);
  *         description: No autorizado para crear usuarios
  */
 router.post("/users", checkRole([2, 4]), UserController.createUser);
-
-/**
- * @swagger
- * /user/users/{id}:
- *   delete:
- *     description: Elimina un usuario por su ID (solo administradores y coordinadores)
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: El ID del usuario a eliminar
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Usuario eliminado con éxito
- *       404:
- *         description: Usuario no encontrado
- */
-router.delete("/users/:id", checkRole([2, 4]), UserController.deleteUser);
-
-// Rutas específicas
 
 /**
  * @swagger
@@ -182,7 +118,6 @@ router.get("/my-courses", UserController.getUserCourses);
  */
 router.get("/my-schools", UserController.getUserSchools);
 router.put("/users/:id", upload.single("imagen"), UserController.updateUser);
-
 
 /**
  * @swagger

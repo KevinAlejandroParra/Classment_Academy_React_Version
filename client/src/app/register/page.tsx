@@ -196,18 +196,32 @@ const Register: React.FC = () => {
     setIsLoading(true)
 
     try {
+      // Log para ver los datos del formulario
+      console.log("Datos del formulario:", formData)
+
       // Validaciones en el frontend
-      if (
-        !formData.user_name ||
-        !formData.user_lastname ||
-        !formData.user_email ||
-        !formData.user_password ||
-        !formData.user_phone ||
-        !formData.user_birth ||
-        !formData.user_document ||
-        !formData.user_document_type ||
-        !formData.role_id
-      ) {
+      const requiredFields = [
+        'user_name',
+        'user_lastname',
+        'user_email',
+        'user_password',
+        'user_phone',
+        'user_birth',
+        'user_document',
+        'user_document_type',
+        'role_id'
+      ]
+
+      // Verificar campos requeridos
+      const missingFields = requiredFields.filter(field => !formData[field as keyof typeof formData])
+      
+      // Si el rol es coordinador, verificar también school_id
+      if (formData.role_id === "3" && !formData.school_id) {
+        missingFields.push('school_id')
+      }
+
+      if (missingFields.length > 0) {
+        console.log("Campos faltantes:", missingFields)
         throw new Error("Todos los campos son requeridos")
       }
 
@@ -236,22 +250,20 @@ const Register: React.FC = () => {
       // Asegurar que la fecha esté en formato YYYY-MM-DD
       const formattedDate = new Date(formData.user_birth).toISOString().split("T")[0]
 
-      // Convertir role_id a número y preparar datos
+      // Preparar datos para enviar
       const userData = {
-        user: {
-          ...formData,
-          role_id: Number.parseInt(formData.role_id),
-          user_birth: formattedDate,
-          user_image: "images/users/default.jpg",
-          // Solo incluir school_id si el rol no es profesor
-          school_id: formData.role_id !== "2" ? formData.school_id : undefined
-        }
+        ...formData,
+        role_id: Number.parseInt(formData.role_id),
+        user_birth: formattedDate,
+        user_image: "images/users/default.jpg",
+        // Solo incluir school_id si el rol no es profesor
+        school_id: formData.role_id !== "2" ? formData.school_id : undefined
       };
 
-      console.log("Enviando datos:", userData)
+      console.log("Datos a enviar al servidor:", userData)
       showToast("info", "Procesando registro...")
 
-      const response = await fetch("http://localhost:5000/api/users", {
+      const response = await fetch("http://localhost:5000/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -263,6 +275,7 @@ const Register: React.FC = () => {
       })
 
       const result = await response.json()
+      console.log("Respuesta del servidor:", result)
 
       if (!response.ok) {
         throw new Error(result.message || "Error al registrar usuario")
@@ -341,7 +354,6 @@ const Register: React.FC = () => {
           isSelect: true,
           options: [
             { value: "1", label: "Estudiante" },
-            { value: "2", label: "Profesor" },
             { value: "3", label: "Coordinador" },
           ],
         },

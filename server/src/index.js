@@ -1,6 +1,9 @@
 require('dotenv').config();
 const express = require("express");
+const bodyParser = require('body-parser');
+const morgan = require("morgan");
 const cors = require("cors");
+const paymentRoutes = require("./routes/paymentRoutes.js");
 const userRoutes = require("./routes/user.routes.js");
 const schoolRoutes = require("./routes/school.routes.js");
 const courseRoutes = require("./routes/course.routes.js");
@@ -8,7 +11,6 @@ const teacherRoutes = require("./routes/teacher.js");
 const profeRoutes = require("./routes/profe.routes.js");
 const classRoutes = require("./routes/classRoutes.js")
 const attendanceRoutes = require("./routes/attendanceRoutes.js")
-const paymentRoutes = require("./routes/paymentRoutes.js")
 const errorHandler = require("./middleware/errorHandler.js");
 const path = require('path');
 const enrollmentRoutes = require('./routes/enrollment.routes');
@@ -18,14 +20,18 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
 
 // Configuración de CORS
-app.use(
-    cors({
-        origin: ["http://localhost:3000", "http://localhost:8081", "exp://localhost:8081"],
-        credentials: true,
-    })
-);
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+app.use(morgan("dev"));
 app.use(express.json());
-
+app.use(bodyParser.json({
+    verify: (req, res, buf) => {
+      req.rawBody = buf.toString();
+    }
+  }));
 // Swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
@@ -33,11 +39,11 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/images", express.static(path.join(__dirname, "..", "public", "images")));
 
 // Rutas públicas
+app.use('/api/payments', paymentRoutes);
 app.use('/api/schools', schoolRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/teachers', profeRoutes);
 app.use('/api/class', classRoutes);
-app.use('/api/payments', paymentRoutes);
 app.use('/api', userRoutes);
 
 

@@ -25,46 +25,54 @@ export default function PaymentSuccessPage() {
   // Obtener parámetros de la URL
   const paymentId = searchParams.get('external_reference')
   
-  useEffect(() => {
-    const verifyPayment = async () => {
-      if (!paymentId) {
-        setError("No se encontró información del pago")
-        setLoading(false)
+  const verifyPayment = async (retryCount = 0) => {
+    try {
+      if (!paymentId) throw new Error("ID de pago no encontrado")
+      
+      const token = localStorage.getItem("token")
+      if (!token) {
+        router.push('/login')
         return
       }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/payments/status/${paymentId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
+        }
+      })
+
+      const data = await response.json()
       
-      try {
-        const token = localStorage.getItem("token")
-        
-        if (!token) {
-          router.push('/login')
-          return
-        }
-        
-        // Verificar el estado del pago
-        const response = await fetch(`http://localhost:5000/api/payments/status/${paymentId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        })
-        
-        const data = await response.json()
-        
-        if (response.ok && data.success) {
-          setEnrollmentData(data.data)
-        } else {
-          setError(data.message || "Error al verificar el pago")
-        }
-      } catch (err) {
-        console.error(err)
-        setError("Error de conexión al servidor")
-      } finally {
-        setLoading(false)
+      if (data.data.status === 'pending' && retryCount < 5) {
+        await new Promise(resolve => setTimeout(resolve, 2000))
+        return verifyPayment(retryCount + 1)
       }
+
+      if (!data.success) throw new Error(data.message)
+      
+      setEnrollmentData(data.data)
+    } catch (error) {
+      // Handle unknown error type
+      if (error instanceof Error) {
+        setError(error.message)
+      } else {
+        setError("Error desconocido")
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (!paymentId) {
+      setError("No se encontró referencia de pago")
+      setLoading(false)
+      return
     }
     
     verifyPayment()
-  }, [paymentId, router])
+  }, [paymentId])
   
   return (
     <main className="min-h-screen">
@@ -144,3 +152,4 @@ export default function PaymentSuccessPage() {
     </main>
   )
 }
+

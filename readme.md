@@ -51,6 +51,11 @@ Eliminar los datos cargados previamente por los seeders:
 npm run db:seed:undo
 ```
 
+Resetear las migraciones y semilleros
+```sh
+npm run db:reset
+
+
 ---
 ## Autor
 **Kevin Alejandro Parra Cifuentes**

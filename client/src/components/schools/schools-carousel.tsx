@@ -40,14 +40,14 @@ export function SchoolsCarousel() {
       console.log("Iniciando petición a la API de escuelas...")
 
       // Obtener el token del localStorage
-    
-      
+      const token = localStorage.getItem("token");
       // Intentar hacer la petición con manejo de errores mejorado
       let response
       try {
         response = await fetch(`${API_BASE_URL}/api/schools`, {
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {})
           }
         })
         console.log("Respuesta recibida:", response.status)

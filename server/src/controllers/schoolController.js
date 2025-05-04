@@ -2,23 +2,44 @@ const { School, Course, User, UserSchoolRole } = require('../models');
 const asyncHandler = require('../middleware/asyncHandler');
 
 // Obtener todas las escuelas
-exports.getAllSchools = (async (req, res) => {
+exports.getAllSchools = asyncHandler(async (req, res) => {
+  if (!req.user) {
+    const error = new Error('Usuario no autenticado');
+    error.statusCode = 401;
+    throw error;
+  }
+
+  const user_id = req.user.user_id;
+  const role_id = req.user.role_id;
+
   let schools;
 
   try {
-    schools = await School.findAll({
-      include: [{
-        model: User,
-        as: 'users',
-        through: {
-          attributes: ['role_id'] 
-        },
-        attributes: ['user_id', 'user_name', 'user_lastname', 'user_email']
-      }]
-    });
-
-    console.log('Schools found:', schools.length);
-    
+    // Si es admin (role_id 3), solo mostrar sus escuelas
+    if (role_id === 3) {
+      schools = await School.findAll({
+        include: [{
+          model: User,
+          as: 'users',
+          where: { user_id: user_id },
+          through: {
+            attributes: ['role_id']
+          },
+          attributes: ['user_id', 'user_name', 'user_lastname', 'user_email']
+        }]
+      });
+    } else {
+      schools = await School.findAll({
+        include: [{
+          model: User,
+          as: 'users',
+          through: {
+            attributes: ['role_id']
+          },
+          attributes: ['user_id', 'user_name', 'user_lastname', 'user_email']
+        }]
+      });
+    }
     return res.status(200).json({
       success: true,
       data: schools

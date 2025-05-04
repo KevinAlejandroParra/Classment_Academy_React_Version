@@ -4,6 +4,8 @@ const schoolController = require('../controllers/schoolController');
 const { verifyToken, checkRole } = require('../middleware/auth');
 
 
+// Rutas protegidas
+router.use(verifyToken);
 /**
  * @swagger
  * /school:
@@ -71,8 +73,7 @@ router.get('/:id', schoolController.getSchoolById);
  *       500:
  *         description: Error interno del servidor
  */
-// Rutas protegidas
-router.use(verifyToken);
+
 
 router.post('/', checkRole([3, 4]), schoolController.createSchool);
 

@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
-import { motion } from "framer-motion"
+import { animate, motion } from "framer-motion"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   faHome,
@@ -11,9 +11,15 @@ import {
   faPhone,
   faEnvelope,
   faMapMarkerAlt,
+  faSpinner,
+  faBuilding,
+  faBook,
 } from "@fortawesome/free-solid-svg-icons"
 import Link from "next/link"
 import Swal from "sweetalert2"
+import Image from "next/image"
+import { Particles } from "@/components/particles"
+import { Sidebar } from "@/components/sidebar"
 
 interface School {
   school_id: string
@@ -33,6 +39,13 @@ interface School {
     course_id: string
     course_name: string
     course_description: string
+    course_duration: string
+    teacher?: {
+      user_id: string
+      user_name: string
+      user_lastname: string
+      user_email: string
+    }
   }>
 }
 
@@ -158,6 +171,8 @@ const SchoolsPage = () => {
       animate={{ opacity: 1 }}
       className="min-h-screen w-full relative overflow-hidden bg-black"
     >
+      <Particles />
+      <Sidebar />
       {/* Header */}
       <div className="fixed top-0 left-0 right-0 bg-black/50 backdrop-blur-md z-40 border-b border-[rgba(var(--primary-rgb),0.2)]">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -193,57 +208,60 @@ const SchoolsPage = () => {
                 className="backdrop-blur-xl bg-black/10 p-6 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)]"
               >
                 <div className="flex items-center gap-4 mb-4">
-                  <div >
+                  <div className="bg-[rgb(var(--primary-rgb))] p-4 rounded-lg">
                     {school.school_image ? (
                       <img
-                        src={`http://localhost:5000${school.school_image}`}
+                        src={school.school_image}
                         alt={school.school_name}
-                        className="w-full h-auto object-cover rounded"
+                        className="w-8 h-8 object-cover rounded"
                       />
                     ) : (
-                      <FontAwesomeIcon icon={faSchool} className="text-4xl text-black" />
+                      <FontAwesomeIcon icon={faSchool} className="text-2xl text-black" />
                     )}
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-white">{school.school_name}</h3>
-                    <p className="text-gray-400 text-sm">{school.school_description}</p>
+                    <h2 className="text-xl font-bold mb-2">{school.school_name}</h2>
+                    <p className="text-sm opacity-70 mb-4 line-clamp-2">{school.school_description}</p>
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                      <div className="flex items-center gap-2">
+                        <FontAwesomeIcon icon={faBook} className="text-[rgb(var(--primary-rgb))]" />
+                        <span className="text-sm">{school.courses?.length || 0} cursos</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <FontAwesomeIcon icon={faUser} className="text-[rgb(var(--primary-rgb))]" />
+                        <span className="text-sm">{school.coordinators?.length || 0} coordinadores</span>
+                      </div>
+                    </div>
+                    <div className="space-y-2 mb-6">
+                      <div className="flex items-center gap-2">
+                        <FontAwesomeIcon icon={faPhone} className="text-[rgb(var(--primary-rgb))]" />
+                        <span className="text-sm">{school.school_phone}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <FontAwesomeIcon icon={faEnvelope} className="text-[rgb(var(--primary-rgb))]" />
+                        <span className="text-sm">{school.school_email}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <FontAwesomeIcon icon={faMapMarkerAlt} className="text-[rgb(var(--primary-rgb))]" />
+                        <span className="text-sm line-clamp-1">{school.school_address}</span>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <button
+                        onClick={() => handleEnroll(school.school_id)}
+                        className="bg-[rgb(var(--primary-rgb))] text-black px-4 py-2 rounded-lg hover:bg-[rgba(var(--primary-rgb),0.9)] transition-colors"
+                      >
+                        Inscribirse
+                      </button>
+                      <Link
+                        href={`/student/schools/${school.school_id}`}
+                        className="text-[rgb(var(--primary-rgb))] flex items-center gap-2 hover:text-[rgba(var(--primary-rgb),0.9)] transition-colors"
+                      >
+                        Ver detalles
+                        <FontAwesomeIcon icon={faArrowRight} />
+                      </Link>
+                    </div>
                   </div>
-                </div>
-
-                <div className="space-y-2 text-gray-300 text-sm mb-4">
-                  <div className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faEnvelope} className="text-[rgb(var(--primary-rgb))]" />
-                    <span>{school.school_email}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faPhone} className="text-[rgb(var(--primary-rgb))]" />
-                    <span>{school.school_phone}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faMapMarkerAlt} className="text-[rgb(var(--primary-rgb))]" />
-                    <span>{school.school_address}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faUser} className="text-[rgb(var(--primary-rgb))]" />
-                    <span>
-                      Coordinador: {
-                        school.coordinators && school.coordinators.length > 0
-                          ? `${school.coordinators[0].user_name} ${school.coordinators[0].user_lastname}`
-                          : "No asignado"
-                      }
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center">
-
-                  <Link
-                    href={`/student/schools/${school.school_id}`}
-                    className="text-[rgb(var(--primary-rgb))] flex items-center gap-2 hover:text-[rgba(var(--primary-rgb),0.9)] transition-colors"
-                  >
-                    Ver detalles
-                    <FontAwesomeIcon icon={faArrowRight} />
-                  </Link>
                 </div>
               </motion.div>
             ))}

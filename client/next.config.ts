@@ -10,6 +10,8 @@ const config: NextConfig = {
         pathname: '/**',
       },
     ],
+    domains: ['localhost'],
+    unoptimized: true, // Desactivar la optimización de imágenes temporalmente
   },
 }
  

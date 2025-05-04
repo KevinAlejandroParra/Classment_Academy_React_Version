@@ -32,7 +32,7 @@ exports.getAllSchools = (async (req, res) => {
 // Obtener una escuela por ID con sus cursos
 exports.getSchoolById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  
+  console.log('ID recibido:', id);
   const school = await School.findByPk(id, {
     include: [
       { 
@@ -63,17 +63,114 @@ exports.getSchoolById = asyncHandler(async (req, res) => {
     throw error;
   }
 
-  // Formatear la respuesta para incluir coordinadores
-  const formattedSchool = {
-    ...school.toJSON(),
-    coordinators: school.users || [],
-  };
-  delete formattedSchool.users;
-  
-  return res.status(200).json({
-    success: true,
-    data: formattedSchool
-  });
+  try {
+    console.log('Buscando escuela con ID:', id);
+    
+    // Primero verificar si la escuela existe
+    const schoolExists = await School.findByPk(id);
+    if (!schoolExists) {
+      console.log('Escuela no encontrada');
+      return res.status(404).json({
+        success: false,
+        message: 'Escuela no encontrada'
+      });
+    }
+
+
+    console.log('Escuela encontrada, buscando detalles...');
+
+    // Obtener la escuela con sus relaciones
+    const school = await School.findByPk(id, {
+      include: [
+        { 
+          model: Course, 
+          as: 'courses',
+          attributes: ['course_id', 'course_name', 'course_description', 'course_duration'],
+          required: false,
+          include: [{
+            model: User,
+            as: 'teachers',
+            through: {
+              attributes: []
+            },
+            attributes: ['user_id', 'user_name', 'user_lastname', 'user_email'],
+            required: false
+          }]
+        },
+        {
+          model: User,
+          as: 'users',
+          through: {
+            where: { role_id: 4 },
+            attributes: ['role_id']
+          },
+          attributes: ['user_id', 'user_name', 'user_lastname', 'user_email'],
+          required: false
+        }
+      ]
+    });
+
+    if (!school) {
+      console.log('Error al cargar detalles de la escuela');
+      return res.status(500).json({
+        success: false,
+        message: 'Error al cargar los detalles de la escuela'
+      });
+    }
+
+    console.log('Detalles de la escuela cargados, formateando respuesta...');
+
+    // Formatear la respuesta
+    const formattedSchool = {
+      school_id: school.school_id,
+      school_name: school.school_name,
+      school_description: school.school_description,
+      school_phone: school.school_phone ? school.school_phone.toString() : '',
+      school_address: school.school_address,
+      school_image: school.school_image,
+      school_email: school.school_email,
+      coordinators: school.users ? school.users.map(user => ({
+        user_id: user.user_id,
+        user_name: user.user_name,
+        user_lastname: user.user_lastname,
+        user_email: user.user_email
+      })) : [],
+      courses: school.courses ? school.courses.map(course => {
+        const courseData = {
+          course_id: course.course_id,
+          course_name: course.course_name,
+          course_description: course.course_description,
+          course_duration: course.course_duration
+        };
+
+        if (course.teachers && course.teachers.length > 0) {
+          const teacher = course.teachers[0];
+          courseData.teacher = {
+            user_id: teacher.user_id,
+            user_name: teacher.user_name,
+            user_lastname: teacher.user_lastname,
+            user_email: teacher.user_email
+          };
+        }
+
+        return courseData;
+      }) : []
+    };
+
+    console.log('Respuesta formateada, enviando...');
+    
+    return res.status(200).json({
+      success: true,
+      data: formattedSchool
+    });
+  } catch (error) {
+    console.error('Error en getSchoolById:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error al obtener los detalles de la escuela',
+      error: error.message
+    });
+  }
 });
 
 // Crear una nueva escuela

@@ -1,8 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useParams } from "next/navigation"
 import { motion } from "framer-motion"
-import { useParams } from "next/navigation"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   faHome,
@@ -44,25 +43,22 @@ interface School {
   }>
 }
 
-interface Props {
-  params: {
-    id: string
-  }
-}
-
 const SchoolDetailsPage = () => {
-  const params = useParams<{ id: string }>()
   const router = useRouter()
+  const params = useParams();
+  const schoolId = typeof params.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : '';
   const [school, setSchool] = useState<School | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const schoolId = params?.id
 
-  const id = params?.id 
   useEffect(() => {
     if (schoolId) {
       fetchSchoolDetails()
+    } else {
+      setError('ID de escuela no válido')
+      setLoading(false)
     }
+    // eslint-disable-next-line
   }, [schoolId])
 
   const fetchSchoolDetails = async () => {
@@ -80,7 +76,10 @@ const SchoolDetailsPage = () => {
         },
       })
 
-      if (!response.ok) throw new Error("Error al cargar los detalles de la escuela")
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Error al cargar los detalles de la escuela")
+      }
 
       const data = await response.json()
       setSchool(data.data)
@@ -261,11 +260,11 @@ const SchoolDetailsPage = () => {
       <main className="container mx-auto px-4 pt-24 pb-12">
         <div className="backdrop-blur-xl bg-black/10 p-8 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)] mb-8">
           <div className="flex items-center gap-6 mb-8">
-            <div >
+            <div>
               {school.school_image ? (
                 <img
-                src={`http://localhost:5000${school.school_image}`}
-                alt={school.school_name}
+                  src={school.school_image}
+                  alt={school.school_name}
                   className="w-24 h-24 object-cover rounded"
                 />
               ) : (
@@ -317,8 +316,6 @@ const SchoolDetailsPage = () => {
               )}
             </div>
           </div>
-
-
         </div>
 
         {/* Cursos */}
@@ -343,12 +340,9 @@ const SchoolDetailsPage = () => {
                       <h3 className="text-xl font-semibold text-white">{course.course_name}</h3>
                     </div>
                   </div>
-                  
                   <div className="space-y-3 mb-6">
                     <p className="text-gray-300">{course.course_description}</p>
-
                   </div>
-
                   <div className="mt-auto flex gap-2">
                     <div className="flex justify-between items-center">
                       <Link
@@ -369,4 +363,4 @@ const SchoolDetailsPage = () => {
   )
 }
 
-export default SchoolDetailsPage 
+export default SchoolDetailsPage

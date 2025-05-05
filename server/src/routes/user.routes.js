@@ -64,7 +64,7 @@ router.post("/reset-password", UserController.resetPassword);
 // Rutas protegidas (requieren autenticación)
 router.get("/auth/me", verifyToken, UserController.validateToken);
 router.get("/users/:id", verifyToken, checkRole([2, 3, 4]), UserController.getUser);
-router.post("/users", verifyToken, checkRole([2, 4]), UserController.createUser); // Ruta para crear usuarios desde el panel admin
+router.post("/users", verifyToken, checkRole([3, 4]), UserController.createUser); // Ruta para crear usuarios desde el panel admin
 router.delete("/users/:id", verifyToken, checkRole([2, 4]), UserController.deleteUser);
 
 /**
@@ -90,7 +90,7 @@ router.delete("/users/:id", verifyToken, checkRole([2, 4]), UserController.delet
  *       403:
  *         description: No autorizado para crear usuarios
  */
-router.post("/users", checkRole([2, 4]), UserController.createUser);
+router.post("/users", verifyToken, checkRole([3, 4]), UserController.createUser);
 
 /**
  * @swagger

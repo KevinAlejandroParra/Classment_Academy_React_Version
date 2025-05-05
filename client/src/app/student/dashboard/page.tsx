@@ -46,6 +46,7 @@ interface User {
   name?: string        // Otra posible estructura 
   email: string
   role_id?: number
+  pending_admin?: boolean
 }
 
 const UserEnrollmentsPage = () => {
@@ -222,6 +223,8 @@ const UserEnrollmentsPage = () => {
     }
   }
 
+  const isPendingAdmin = user && !!user.pending_admin;
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -288,6 +291,13 @@ const UserEnrollmentsPage = () => {
           </div>
         </div>
       </header>
+
+      {isPendingAdmin && (
+        <div className="max-w-2xl mx-auto mt-8 mb-4 p-4 bg-yellow-900/80 border-l-4 border-yellow-400 rounded-xl text-yellow-200 shadow-lg text-center">
+          <FontAwesomeIcon icon="exclamation-triangle" className="mr-2 text-yellow-400" />
+          <span>Tu solicitud para ser <b>Administrador</b> está pendiente de aprobación por el regulador. Mientras tanto, tienes acceso como estudiante.</span>
+        </div>
+      )}
 
       {/* Contenido principal */}
       <main className="container mx-auto px-4 pt-24 pb-16">

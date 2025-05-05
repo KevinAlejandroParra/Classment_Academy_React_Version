@@ -34,11 +34,21 @@ interface Administrator {
   schools: School[]
 }
 
+interface PendingAdmin {
+  user_id: string
+  user_name: string
+  user_lastname: string
+  user_email: string
+}
+
 const RegulatorDashboard = () => {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [administrators, setAdministrators] = useState<Administrator[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [pendingAdmins, setPendingAdmins] = useState<PendingAdmin[]>([])
+  const [loadingPendingAdmins, setLoadingPendingAdmins] = useState(true)
+  const [errorPendingAdmins, setErrorPendingAdmins] = useState<string | null>(null)
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -172,6 +182,61 @@ const RegulatorDashboard = () => {
     })
   }
 
+  const fetchPendingAdmins = async () => {
+    setLoadingPendingAdmins(true)
+    setErrorPendingAdmins(null)
+    try {
+      const token = localStorage.getItem("token")
+      const res = await fetch("http://localhost:5000/api/admin/pending-admins", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
+      if (!data.success) throw new Error(data.message)
+      setPendingAdmins(data.data)
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Error al cargar solicitudes"
+      setErrorPendingAdmins(errorMessage)
+    } finally {
+      setLoadingPendingAdmins(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchPendingAdmins()
+  }, [])
+
+  const handleAction = async (userId: string, action: "approve" | "reject") => {
+    const token = localStorage.getItem("token")
+    const url = `http://localhost:5000/api/admin/${action}-admin/${userId}`
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
+      if (!data.success) throw new Error(data.message)
+      Swal.fire({
+        icon: "success",
+        title: action === "approve" ? "Aprobado" : "Rechazado",
+        text: data.message,
+        confirmButtonColor: "#FFD700",
+        background: "#1a1a1a",
+        color: "#fff",
+      })
+      fetchPendingAdmins()
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Error al procesar la solicitud"
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+        confirmButtonColor: "#FFD700",
+        background: "#1a1a1a",
+        color: "#fff",
+      })
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -297,8 +362,108 @@ const RegulatorDashboard = () => {
             </motion.div>
           ))}
         </div>
+        <PendingAdminsBlock />
       </main>
     </motion.div>
+  )
+}
+
+function PendingAdminsBlock() {
+  const [pendingAdmins, setPendingAdmins] = useState<PendingAdmin[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchPendingAdmins = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const token = localStorage.getItem("token")
+      const res = await fetch("http://localhost:5000/api/admin/pending-admins", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
+      if (!data.success) throw new Error(data.message)
+      setPendingAdmins(data.data)
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Error al cargar solicitudes"
+      setError(errorMessage)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchPendingAdmins()
+  }, [])
+
+  const handleAction = async (userId: string, action: "approve" | "reject") => {
+    const token = localStorage.getItem("token")
+    const url = `http://localhost:5000/api/admin/${action}-admin/${userId}`
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
+      if (!data.success) throw new Error(data.message)
+      Swal.fire({
+        icon: "success",
+        title: action === "approve" ? "Aprobado" : "Rechazado",
+        text: data.message,
+        confirmButtonColor: "#FFD700",
+        background: "#1a1a1a",
+        color: "#fff",
+      })
+      fetchPendingAdmins()
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Error al procesar la solicitud"
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+        confirmButtonColor: "#FFD700",
+        background: "#1a1a1a",
+        color: "#fff",
+      })
+    }
+  }
+
+  return (
+    <div className="bg-gray-900 rounded-xl p-6 mb-8 shadow-lg border border-gray-700">
+      <h2 className="text-2xl font-bold text-[#FFD700] mb-4">Solicitudes de Administrador Pendientes</h2>
+      {loading ? (
+        <div className="text-white">Cargando...</div>
+      ) : error ? (
+        <div className="text-red-500">{error}</div>
+      ) : pendingAdmins.length === 0 ? (
+        <div className="text-gray-400">No hay solicitudes pendientes.</div>
+      ) : (
+        <div className="space-y-4">
+          {pendingAdmins.map((user) => (
+            <div key={user.user_id} className="flex flex-col md:flex-row md:items-center md:justify-between bg-gray-800 rounded-lg p-4">
+              <div>
+                <div className="font-semibold text-white">{user.user_name} {user.user_lastname}</div>
+                <div className="text-gray-400 text-sm">{user.user_email}</div>
+              </div>
+              <div className="flex gap-2 mt-2 md:mt-0">
+                <button
+                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-semibold"
+                  onClick={() => handleAction(user.user_id, "approve")}
+                >
+                  Aprobar
+                </button>
+                <button
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold"
+                  onClick={() => handleAction(user.user_id, "reject")}
+                >
+                  Rechazar
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
 

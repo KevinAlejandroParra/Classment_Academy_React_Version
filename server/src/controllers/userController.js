@@ -6,6 +6,7 @@ const path = require("path");
 const asyncHandler = require("../middleware/asyncHandler");
 const { v4: uuidv4 } = require('uuid');
 const emailConfig = require('../config/emailConfig');
+const { createTransporter } = require('../config/emailConfig');
 
 // Configurar el transporter de nodemailer
 const transporter = nodemailer.createTransport({
@@ -72,6 +73,12 @@ class UserController {
     static async createUser(req, res) {
         try {
             const userJSON = req.body;
+
+            // Si intenta registrarse como admin, lo dejamos como estudiante y pendiente
+            if (parseInt(userJSON.role_id) === 3) {
+                userJSON.role_id = 1; // estudiante
+                userJSON.pending_admin = true;
+            }
 
             // Validaciones adicionales
             if (!userJSON.user_name || !userJSON.user_lastname || !userJSON.user_email || 
@@ -358,8 +365,15 @@ class UserController {
                     message: "Usuario inactivo, por favor contacte al administrador para mas información",
                 });
             }
-            // Si llegamos aquí, las credenciales son correctas
-            // Creamos el token JWT
+
+            // Si el usuario tiene pending_admin inicia sesion como estudiante
+            if (foundUser.pending_admin && foundUser.role_id === 3) {
+                return res.status(401).json({
+                    success: false,
+                    message: "Tu solicitud para ser administrador está pendiente de aprobación",
+                });
+            }
+            // token JWT
             const token = jwt.sign(
                 {
                     user_id: foundUser.user_id,
@@ -420,7 +434,8 @@ class UserController {
                     name: user.user_name,
                     lastname: user.user_lastname,
                     image: user.user_image,
-                    state: user.user_state
+                    state: user.user_state,
+                    pending_admin: user.pending_admin
                 }
             });
         } catch (error) {
@@ -1088,6 +1103,91 @@ class UserController {
             return res.status(500).json({
                 success: false,
                 message: "Error al cambiar el estado del administrador",
+                error: error.message
+            });
+        }
+    }
+
+    // Listar usuarios pendientes de admin
+    static async getPendingAdmins(req, res) {
+        try {
+            const pendingAdmins = await User.findAll({
+                where: { pending_admin: true },
+                attributes: { exclude: ["user_password"] }
+            });
+            res.status(200).json({
+                success: true,
+                data: pendingAdmins,
+                message: "Usuarios pendientes de ser administradores obtenidos correctamente"
+            });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: "Error al obtener usuarios pendientes de admin",
+                error: error.message
+            });
+        }
+    }
+
+    // Aprobar solicitud de admin
+    static async approveAdmin(req, res) {
+        try {
+            const { userId } = req.params;
+            const user = await User.findByPk(userId);
+            if (!user) {
+                return res.status(404).json({ success: false, message: "Usuario no encontrado" });
+            }
+            user.role_id = 3; // admin
+            user.pending_admin = false;
+            await user.save();
+
+            // Enviar correo de notificación
+            try {
+                const transporter = createTransporter();
+                await transporter.sendMail({
+                    from: `"Classment Academy" <${process.env.EMAIL_USER}>`,
+                    to: user.user_email,
+                    subject: "¡Has sido aprobado como Administrador!",
+                    html: `
+                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                            <h1 style="color: #333; text-align: center;">¡Felicidades!</h1>
+                            <p style="color: #666;">Tu solicitud para ser administrador ha sido <b>aprobada</b>.</p>
+                            <p style="color: #666;">Ya puedes ingresar al sistema con permisos de administrador.</p>
+                            <p style="color: #999; font-size: 12px;">Si tienes dudas, contacta al equipo de soporte.</p>
+                        </div>
+                    `
+                });
+            } catch (err) {
+                console.error("Error enviando correo de aprobación de admin:", err);
+                // No interrumpir el flujo si falla el correo
+            }
+
+            res.status(200).json({ success: true, message: "Usuario aprobado como administrador" });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: "Error al aprobar administrador",
+                error: error.message
+            });
+        }
+    }
+
+    // Rechazar solicitud de admin
+    static async rejectAdmin(req, res) {
+        try {
+            const { userId } = req.params;
+            const user = await User.findByPk(userId);
+            if (!user) {
+                return res.status(404).json({ success: false, message: "Usuario no encontrado" });
+            }
+            user.role_id = 1; // estudiante
+            user.pending_admin = false;
+            await user.save();
+            res.status(200).json({ success: true, message: "Solicitud de administrador rechazada" });
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: "Error al rechazar administrador",
                 error: error.message
             });
         }

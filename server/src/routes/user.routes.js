@@ -203,7 +203,7 @@ router.post("/enroll/:schoolId", checkRole([1]), UserController.enrollInSchool);
  *       403:
  *         description: No autorizado
  */
-router.get('/administrators', checkRole([4]), UserController.getAdministrators);
+router.get('/administrators', verifyToken, checkRole([4]), UserController.getAdministrators);
 
 /**
  * @swagger
@@ -223,6 +223,12 @@ router.get('/administrators', checkRole([4]), UserController.getAdministrators);
  *       404:
  *         description: Administrador no encontrado
  */
+
+
+// Rutas para el regulador
 router.put('/administrators/:id/toggle-state', checkRole([4]), UserController.toggleAdminState);
+router.get("/admin/pending-admins", verifyToken, checkRole([4]), UserController.getPendingAdmins);
+router.post("/admin/approve-admin/:userId", verifyToken, checkRole([4]), UserController.approveAdmin);
+router.post("/admin/reject-admin/:userId", verifyToken, checkRole([4]), UserController.rejectAdmin);
 
 module.exports = router;

@@ -215,8 +215,8 @@ const Register: React.FC = () => {
       // Verificar campos requeridos
       const missingFields = requiredFields.filter(field => !formData[field as keyof typeof formData])
       
-      // Si el rol es coordinador, verificar también school_id
-      if (formData.role_id === "3" && !formData.school_id) {
+      // Si el rol es coordinador o profesor, verificar también school_id
+      if ((formData.role_id === "4" || formData.role_id === "2") && !formData.school_id) {
         missingFields.push('school_id')
       }
 
@@ -256,8 +256,8 @@ const Register: React.FC = () => {
         role_id: Number.parseInt(formData.role_id),
         user_birth: formattedDate,
         user_image: "images/users/default.jpg",
-        // Solo incluir school_id si el rol no es profesor
-        school_id: formData.role_id !== "2" ? formData.school_id : undefined
+        // Solo incluir school_id si el rol es coordinador o profesor
+        school_id: (formData.role_id === "4" || formData.role_id === "2") ? formData.school_id : undefined
       };
 
       console.log("Datos a enviar al servidor:", userData)
@@ -354,21 +354,9 @@ const Register: React.FC = () => {
           isSelect: true,
           options: [
             { value: "1", label: "Estudiante" },
-            { value: "3", label: "Coordinador" },
+            { value: "3", label: "Coordinador" }, // admin pendiente
           ],
         },
-        {
-          name: "school_id",
-          label: "Escuela",
-          icon: faSchool,
-          isSelect: true,
-          options: schools.map(school => ({
-            value: school.school_id,
-            label: school.school_name
-          })),
-          showIf: formData.role_id === "3", // Solo mostrar si el rol es coordinador
-          required: true
-        }
       ],
     },
   ]

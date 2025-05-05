@@ -1070,8 +1070,9 @@ class UserController {
     static async toggleAdminState(req, res) {
         try {
             const { id } = req.params;
-            
+            console.log('toggleAdminState - ID recibido:', id);
             const user = await User.findByPk(id);
+            console.log('toggleAdminState - Usuario encontrado:', user ? user.toJSON() : null);
             if (!user) {
                 return res.status(404).json({
                     success: false,
@@ -1079,23 +1080,34 @@ class UserController {
                 });
             }
 
-            // Solo permitir cambiar estado de administradores
-            if (user.role_id !== 3) {
+            // Solo permitir cambiar estado de administradores o ex-admins
+            if (![1, 3].includes(user.role_id)) {
+                console.log('toggleAdminState - El usuario no es admin ni ex-admin, role_id:', user.role_id);
                 return res.status(403).json({
                     success: false,
-                    message: 'Solo se puede cambiar el estado de administradores'
+                    message: 'Solo se puede cambiar el estado de administradores o ex-administradores'
                 });
             }
 
-            const newState = user.user_state === 'activo' ? 'inactivo' : 'activo';
-            await user.update({ user_state: newState });
+            let newState, newRole;
+            if (user.user_state === 'activo') {
+                newState = 'inactivo';
+                newRole = 1; // estudiante
+            } else {
+                newState = 'activo';
+                newRole = 3; // admin
+            }
+
+            console.log('toggleAdminState - Actualizando a:', { user_state: newState, role_id: newRole });
+            await user.update({ user_state: newState, role_id: newRole });
 
             return res.status(200).json({
                 success: true,
                 message: `Estado del administrador actualizado a ${newState}`,
                 data: {
                     user_id: user.user_id,
-                    user_state: newState
+                    user_state: newState,
+                    role_id: newRole
                 }
             });
         } catch (error) {
@@ -1103,7 +1115,8 @@ class UserController {
             return res.status(500).json({
                 success: false,
                 message: "Error al cambiar el estado del administrador",
-                error: error.message
+                error: error.message,
+                stack: error.stack // Para depuración
             });
         }
     }

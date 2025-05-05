@@ -226,7 +226,7 @@ router.get('/administrators', verifyToken, checkRole([4]), UserController.getAdm
 
 
 // Rutas para el regulador
-router.put('/administrators/:id/toggle-state', checkRole([4]), UserController.toggleAdminState);
+router.put('/administrators/:id/toggle-state', verifyToken, checkRole([4]), UserController.toggleAdminState);
 router.get("/admin/pending-admins", verifyToken, checkRole([4]), UserController.getPendingAdmins);
 router.post("/admin/approve-admin/:userId", verifyToken, checkRole([4]), UserController.approveAdmin);
 router.post("/admin/reject-admin/:userId", verifyToken, checkRole([4]), UserController.rejectAdmin);

@@ -10,6 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons"
 import Link from "next/link"
 import Swal from "sweetalert2"
+import { param } from "framer-motion/client"
 
 interface School {
   school_id: string
@@ -19,7 +20,7 @@ interface School {
   school_phone: string
   school_address: string
   school_image: string
-  coordinators: [{
+  users: [{
     user_id: string
     user_name: string
     user_lastname: string
@@ -47,15 +48,13 @@ const SchoolsPage = () => {
       }
 
       console.log("Fetching schools...")
-      const response = await fetch("http://localhost:5000/api/schools", {
-        method: "GET",
+      const response = await fetch(`http://localhost:5000/api/my-schools`, {
         headers: {
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         credentials: "include",
       })
-
       console.log("Response status:", response.status)
       
       if (!response.ok) {
@@ -167,8 +166,8 @@ const SchoolsPage = () => {
                 </div>
                 <div className="text-gray-300 space-y-2">
                   <p>
-                    <strong>Coordinador:</strong> {school.coordinators && school.coordinators[0] ? 
-                      `${school.coordinators[0].user_name} ${school.coordinators[0].user_lastname}` : 
+                    <strong>Coordinador:</strong> {school.users && school.users[0] ? 
+                      `${school.users[0].user_name} ${school.users[0].user_lastname}` : 
                       'No asignado'}
                   </p>
                   <p>

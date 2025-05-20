@@ -28,7 +28,7 @@ export default function CoursesSchoolsListPage() {
           router.push("/login");
           return;
         }
-        const res = await fetch(`${API_BASE_URL}/api/schools`, {
+        const res = await fetch(`${API_BASE_URL}/api/schools/get-school`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error("Error al cargar las escuelas");

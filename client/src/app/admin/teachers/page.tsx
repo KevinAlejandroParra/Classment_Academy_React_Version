@@ -175,7 +175,7 @@ const TeachersPage = () => {
         setUser(data.user)
 
         // Obtener las escuelas del admin
-        const schoolResponse = await fetch(`http://localhost:5000/api/schools`, {
+        const schoolResponse = await fetch(`http://localhost:5000/api/schools/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -327,6 +327,7 @@ const TeachersPage = () => {
     } finally {
       setIsSubmitting(false)
     }
+    
   }
 
   const handleAssignTeacher = async (e: React.FormEvent) => {
@@ -389,12 +390,18 @@ const TeachersPage = () => {
         },
       })
 
+      // Log the response status and data
+      console.log("Response status:", response.status);
+      const data = await response.json();
+      console.log("Data received from API:", data); // Log the data received
+
       if (response.ok) {
-        const data = await response.json()
         setTeachers(data.data || [])
         // Guardar los cursos junto con la escuela seleccionada
         const schoolObj = schools.find((s) => s.school_id === schoolId)
         setSelectedSchool({ ...schoolObj, courses: data.courses || [] })
+      } else {
+        throw new Error(data.message || "Error al cargar los profesores");
       }
     } catch (error) {
       console.error("Error al cargar profesores:", error)

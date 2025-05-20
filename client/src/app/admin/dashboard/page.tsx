@@ -106,7 +106,7 @@ const AdminDashboard = () => {
         setUser(data.user)
         
         // Obtener las escuelas del administrador
-        const schoolResponse = await fetch(`http://localhost:5000/api/schools`, {
+        const schoolResponse = await fetch(`http://localhost:5000/api/schools/get-school`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -139,12 +139,12 @@ const AdminDashboard = () => {
     e.preventDefault()
     try {
       const token = localStorage.getItem("token")
-      const response = await fetch("http://localhost:5000/api/schools", {
-        method: "POST",
+      const response = await fetch(`http://localhost:5000/api/schools`, {
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
+        method: "POST",
         credentials: "include",
         body: JSON.stringify({
           school_name: newSchool.school_name,
@@ -153,7 +153,7 @@ const AdminDashboard = () => {
           school_address: newSchool.school_address,
           school_image: newSchool.school_image,
           school_email: newSchool.school_email,
-          teacher_id: user.id
+          teacher_id: user.id,
         }),
       })
 

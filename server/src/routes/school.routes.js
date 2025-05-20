@@ -4,8 +4,7 @@ const schoolController = require('../controllers/schoolController');
 const { verifyToken, checkRole } = require('../middleware/auth');
 
 
-// Rutas protegidas
-router.use(verifyToken);
+
 /**
  * @swagger
  * /school:
@@ -22,6 +21,8 @@ router.use(verifyToken);
  *         description: Error interno del servidor
  */
 router.get('/', schoolController.getAllSchools);
+router.get('/:id', schoolController.getSchoolById);
+
 
 /**
  * @swagger
@@ -43,7 +44,10 @@ router.get('/', schoolController.getAllSchools);
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/:id', schoolController.getSchoolById);
+router.use(verifyToken);
+
+router.get('/get-school/', schoolController.getAdminSchool);
+
 
 /**
  * @swagger

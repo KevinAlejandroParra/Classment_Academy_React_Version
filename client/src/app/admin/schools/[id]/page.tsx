@@ -55,7 +55,7 @@ const SchoolDetailsPage = ({ params }: Props) => {
         return
       }
 
-      const response = await fetch(`http://localhost:5000/api/schools/${params.id}`, {
+      const response = await fetch(`http://localhost:5000/api/schools/get-school`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

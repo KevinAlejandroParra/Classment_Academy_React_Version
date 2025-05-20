@@ -10,7 +10,7 @@ router.post('/', verifyToken, checkRole([3]), teacherController.createTeacher);
 router.post('/assign-course', verifyToken, checkRole([3]), teacherController.assignTeacherToCourse);
 
 // Obtener todos los profesores de una escuela
-router.get('/school/:school_id', verifyToken, checkRole([3]), teacherController.getSchoolTeachers);
+router.get('/school/:school_id', verifyToken, checkRole([2,3]), teacherController.getTeachersBySchool);
 
 // Obtener cursos asignados al profesor
 router.get('/courses', verifyToken, checkRole([2]), teacherController.getCourses);

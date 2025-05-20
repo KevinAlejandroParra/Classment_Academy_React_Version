@@ -3,6 +3,27 @@ const asyncHandler = require('../middleware/asyncHandler');
 
 // Obtener todas las escuelas
 exports.getAllSchools = asyncHandler(async (req, res) => {
+
+  const schools = await School.findAll({
+    include: [{
+      model: User,
+      as: 'users',
+      through: {
+        attributes: ['role_id']
+      },
+      attributes: ['user_id', 'user_name', 'user_lastname', 'user_email']
+    }]
+  });
+  
+  return res.status(200).json({
+    success: true,
+    data: schools
+  });
+});
+
+
+// Obtener escuela mediante ID de coordinador 
+exports.getAdminSchool = asyncHandler(async (req, res) => {
   if (!req.user) {
     const error = new Error('Usuario no autenticado');
     error.statusCode = 401;
@@ -49,7 +70,6 @@ exports.getAllSchools = asyncHandler(async (req, res) => {
     throw error;
   }
 });
-
 // Obtener una escuela por ID con sus cursos
 exports.getSchoolById = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -70,7 +90,7 @@ exports.getSchoolById = asyncHandler(async (req, res) => {
         model: User,
         as: 'users',
         through: {
-          where: { role_id: 4 }, // Solo coordinadores
+          where: { role_id: 4 }, 
           attributes: ['role_id']
         },
         attributes: ['user_id', 'user_name', 'user_lastname', 'user_email']
@@ -106,7 +126,7 @@ exports.getSchoolById = asyncHandler(async (req, res) => {
         { 
           model: Course, 
           as: 'courses',
-          attributes: ['course_id', 'course_name', 'course_description', 'course_duration'],
+          attributes: ['course_id', 'course_name', 'course_description'],
           required: false,
           include: [{
             model: User,

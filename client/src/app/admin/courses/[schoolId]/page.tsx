@@ -71,7 +71,7 @@ export default function CoursesAdminPage() {
           return;
         }
         const [schoolRes, coursesRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/api/schools/${schoolId}`, {
+          fetch(`${API_BASE_URL}/api/schools/get-school`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
           fetch(`${API_BASE_URL}/api/courses/school/${schoolId}`, {
@@ -278,7 +278,7 @@ export default function CoursesAdminPage() {
       <Particles />
       <div className="container mx-auto px-4 py-8 relative z-10">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-[#FFD700]">Cursos de {school.school_name}</h1>
+          <h1 className="text-3xl font-bold text-[#FFD700]">Administra tus cursos</h1>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -479,15 +479,7 @@ export default function CoursesAdminPage() {
                       className="w-full p-3 bg-gray-700/50 text-white rounded-lg border border-gray-600 focus:border-[#FFD700] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/50"
                     />
                   </div>
-                  <div>
-                    <label className="block text-gray-300 mb-2 text-sm font-medium">Escuela</label>
-                    <input
-                      type="text"
-                      value={school?.school_name || ""}
-                      disabled
-                      className="w-full p-3 bg-gray-700/50 text-white rounded-lg border border-gray-600 focus:border-[#FFD700] focus:outline-none focus:ring-2 focus:ring-[#FFD700]/50"
-                    />
-                  </div>
+                  
                 </div>
 
                 <div className="flex justify-end gap-3 mt-6">

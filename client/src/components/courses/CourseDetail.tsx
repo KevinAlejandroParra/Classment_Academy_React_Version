@@ -250,7 +250,7 @@ export default function CourseDetail() {
       }
       
       if (course) {
-        const response = await fetch(`http://localhost:5000/api/payments/create-payment`, {
+        const response = await fetch(`http://localhost:5000/api/payments/create`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,

@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const PaymentController = require('../controllers/paymentController');
 const { verifyToken } = require('../middleware/auth');
-const cors = require('cors');
 
 // Ruta para crear un nuevo pago
 router.post('/create', verifyToken, PaymentController.createPayment);

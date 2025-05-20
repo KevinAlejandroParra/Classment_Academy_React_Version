@@ -21,8 +21,7 @@ const swaggerDocument = require('./swagger.json');
 
 // Configuración de CORS
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    credentials: true,
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -41,17 +40,17 @@ app.use("/images", express.static(path.join(__dirname, "..", "public", "images")
 
 // Rutas públicas
 app.use('/api/payments', paymentRoutes);
-app.use('/api/schools', schoolRoutes);
 app.use('/api/courses', courseRoutes);
-app.use('/api/teachers', profeRoutes);
+app.use('/api/schools', schoolRoutes);
 app.use('/api/class', classRoutes);
 app.use('/api', userRoutes);
 
 
 // Rutas que pueden requerir autenticación
 app.use("/api/auth", userRoutes);
-app.use('/api/enrollments', enrollmentRoutes);
 app.use('/api/courseteacher', courseTeacherRoutes);
+app.use('/api/teachers', profeRoutes);
+app.use('/api/enrollments', enrollmentRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/teacher', teacherRoutes);
 

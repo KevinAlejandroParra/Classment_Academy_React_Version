@@ -559,7 +559,7 @@ class UserController {
                             as: 'school'
                         }]
                     }],
-                    attributes: ['enrollment_id', 'plan_type', 'status', 'start_date', 'end_date', 'progress']
+                    attributes: ['enrollment_id', 'status', 'progress']
                 });
     
                 coursesData = enrollments.map(enrollment => {
@@ -569,10 +569,7 @@ class UserController {
     
                     return {
                         enrollment_id: e.enrollment_id,
-                        plan_type: e.plan_type,
                         status: e.status,
-                        start_date: e.start_date,
-                        end_date: e.end_date,
                         progress: e.progress,
                         course_id: course.course_id,
                         course_name: course.course_name,
@@ -584,7 +581,7 @@ class UserController {
                             school_image: school.school_image,
                             school_email: school.school_email
                         },
-                        access_type: 'student' // Indica que es un curso como estudiante
+                        access_type: 'student' 
                     };
                 });
             }
@@ -623,9 +620,9 @@ class UserController {
                                     school_image: school.school_image,
                                     school_email: school.school_email
                                 },
-                                access_type: usr.role_id === 2 ? 'teacher' : 'admin', // Tipo de acceso
-                                user_role_id: usr.role_id, // Rol específico en esta escuela
-                                school_role: usr.role_id // Podríamos añadir más info del rol si es necesario
+                                access_type: usr.role_id === 2 ? 'teacher' : 'admin', 
+                                user_role_id: usr.role_id, 
+                                school_role: usr.role_id 
                             });
                         });
                     }
@@ -720,7 +717,7 @@ class UserController {
                             include: [
                                 {
                                     model: School,
-                                    as: "school",
+                                    as: "school", 
                                     attributes: [
                                         "school_id",
                                         "school_name",
@@ -733,7 +730,6 @@ class UserController {
                             ],
                         },
                     ],
-                    attributes: ["enrollment_id", "start_date", "end_date"],
                 });
 
                 // Mapear escuelas únicas

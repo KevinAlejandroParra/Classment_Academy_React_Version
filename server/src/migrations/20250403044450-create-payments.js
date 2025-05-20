@@ -1,7 +1,7 @@
 'use strict';
 /** @type {import('sequelize-cli').Migration} */module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('payments', { // ← Nota: minúsculas para consistencia
+    await queryInterface.createTable('payments', { 
       payment_id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
@@ -55,10 +55,10 @@
       type: 'foreign key',
       name: 'fk_payments_user',
       references: {
-        table: 'users', // ← Nombre exacto de la tabla (minúsculas)
+        table: 'users', 
         field: 'user_id'
       },
-      onDelete: 'RESTRICT', // o 'CASCADE' según tu necesidad
+      onDelete: 'RESTRICT', 
       onUpdate: 'CASCADE'
     });
 
@@ -68,7 +68,7 @@
       type: 'foreign key',
       name: 'fk_payments_course',
       references: {
-        table: 'courses', // ← Nombre exacto de la tabla
+        table: 'courses', 
         field: 'course_id'
       },
       onDelete: 'RESTRICT',

@@ -103,7 +103,7 @@ router.post("/users", verifyToken, checkRole([3, 4]), UserController.createUser)
  *       401:
  *         description: Usuario no autenticado
  */
-router.get("/my-courses", UserController.getUserCourses);
+router.get("/my-courses" , verifyToken, UserController.getUserCourses);
 
 /**
  * @swagger
@@ -116,7 +116,7 @@ router.get("/my-courses", UserController.getUserCourses);
  *       401:
  *         description: Usuario no autenticado
  */
-router.get("/my-schools", UserController.getUserSchools);
+router.get("/my-schools", verifyToken, UserController.getUserSchools);
 router.put("/users/:id", upload.single("imagen"), UserController.updateUser);
 
 /**

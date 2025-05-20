@@ -54,6 +54,11 @@ module.exports = {
                 defaultValue: "activo",
                 allowNull: false,
             },
+            pending_admin: {
+                type: Sequelize.BOOLEAN,
+                defaultValue: false,
+                allowNull: false,
+            },
             createdAt: {
                 type: Sequelize.DATE,
                 defaultValue: Sequelize.NOW,

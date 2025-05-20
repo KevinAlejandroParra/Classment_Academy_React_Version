@@ -393,7 +393,7 @@ exports.assignTeacherToCourse = asyncHandler(async (req, res) => {
 });
 
 // Obtener todos los profesores de una escuela
-exports.getSchoolTeachers = asyncHandler(async (req, res) => {
+exports.getTeachersBySchool = asyncHandler(async (req, res) => {
   const { school_id } = req.params;
 
   // Verificar que el usuario que hace la petición es admin de la escuela

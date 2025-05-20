@@ -103,6 +103,11 @@ CourseTeacher.belongsTo(User, { foreignKey: "teacher_id", as: "teacher" });
 UserSchoolRole.belongsTo(User, { foreignKey: "user_id", as: "user" });
 UserSchoolRole.belongsTo(School, { foreignKey: "school_id", as: "school" });
 UserSchoolRole.belongsTo(Role, { foreignKey: "role_id", as: "role" });
+Enrollment.belongsTo(Course, { foreignKey: "course_id", as: "course" });
+Course.hasMany(Enrollment, { foreignKey: "course_id", as: "enrollments" });
+Enrollment.belongsTo(User, { foreignKey: "user_id", as: "student" });
+User.hasMany(Enrollment, { foreignKey: "user_id", as: "enrollments" });
+
 
 // Class
 Course.hasMany(Class, { as: "classes", foreignKey: "course_id" });

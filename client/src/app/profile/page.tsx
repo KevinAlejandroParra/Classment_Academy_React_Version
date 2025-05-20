@@ -168,15 +168,10 @@ const ProfilePage = () => {
           setUserData(userData.user);
           setEditForm(userData.user);
 
-          // Fetch cursos del usuario según su rol
+          // Fetch cursos del usuario 
           let coursesEndpoint = "";
-          if (userData.user.role_id === 1) {
-            coursesEndpoint = "http://localhost:5000/api/my-courses";
-          } else if (userData.user.role_id === 2) {
-            coursesEndpoint = "http://localhost:5000/api/teacher/courses";
-          } else if (userData.user.role_id === 3) {
-            coursesEndpoint = "http://localhost:5000/api/admin/courses";
-          }
+         coursesEndpoint = "http://localhost:5000/api/my-courses";
+         
 
           if (coursesEndpoint) {
             try {
@@ -202,13 +197,8 @@ const ProfilePage = () => {
           // Fetch escuelas del usuario
           try {
             let schoolsEndpoint = "";
-            if (userData.user.role_id === 1) {
               schoolsEndpoint = "http://localhost:5000/api/my-schools";
-            } else if (userData.user.role_id === 2) {
-              schoolsEndpoint = "http://localhost:5000/api/teacher/schools";
-            } else if (userData.user.role_id === 3) {
-              schoolsEndpoint = "http://localhost:5000/api/admin/schools";
-            }
+            
 
             if (schoolsEndpoint) {
               const schoolsResponse = await fetch(schoolsEndpoint, {

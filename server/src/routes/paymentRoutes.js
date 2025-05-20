@@ -5,7 +5,7 @@ const { verifyToken } = require('../middleware/auth');
 const cors = require('cors');
 
 // Ruta para crear un nuevo pago
-router.post('/create-payment', verifyToken, PaymentController.createPayment);
+router.post('/create', verifyToken, PaymentController.createPayment);
 
 // Ruta para manejar el éxito del pago
 router.get('/success', PaymentController.handleSuccess);

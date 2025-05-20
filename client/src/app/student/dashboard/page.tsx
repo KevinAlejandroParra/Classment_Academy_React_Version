@@ -27,23 +27,20 @@ interface Course {
 interface Enrollment {
   enrollment_id: string
   course_id: string
-  plan_type: string
-  start_date: string
-  end_date: string
   status: string
   progress: number
   course: Course
+  price: number
 }
 
-// Actualizada para manejar diferentes estructuras de usuario
 interface User {
-  id?: string          // Nueva API
-  user_id?: string     // API antigua
+  id?: string          
+  user_id?: string     
   user_name?: string
   user_lastname?: string
-  first_name?: string  // Nueva API posible
-  last_name?: string   // Nueva API posible
-  name?: string        // Otra posible estructura 
+  first_name?: string  
+  last_name?: string   
+  name?: string        
   email: string
   role_id?: number
   pending_admin?: boolean
@@ -410,25 +407,8 @@ const UserEnrollmentsPage = () => {
                     </div>
                   </div>
 
-                  {/* Cuerpo de la tarjeta */}
+                  {/* Contenido de la tarjeta */}
                   <div className="p-6">
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                      <div className="flex flex-col">
-                        <span className="text-gray-500 text-xs uppercase font-semibold mb-1">Inicio</span>
-                        <div className="flex items-center gap-2 text-gray-300">
-                          <FontAwesomeIcon icon={faCalendarAlt} className="text-[rgb(var(--primary-rgb))]" />
-                          <span className="text-sm">{formatDate(enrollment.start_date)}</span>
-                        </div>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-gray-500 text-xs uppercase font-semibold mb-1">Finalización</span>
-                        <div className="flex items-center gap-2 text-gray-300">
-                          <FontAwesomeIcon icon={faCalendarAlt} className="text-[rgb(var(--primary-rgb))]" />
-                          <span className="text-sm">{formatDate(enrollment.end_date)}</span>
-                        </div>
-                      </div>
-                    </div>
-
                     <div className="grid grid-cols-2 gap-4 mb-6">
                       <div className="flex flex-col">
                         <span className="text-gray-500 text-xs uppercase font-semibold mb-1">Progreso</span>
@@ -462,7 +442,7 @@ const UserEnrollmentsPage = () => {
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
                         className="flex-1 py-2 bg-[rgba(var(--primary-rgb),0.1)] text-[rgb(var(--primary-rgb))] rounded-lg hover:bg-[rgba(var(--primary-rgb),0.2)] transition-colors border border-[rgba(var(--primary-rgb),0.2)]"
-                        onClick={() => router.push(`/course/${enrollment.course_id}`)}
+                        onClick={() => router.push(`/courses/${enrollment.course.course_id}`)}
                       >
                         Ver Curso
                       </motion.button>
@@ -470,7 +450,7 @@ const UserEnrollmentsPage = () => {
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
                         className="flex-1 py-2 bg-[rgb(var(--primary-rgb))] text-black rounded-lg hover:bg-[rgba(var(--primary-rgb),0.9)] transition-colors font-medium"
-                        onClick={() => router.push(`/course/${enrollment.course_id}/classes`)}
+                        onClick={() => router.push(`/pendiente/${enrollment.course.course_id}/classes`)}
                       >
                         Ir a Clases
                       </motion.button>

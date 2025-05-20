@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require("uuid");
 const { MercadoPagoConfig, Preference, Payment: MPPayment } = require("mercadopago");
 const asyncHandler = require("../middleware/asyncHandler");
 const crypto = require("crypto");
+const mercadopago = require("mercadopago");
 
 // Configuración de credenciales
 const client = new MercadoPagoConfig({
@@ -57,8 +58,6 @@ class PaymentController {
                 auto_return: "approved",
             };
 
-            console.log("Preferencia a enviar:", JSON.stringify(preference, null, 2));
-
             await Payment.create({
                 payment_id: paymentId,
                 user_id: userId,
@@ -75,8 +74,6 @@ class PaymentController {
                 console.error("Respuesta inesperada:", response);
                 throw new Error("No se recibió URL de pago de MercadoPago");
             }
-
-            console.log("Respuesta de MercadoPago:", response);
 
             return res.status(200).json({
                 success: true,
@@ -98,72 +95,52 @@ class PaymentController {
             });
         }
     });
+
     static handleWebhook = asyncHandler(async (req, res) => {
         try {
-            // Validar origen del webhook
+            // Recibir la informacion del webhook y validarlo
             const { body } = req;
-            const signature = req.headers["x-signature"];
-            if (!signature) {
-                return res.status(403).json({
+
+            if (
+                (body.action !== "payment.updated" && body.action !== "payment.created") ||
+                body.type !== "payment"
+            ) {
+                return res.status(400).json({
                     success: false,
-                    message: "No autorizado",
+                    message: "Acción no reconocida",
                 });
             }
-            const verified = this.verifyMercadoPagoSignature(req, body);
-            if (!verified) {
-                return res.status(403).json({ success: false, message: "Firma inválida" });
-            }
-            console.log("test");
 
-            const { type, data } = req.body;
+            const paymentId = body.data.id;
+            const payment = await fetch("https://api.mercadopago.com/v1/payments/" + paymentId, {
+                headers: {
+                    Authorization: `Bearer ${process.env.MERCADO_PAGO_ACCESS_TOKEN}`,
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                },
+            }).then((response) => response.json());
 
-            if (type === "payment") {
-                const mpPayment = await paymentClient.get({ id: data.id });
+            // verifcar que el pago exista y que ya se haya recibido
+            // if (!isValidPayment) return error
 
-                // Actualizar pago en base de datos
-                const payment = await Payment.findOne({
-                    where: { payment_id: mpPayment.external_reference },
+            // actualizar el estado del pedido
+
+            // create a enrollment user_id, course_id, payment_id
+
+            // enviar email notificando que la inscripcion fue exitosa
+
+            if (!payment) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Pago no encontrado",
                 });
-
-                if (!payment) {
-                    return res.status(404).json({ success: false, message: "Pago no encontrado" });
-                }
-
-                // Mapear estados de Mercado Pago
-                const statusMap = {
-                    approved: "completed",
-                    pending: "pending",
-                    in_process: "pending",
-                    rejected: "failed",
-                };
-
-                const newStatus = statusMap[mpPayment.status] || "pending";
-
-                await payment.update({
-                    status: newStatus,
-                    payment_details: JSON.stringify(mpPayment),
-                });
-
-                // Crear inscripción si el pago es exitoso
-                if (newStatus === "completed") {
-                    const [enrollment] = await Enrollment.findOrCreate({
-                        where: {
-                            user_id: payment.user_id,
-                            course_id: payment.course_id,
-                        },
-                        defaults: {
-                            enrollment_id: uuidv4(),
-                            course_price: payment.amount,
-                            status: "active",
-                            progress: 0,
-                        },
-                    });
-                }
-
-                return res.status(200).send("OK");
             }
 
-            res.status(200).send("OK");
+            console.log(payment);
+
+            // Si el pago es exitoso actualizar el apgo como pagado
+            // añadir el enrollment y notificar via correo al usuario de su inscripcion
+            return res.json({ success: true, message: "Usuario inscrito correctamente" });
         } catch (error) {
             console.error("Error en webhook:", error);
             return res.status(500).json({

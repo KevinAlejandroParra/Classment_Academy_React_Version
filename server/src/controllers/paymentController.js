@@ -3,6 +3,8 @@ const { v4: uuidv4 } = require("uuid");
 const { MercadoPagoConfig, Preference, Payment: MPPayment } = require("mercadopago");
 const asyncHandler = require("../middleware/asyncHandler");
 const crypto = require("crypto");
+const dotenv = require("dotenv");
+const nodemailer = require("nodemailer");
 
 // Configuración de credenciales
 const client = new MercadoPagoConfig({
@@ -11,6 +13,32 @@ const client = new MercadoPagoConfig({
 
 const preferenceClient = new Preference(client);
 const paymentClient = new MPPayment(client);
+
+// Configure nodemailer transporter
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
+    }
+});
+console.log("EMAIL_USER:", process.env.EMAIL_USER);
+console.log("EMAIL_PASSWORD exists:", !!process.env.EMAIL_PASSWORD);
+
+
+// Function to send email
+const sendEmail = async (to, subject, text) => {
+    try {
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to,
+            subject,
+            text
+        });
+    } catch (error) {
+        console.error("Error sending email:", error);
+    }
+};
 
 class PaymentController {
     static createPayment = asyncHandler(async (req, res) => {
@@ -153,11 +181,9 @@ class PaymentController {
             const payment = await paymentClient.get({ id: Number(paymentId) });
             
             if (!payment) {
-                console.error("Pago no encontrado en MercadoPago:", paymentId);
                 return res.status(404).json({ success: false, message: "Pago no encontrado" });
             }
             
-            console.log("Detalles del pago:", JSON.stringify(payment));
             
             // Buscar el pago en nuestra base de datos mediante external_reference
             if (!payment.external_reference) {
@@ -187,6 +213,38 @@ class PaymentController {
                 updated_at: new Date()
             });
             
+            // Obtener información del usuario y curso para el correo
+            const user = await User.findByPk(dbPayment.user_id);
+            const course = await Course.findByPk(dbPayment.course_id);
+            
+
+            const fullName = `${user.user_name} ${user.user_lastname}`;
+            if (user && course) {
+                const subject = `Estado de tu pago: ${paymentStatus === "completed" ? "Aprobado" : paymentStatus === "failed" ? "Fallido" : "Pendiente"}`;
+                const text = `
+            Hola ${fullName || user.user_name || ""},
+
+            Tu pago para el curso "${course.course_name}" ha sido procesado con el siguiente estado: ${paymentStatus.toUpperCase()}.
+
+            Detalles:
+            - Curso: ${course.course_name}
+            - Monto: $${dbPayment.amount.toLocaleString()} COP
+            - Estado: ${paymentStatus.toUpperCase()}
+            - Fecha: ${new Date().toLocaleString()}
+
+            Gracias por confiar en nosotros.
+            Si tienes alguna pregunta, no dudes en contactarnos.
+            📞+57 321 237 6552
+            Atentamente,
+            Classment Academy 🦁
+            `;
+
+                await sendEmail(user.user_email, subject, text);
+
+                console.log(`[EMAIL] Estado del pago enviado a ${user.user_email} | Estado: ${paymentStatus}`);
+            } else {
+                console.warn("[EMAIL] Usuario o curso no encontrados para enviar correo.");
+            }
             // Si el pago es exitoso, crear la inscripción
             if (paymentStatus === "completed") {
                 // Verificar si ya existe una inscripción
@@ -210,8 +268,7 @@ class PaymentController {
                     
                     console.log("Inscripción creada correctamente para el usuario:", dbPayment.user_id);
                     
-                    // Aquí podrías implementar el envío de un correo de confirmación
-                    // sendEnrollmentEmail(dbPayment.user_id, dbPayment.course_id);
+
                 } else if (existingEnrollment.status !== "active") {
                     // Actualizar inscripción existente si no está activa
                     await existingEnrollment.update({
@@ -234,6 +291,7 @@ class PaymentController {
                 error: error.message
             });
         }
+        
     });
 
     static verifyMercadoPagoSignature(req, body) {

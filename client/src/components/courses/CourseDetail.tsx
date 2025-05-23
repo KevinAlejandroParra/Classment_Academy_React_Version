@@ -167,7 +167,6 @@ export default function CourseDetail() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [schoolAdmin, setSchoolAdmin] = useState<SchoolAdmin | null>(null)
 
-  // Buscar detalles del curso
   useEffect(() => {
     const fetchCourseDetails = async () => {
       try {
@@ -369,7 +368,7 @@ export default function CourseDetail() {
             <div className="relative w-full h-64 md:h-80 rounded-xl overflow-hidden mb-6">
               {course.course_image ? (
                 <Image
-                  src={course.course_image}
+                  src={`${process.env.NEXT_PUBLIC_API_URL}${course.course_image}`}
                   alt={course.course_name}
                   fill
                   className="object-cover"
@@ -399,7 +398,7 @@ export default function CourseDetail() {
               <div className="relative h-10 w-10 rounded-full overflow-hidden border-2 border-[rgb(var(--primary-rgb))]">
                 {course.school.school_image ? (
                   <Image
-                    src={course.school.school_image}
+                    src={`${process.env.NEXT_PUBLIC_API_URL}${course.school.school_image}`}
                     alt={course.school.school_name}
                     fill
                     className="object-cover"

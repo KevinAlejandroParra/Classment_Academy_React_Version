@@ -42,13 +42,13 @@ export default function CoursesList() {
 
         // Fetch both schools and courses
         const [schoolsRes, coursesRes] = await Promise.all([
-          fetch("http://localhost:5000/api/schools/", {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/schools/`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
           }),
-          fetch("http://localhost:5000/api/courses/", {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/courses/`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",

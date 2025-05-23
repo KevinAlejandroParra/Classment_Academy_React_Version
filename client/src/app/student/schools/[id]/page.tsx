@@ -58,7 +58,6 @@ const SchoolDetailsPage = () => {
       setError('ID de escuela no válido')
       setLoading(false)
     }
-    // eslint-disable-next-line
   }, [schoolId])
 
   const fetchSchoolDetails = async () => {
@@ -263,7 +262,7 @@ const SchoolDetailsPage = () => {
             <div>
               {school.school_image ? (
                 <img
-                  src={school.school_image}
+                  src={`${process.env.NEXT_PUBLIC_API_URL}${school.school_image}`}
                   alt={school.school_name}
                   className="w-24 h-24 object-cover rounded"
                 />

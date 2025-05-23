@@ -21,7 +21,11 @@ interface Escuela {
   school_image: string
 }
 
-const API_BASE_URL = "http://localhost:5000"
+// Remove this line:
+// const API_BASE_URL = "http://localhost:5000"
+
+// Add this instead:
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 export function SchoolsCarousel() {
   const [escuelas, setEscuelas] = useState<Escuela[]>([])

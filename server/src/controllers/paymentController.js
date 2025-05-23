@@ -412,12 +412,15 @@ class PaymentController {
                     status: payment.status,
                     amount: payment.amount,
                     description: payment.description,
+                    payment_method: payment.payment_method,
+                    createdAt: payment.createdAt,
                     mp_status: payment.mp_status,
                     mp_status_detail: payment.mp_status_detail,
                     enrollment: enrollment
                         ? {
                               enrollment_id: enrollment.enrollment_id,
                               course_name: enrollment.course.course_name,
+                              enrolled_at: enrollment.enrolled_at,
                           }
                         : null,
                 },

@@ -5,12 +5,16 @@
   --foreground-rgb: 0, 0, 0;
   --background-rgb: 255, 255, 255;
   --primary-rgb: 255, 215, 0; /* Color amarillo dorado */
+  --surface-1: 255, 255, 255; /* Light card */
+  --surface-2: 245, 222, 179; /* Light accent (wheat/gold) */
 }
 
 .dark {
   --foreground-rgb: 255, 255, 255;
   --background-rgb: 0, 0, 0;
   --primary-rgb: 255, 215, 0; /* Color amarillo dorado */
+  --surface-1: 24, 24, 24;    /* Dark card */
+  --surface-2: 60, 50, 10;    /* Dark accent */
 }
 
 body {

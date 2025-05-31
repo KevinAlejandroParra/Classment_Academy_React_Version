@@ -1590,9 +1590,6 @@
             "schema": {
               "type": "object",
               "properties": {
-                "plan_type": {
-                  "example": "any"
-                },
                 "start_date": {
                   "example": "any"
                 },

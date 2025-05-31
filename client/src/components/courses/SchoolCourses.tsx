@@ -37,7 +37,6 @@ interface SchoolCoursesProps {
 export default function SchoolCourses({ school, courses }: SchoolCoursesProps) {
   const [expanded, setExpanded] = useState(true)
 
-  // If no courses for this school, don't render anything
   if (courses.length === 0) {
     return null
   }

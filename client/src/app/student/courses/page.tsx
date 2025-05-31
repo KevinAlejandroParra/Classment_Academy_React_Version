@@ -27,7 +27,6 @@ interface Course {
 interface Enrollment {
   enrollment_id: string
   course_id: string
-  plan_type: string
   start_date: string
   end_date: string
   status: string
@@ -35,7 +34,6 @@ interface Enrollment {
   course: Course
 }
 
-// Actualizada para manejar diferentes estructuras de usuario
 interface User {
   id?: string          
   user_id?: string     

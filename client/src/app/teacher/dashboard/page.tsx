@@ -95,7 +95,7 @@ export default function TeacherDashboard() {
         }
 
         // Obtener cursos del profesor
-        const coursesRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/teacher/courses`, {
+        const coursesRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/teachers/courses`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -166,7 +166,7 @@ export default function TeacherDashboard() {
     const fetchStudents = async () => {
       try {
         const token = localStorage.getItem("token")
-        const res = await fetch(`http://localhost:5000/api/courses/${selectedCourse}/students`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/courses/${selectedCourse}/students`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -181,7 +181,7 @@ export default function TeacherDashboard() {
             progress: 0
           })))
         } else {
-          showAlert("error", "Error al cargar estudiantes")
+          showAlert("error", "Error al cargar estudiantesygfhf")
         }
       } catch (err) {
         console.error("Error al cargar estudiantes:", err)

@@ -88,45 +88,52 @@ const AdminDashboard = () => {
           return
         }
 
-        const response = await fetch("http://localhost:5000/api/auth/me", {
+        // 1. Get user info
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         })
-
         const data = await response.json()
         if (!response.ok) throw new Error(data.message)
 
-        // Verificar si el usuario es administrador (role_id: 3)
         if (data.user.role_id !== 3) {
           router.push("/")
           return
         }
-
         setUser(data.user)
-        
-        // Obtener las escuelas del administrador
-        const schoolResponse = await fetch(`http://localhost:5000/api/schools/get-school`, {
+
+        // 2. Get admin's schools
+
+        if (!token) {
+          router.push("/login")
+          return
+        }
+        console.log("TOKEN ENVIADO:", token); // Debug: check token value
+
+        const schoolResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/schools/get-school`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         })
-        
         if (schoolResponse.ok) {
           const schoolData = await schoolResponse.json()
           setSchools(schoolData.data || [])
         } else {
           console.error("Error al obtener escuelas:", await schoolResponse.json())
         }
-        
+
         setIsLoading(false)
       } catch (error) {
         console.error("Error de autenticación:", error)
         Swal.fire({
           icon: 'error',
           title: 'Error',
+          background: "rgb(var(--background-rgb))",
+          color: "#ffffff",
+          iconColor: "rgb(var(--primary-rgb))",
+          confirmButtonColor: "rgb(var(--primary-rgb))",
           text: 'Ha ocurrido un error al cargar tus datos',
-          confirmButtonColor: '#3085d6'
         })
         router.push("/login")
       }
@@ -139,7 +146,7 @@ const AdminDashboard = () => {
     e.preventDefault()
     try {
       const token = localStorage.getItem("token")
-      const response = await fetch(`http://localhost:5000/api/schools`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/schools/`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -147,13 +154,8 @@ const AdminDashboard = () => {
         method: "POST",
         credentials: "include",
         body: JSON.stringify({
-          school_name: newSchool.school_name,
-          school_description: newSchool.school_description,
-          school_phone: newSchool.school_phone,
-          school_address: newSchool.school_address,
-          school_image: newSchool.school_image,
-          school_email: newSchool.school_email,
-          teacher_id: user.id,
+          ...newSchool,
+          teacher_id: user.user_id,
         }),
       })
 
@@ -171,7 +173,7 @@ const AdminDashboard = () => {
           school_email: "",
           teacher_id: ""
         })
-        
+
         Swal.fire({
           icon: 'success',
           title: '¡Éxito!',
@@ -191,7 +193,7 @@ const AdminDashboard = () => {
       }
     } catch (error: any) {
       console.error("Error al crear escuela:", error)
-      
+
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -212,16 +214,16 @@ const AdminDashboard = () => {
         showCancelButton: true,
         background: "#1a1a1a",
         color: "#ffffff",
-        iconColor: "rgb(var(--primary-rgb))", 
+        iconColor: "rgb(var(--primary-rgb))",
         confirmButtonColor: 'rgb(var(--primary-rgb))',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Sí, eliminar',
         cancelButtonText: 'Cancelar'
       })
-      
+
       if (result.isConfirmed) {
         const token = localStorage.getItem("token")
-        const response = await fetch(`http://localhost:5000/api/schools/${schoolId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/schools/${schoolId}`, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
@@ -284,7 +286,7 @@ const AdminDashboard = () => {
     e.preventDefault()
     try {
       const token = localStorage.getItem("token")
-      const response = await fetch("http://localhost:5000/api/courses", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/courses/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -306,7 +308,7 @@ const AdminDashboard = () => {
           course_age: "",
           course_image: ""
         })
-        
+
         Swal.fire({
           icon: 'success',
           title: '¡Éxito!',
@@ -324,7 +326,7 @@ const AdminDashboard = () => {
       } else {
         const errorData = await response.json()
         console.error("Error al crear curso:", errorData.message)
-        
+
         Swal.fire({
           icon: 'error',
           title: 'Error',
@@ -342,7 +344,7 @@ const AdminDashboard = () => {
       }
     } catch (error) {
       console.error("Error al crear curso:", error)
-      
+
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -713,4 +715,4 @@ const AdminDashboard = () => {
   )
 }
 
-export default AdminDashboard 
+export default AdminDashboard

@@ -21,10 +21,7 @@ interface Escuela {
   school_image: string
 }
 
-// Remove this line:
-// const API_BASE_URL = "http://localhost:5000"
 
-// Add this instead:
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
 export function SchoolsCarousel() {
@@ -43,9 +40,7 @@ export function SchoolsCarousel() {
 
       console.log("Iniciando petición a la API de escuelas...")
 
-      // Obtener el token del localStorage
       const token = localStorage.getItem("token");
-      // Intentar hacer la petición con manejo de errores mejorado
       let response
       try {
         response = await fetch(`${API_BASE_URL}/api/schools`, {
@@ -97,7 +92,6 @@ export function SchoolsCarousel() {
 
       // Verificar si data.data es un array
       if (!data.data) {
-        // Si no hay data.data pero la respuesta es exitosa, intentamos usar data directamente
         if (Array.isArray(data)) {
           setEscuelas(data)
         } else {
@@ -253,7 +247,6 @@ export function SchoolsCarousel() {
                 disableOnInteraction: false,
                 pauseOnMouseEnter: true,
               }}
-              // Corregir el error de TypeScript en la configuración de navegación
               onSwiper={(swiper) => {
                 swiperRef.current = swiper
                 // Actualizar la navegación después de que Swiper se inicialice

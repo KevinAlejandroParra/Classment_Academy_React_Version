@@ -282,7 +282,7 @@ const ProfilePage = () => {
         Swal.fire({
           icon: "success",
           title: "¡Perfil actualizado!",
-          text: "Tu imagen y datos fueron actualizados correctamente.",
+          text: "Tus datos fueron actualizados correctamente, por favor recarga la página!",
           confirmButtonColor: "#FFD700",
           background: "#1a1a1a",
           color: "#fff",
@@ -752,40 +752,48 @@ const ProfilePage = () => {
             </div>
 
             <form
-              className="space-y-4"
+              className="max-w-2xl mx-auto space-y-6 p-4"
               onSubmit={handleEdit}
               encType="multipart/form-data"
             >
-              <div className="flex flex-col items-center space-y-2">
-                {previewImage ? (
-                  <Image
-                    src={previewImage}
-                    alt="Preview"
-                    width={128}
-                    height={128}
-                    className="rounded-full object-cover border w-32 h-32"
-                  />
-                ) : userData?.image ? (
-                  <Image
-                    src={getImageUrl(userData.image)}
-                    alt="Foto de perfil"
-                    width={128}
-                    height={128}
-                    className="rounded-full object-cover border w-32 h-32"
-                  />
-                ) : (
-                  <div className="w-32 h-32 rounded-full bg-gray-700 flex items-center justify-center border border-gray-600">
-                    <FontAwesomeIcon
-                      icon={faUser}
-                      className="text-white text-4xl"
+              {/* Profile Image Section */}
+              <div className="flex flex-col items-center space-y-3 mb-6">
+                <div className="w-28 h-28">
+                  {previewImage ? (
+                    <Image
+                      src={previewImage}
+                      alt="Preview"
+                      width={112}
+                      height={112}
+                      className="rounded-full object-cover border w-28 h-28"
                     />
-                  </div>
-                )}
+                  ) : userData?.image ? (
+                    <Image
+                      src={getImageUrl(userData.image)}
+                      alt="Foto de perfil"
+                      width={112}
+                      height={112}
+                      className="rounded-full object-cover border w-28 h-28"
+                    />
+                  ) : (
+                    <div className="w-28 h-28 rounded-full bg-gray-700 flex items-center justify-center border border-gray-600">
+                      <FontAwesomeIcon icon={faUser} className="text-white text-3xl" />
+                    </div>
+                  )}
+                </div>
+                <button 
+                  type="button" 
+                  onClick={() => document.getElementById('fileInput')?.click()}
+                  className="px-3 py-1.5 text-sm bg-[rgb(var(--primary-rgb))] text-black rounded-lg hover:bg-[rgba(var(--primary-rgb),0.9)]"
+                >
+                  Cambiar foto
+                </button>
                 <input
+                  id="fileInput"
                   type="file"
                   name="user_image"
                   accept="image/*"
-                  className="text-white"
+                  className="hidden"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) {
@@ -796,100 +804,101 @@ const ProfilePage = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-gray-300 mb-1">Nombre</label>
-                <input
-                  type="text"
-                  name="user_name"
-                  defaultValue={userData?.name}
-                  className="w-full p-2 bg-gray-800 rounded-lg text-white"
-                />
+              {/* Personal Information Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Name and Lastname Row */}
+                <div>
+                  <label className="block text-gray-300 text-sm mb-1">Nombre</label>
+                  <input
+                    type="text"
+                    name="user_name"
+                    defaultValue={userData?.name}
+                    className="w-full p-2 bg-gray-800 rounded-lg text-white text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-300 text-sm mb-1">Apellido</label>
+                  <input
+                    type="text"
+                    name="user_lastname"
+                    defaultValue={userData?.lastname}
+                    className="w-full p-2 bg-gray-800 rounded-lg text-white text-sm"
+                  />
+                </div>
+
+                {/* Contact Information */}
+                <div>
+                  <label className="block text-gray-300 text-sm mb-1">Email</label>
+                  <input
+                    type="email"
+                    name="user_email"
+                    defaultValue={userData?.email}
+                    className="w-full p-2 bg-gray-800 rounded-lg text-white text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-gray-300 text-sm mb-1">Teléfono</label>
+                  <input
+                    type="text"
+                    name="user_phone"
+                    defaultValue={userData?.phone}
+                    className="w-full p-2 bg-gray-800 rounded-lg text-white text-sm"
+                  />
+                </div>
+
+                {/* Document Information */}
+                <div>
+                  <label className="block text-gray-300 text-sm mb-1">Tipo de Documento</label>
+                  <select
+                    name="user_document_type"
+                    defaultValue={userData?.document_type}
+                    className="w-full p-2 bg-gray-800 rounded-lg text-white text-sm"
+                  >
+                    <option value="CC">Cédula de Ciudadanía</option>
+                    <option value="TI">Tarjeta de Identidad</option>
+                    <option value="CE">Cédula de Extranjería</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-gray-300 text-sm mb-1">Número de Documento</label>
+                  <input
+                    type="text"
+                    name="user_document"
+                    defaultValue={userData?.document}
+                    className="w-full p-2 bg-gray-800 rounded-lg text-white text-sm"
+                  />
+                </div>
+
+                {/* Birth Date - Full Width */}
+                <div className="md:col-span-2">
+                  <label className="block text-gray-300 text-sm mb-1">Fecha de Nacimiento</label>
+                  <input
+                    type="date"
+                    name="user_birthdate"
+                    defaultValue={
+                      userData?.birthdate
+                        ? new Date(userData.birthdate).toISOString().split("T")[0]
+                        : ""
+                    }
+                    className="w-full p-2 bg-gray-800 rounded-lg text-white text-sm"
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-gray-300 mb-1">Apellido</label>
-                <input
-                  type="text"
-                  name="user_lastname"
-                  defaultValue={userData?.lastname}
-                  className="w-full p-2 bg-gray-800 rounded-lg text-white"
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-300 mb-1">Email</label>
-                <input
-                  type="email"
-                  name="user_email"
-                  defaultValue={userData?.email}
-                  className="w-full p-2 bg-gray-800 rounded-lg text-white"
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-300 mb-1">Teléfono</label>
-                <input
-                  type="text"
-                  name="user_phone"
-                  defaultValue={userData?.phone}
-                  className="w-full p-2 bg-gray-800 rounded-lg text-white"
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-300 mb-1">
-                  Fecha de Nacimiento
-                </label>
-                <input
-                  type="date"
-                  name="user_birthdate"
-                  defaultValue={
-                    userData?.birthdate
-                      ? new Date(userData.birthdate).toISOString().split("T")[0]
-                      : ""
-                  }
-                  className="w-full p-2 bg-gray-800 rounded-lg text-white"
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-300 mb-1">
-                  Tipo de Documento
-                </label>
-                <select
-                  name="user_document_type"
-                  defaultValue={userData?.document_type}
-                  className="w-full p-2 bg-gray-800 rounded-lg text-white"
-                >
-                  <option value="CC">Cédula de Ciudadanía</option>
-                  <option value="TI">Tarjeta de Identidad</option>
-                  <option value="CE">Cédula de Extranjería</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-gray-300 mb-1">Documento</label>
-                <input
-                  type="text"
-                  name="user_document"
-                  defaultValue={userData?.document}
-                  className="w-full p-2 bg-gray-800 rounded-lg text-white"
-                />
-              </div>
-
-              <div className="mt-6 flex justify-end gap-2">
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-3 mt-8">
                 <button
                   type="button"
                   onClick={() => setShowEditModal(false)}
-                  className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600"
+                  className="px-4 py-2 text-sm bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[rgb(var(--primary-rgb))] text-black rounded-lg hover:bg-[rgba(var(--primary-rgb),0.9)]"
+                  className="px-4 py-2 text-sm bg-[rgb(var(--primary-rgb))] text-black rounded-lg hover:bg-[rgba(var(--primary-rgb),0.9)] transition-colors"
                 >
-                  Guardar
+                  Guardar Cambios
                 </button>
               </div>
             </form>

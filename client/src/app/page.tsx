@@ -3,6 +3,7 @@ import { Sidebar } from "../components/sidebar"
 import { Particles } from "../components/particles"
 import { SchoolsCarousel } from "../components/schools/schools-carousel"
 import { CoursesCarousel } from "../components/courses/courses-carousel"
+import { PromotionBanner } from "../components/PromotionBanner";
 
 export default function Home() {
   return (
@@ -13,6 +14,7 @@ export default function Home() {
         <Banner />
         <SchoolsCarousel />
         <CoursesCarousel />
+        <PromotionBanner />
       </div>
     </main>
   )

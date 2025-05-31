@@ -110,7 +110,7 @@ module.exports = (sequelize, DataTypes) => {
             pending_admin: {
                 type: DataTypes.BOOLEAN,
                 allowNull: false,
-                defaultValue: false
+                defaultValue: false  
             },
         },
         {

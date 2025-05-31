@@ -1,4 +1,4 @@
-const { User, School, Course, Enrollment, UserSchoolRole } = require("../models");
+const { User, School, Course, Enrollment, UserSchoolRole, CourseTeacher } = require("../models");
 const jwt = require("jsonwebtoken"); 
 const bcrypt = require("bcrypt"); 
 const nodemailer = require("nodemailer");
@@ -587,7 +587,7 @@ class UserController {
             }
             // Lógica para profesores y administradores (roles 2 y 3)
             else if ([2, 3].includes(user.role_id)) {
-                // 1. Obtener todas las escuelas donde el usuario tiene roles
+                // 1. Obtener todas las escuelas donde el usuario tiene otro rol que no sea estudiante
                 const userSchoolRoles = await UserSchoolRole.findAll({
                     where: { user_id: userId },
                     include: [{
@@ -630,8 +630,8 @@ class UserController {
     
                 // 3. Opcional: Si es profesor, también podríamos buscar cursos específicamente asignados
                 if (user.role_id === 2) {
-                    const teacherCourses = await TeacherCourse.findAll({
-                        where: { user_id: userId },
+                    const teacherCourses = await CourseTeacher.findAll({
+                        where: { teacher_id: userId },
                         include: [{
                             model: Course,
                             as: 'course',

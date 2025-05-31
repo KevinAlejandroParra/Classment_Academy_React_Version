@@ -49,7 +49,6 @@ interface Course {
   course_name: string;
   course_description: string;
   course_image: string;
-  plan_type: string;
   status: string;
   start_date: string;
   end_date: string;
@@ -62,15 +61,19 @@ interface Course {
   };
 }
 
-// Tipos para la escuela
+// Types for school
 interface School {
   school_id: string;
   school_name: string;
   school_description: string;
   school_phone: string;
-  school_address: string;
   school_image: string;
   school_email: string;
+  courses?: Array<{
+    course_id: string;
+    course_name: string;
+  }>;
+  user_role_id?: number;
   enrollments?: Array<{
     enrollment_id: string;
     course_id: string;
@@ -113,9 +116,7 @@ const buttonTap = {
   scale: 0.98,
 };
 
-const API_BASE_URL = "http://localhost:5000";
 
-// Función para manejar URLs de imágenes
 const getImageUrl = (url: string | null | undefined): string => {
   if (!url) return "/placeholder.svg";
   
@@ -126,7 +127,7 @@ const getImageUrl = (url: string | null | undefined): string => {
   
   // Si la URL no comienza con /, añadimos uno
   const path = url.startsWith('/') ? url : `/${url}`;
-  return `${API_BASE_URL}${path}`;
+  return `${process.env.NEXT_PUBLIC_API_URL}${path}`;
 };
 
 const ProfilePage = () => {
@@ -152,7 +153,7 @@ const ProfilePage = () => {
         }
 
         // Fetch user data
-        const userResponse = await fetch("http://localhost:5000/api/auth/me", {
+        const userResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -170,7 +171,7 @@ const ProfilePage = () => {
 
           // Fetch cursos del usuario 
           let coursesEndpoint = "";
-         coursesEndpoint = "http://localhost:5000/api/my-courses";
+         coursesEndpoint = `${process.env.NEXT_PUBLIC_API_URL}/api/my-courses`;
          
 
           if (coursesEndpoint) {
@@ -197,9 +198,8 @@ const ProfilePage = () => {
           // Fetch escuelas del usuario
           try {
             let schoolsEndpoint = "";
-              schoolsEndpoint = "http://localhost:5000/api/my-schools";
+            schoolsEndpoint = `${process.env.NEXT_PUBLIC_API_URL}/api/my-schools`;
             
-
             if (schoolsEndpoint) {
               const schoolsResponse = await fetch(schoolsEndpoint, {
                 headers: {
@@ -213,24 +213,7 @@ const ProfilePage = () => {
                   setSchools(schoolsData.data || []);
                 }
               } else {
-                // Si falla, intentar con UserSchoolRole
-                const userSchoolRolesResponse = await fetch(
-                  `http://localhost:5000/api/users/${userData.user.user_id}/schools`,
-                  {
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                  }
-                );
-
-                if (userSchoolRolesResponse.ok) {
-                  const schoolsData = await userSchoolRolesResponse.json();
-                  if (schoolsData.success) {
-                    setSchools(schoolsData.data || []);
-                  }
-                } else {
-                  console.error("Error al cargar escuelas:", await userSchoolRolesResponse.text());
-                }
+                console.error("Error al cargar escuelas:", await schoolsResponse.text());
               }
             }
           } catch (error) {
@@ -243,6 +226,7 @@ const ProfilePage = () => {
         console.error("Error al cargar datos:", error);
         setError("Error al cargar los datos del perfil");
         setIsLoading(false);
+        console.error("DATOS DEL USUARIO", userData);
       }
     };
 
@@ -279,7 +263,7 @@ const ProfilePage = () => {
       }
 
       const response = await fetch(
-        `http://localhost:5000/api/users/${userData?.id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/${userData?.id}`,
         {
           method: "PUT",
           headers: {
@@ -326,7 +310,7 @@ const ProfilePage = () => {
             return;
         }
 
-        const response = await fetch(`http://localhost:5000/api/users/${userData?.id}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${userData?.id}`, {
             method: "PUT",
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -475,17 +459,6 @@ const ProfilePage = () => {
                 </h1>
                 <p className="text-gray-300">{userData.email}</p>
                 <div className="flex flex-wrap gap-2 mt-2 justify-center md:justify-start">
-                  <span className="px-3 py-1 bg-[rgba(var(--primary-rgb),0.2)] text-[rgb(var(--primary-rgb))] rounded-full text-sm">
-                    {userData.role === 1
-                      ? "Estudiante"
-                      : userData.role === 2
-                      ? "Profesor"
-                      : userData.role === 3
-                      ? "Administrador"
-                      : userData.role === 4
-                      ? "Coordinador"
-                      : "Usuario"}
-                  </span>
                   {userData.state && (
                     <span
                       className={`px-3 py-1 rounded-full text-sm ${
@@ -708,9 +681,6 @@ const ProfilePage = () => {
                                     icon={faGraduationCap}
                                     className="text-[rgb(var(--primary-rgb))] w-3"
                                   />
-                                  <span className="truncate">
-                                    {course.plan_type || "No especificado"}
-                                  </span>
                                 </div>
                                 <div className="flex items-center gap-1">
                                   <FontAwesomeIcon

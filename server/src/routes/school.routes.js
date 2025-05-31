@@ -21,7 +21,11 @@ const { verifyToken, checkRole } = require('../middleware/auth');
  *         description: Error interno del servidor
  */
 router.get('/', schoolController.getAllSchools);
-router.get('/:id', schoolController.getSchoolById);
+router.use(verifyToken);
+
+router.get('/get-school/', schoolController.getAdminSchool);
+
+router.get('/:id', verifyToken, schoolController.getSchoolById);
 
 
 /**
@@ -45,8 +49,6 @@ router.get('/:id', schoolController.getSchoolById);
  *         description: Error interno del servidor
  */
 router.use(verifyToken);
-
-router.get('/get-school/', schoolController.getAdminSchool);
 
 
 /**
@@ -161,6 +163,7 @@ router.delete('/:id', checkRole([3]), schoolController.deleteSchool);
  *       500:
  *         description: Error interno del servidor
  */
+
 router.get('/coordinator/schools', checkRole([4]), schoolController.getCoordinatorSchools);
 
 module.exports = router;

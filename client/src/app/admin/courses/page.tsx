@@ -13,7 +13,6 @@ interface School {
   school_image?: string;
 }
 
-const API_BASE_URL = "http://localhost:5000";
 
 export default function CoursesSchoolsListPage() {
   const router = useRouter();
@@ -28,7 +27,7 @@ export default function CoursesSchoolsListPage() {
           router.push("/login");
           return;
         }
-        const res = await fetch(`${API_BASE_URL}/api/schools/get-school`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/schools/get-school`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error("Error al cargar las escuelas");
@@ -73,7 +72,7 @@ export default function CoursesSchoolsListPage() {
             >
               {school.school_image && (
                 <img
-                  src={school.school_image}
+                  src={`${process.env.NEXT_PUBLIC_API_URL}${school.school_image}`}
                   alt={school.school_name}
                   className="w-24 h-24 object-cover rounded-full mb-4 border border-gray-600"
                 />

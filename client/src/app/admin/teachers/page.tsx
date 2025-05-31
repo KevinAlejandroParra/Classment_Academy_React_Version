@@ -101,7 +101,6 @@ const TeachersPage = () => {
     role_id: 2, 
   })
 
-  // Custom SweetAlert toast configuration
   const Toast = Swal.mixin({
     toast: true,
     position: "top-end",
@@ -193,6 +192,10 @@ const TeachersPage = () => {
           icon: "error",
           title: "Error",
           text: "Ha ocurrido un error al cargar tus datos",
+          confirmButtonText: "Intentar de nuevo",
+          background: "#1a1a1a",
+          color: "#ffffff",
+          iconColor: "#f87171",
           confirmButtonColor: "#3085d6",
         })
         router.push("/login")

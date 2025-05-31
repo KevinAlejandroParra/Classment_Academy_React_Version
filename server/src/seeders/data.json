@@ -18,11 +18,11 @@
         },
         {
             "user_id": "550e8400-e29b-41d4-a716-446655440001",
-            "user_name": "Carlos",
-            "user_lastname": "Rodríguez",
+            "user_name": " Patrona Sofía",
+            "user_lastname": "Rojas",
             "user_document_type": "CC",
             "user_document": 1003003003,
-            "user_email": "carlos.rodriguez@email.com",
+            "user_email": "soyfit@email.com",
             "user_password": "$2a$10$lrTDwCCjDLcXuf7.Lm/pku.Vci8H1cPlsf29pHN.Tivjlir4p523S",
             "user_phone": 3005555555,
             "user_image": "http://localhost:5000/images/users/default.jpg",
@@ -143,6 +143,22 @@
             "role_id": 2,
             "createdAt": "2025-04-03T12:00:00Z",
             "updatedAt": "2025-04-03T12:00:00Z"
+        },
+        {
+            "user_id": "550e8400-e29b-41d4-a716-446655440013",
+            "user_name": "Patron Carlos",
+            "user_lastname": "Guillermo",
+            "user_document_type": "CC",
+            "user_document": 1022334413,
+            "user_email": "taekondo@email.com",
+            "user_password": "$2a$10$xsMhIclPh1kWAFD4gm35D.EPlJyMALzhgMmha4tcw.N9N33REPXMG",
+            "user_phone": 3101234513,
+            "user_image": "http://localhost:5000/images/users/default.jpg",
+            "user_birth": "1990-09-13",
+            "user_state": "activo",
+            "role_id": 3,
+            "createdAt": "2025-03-03T12:00:00Z",
+            "updatedAt": "2025-03-03T12:00:00Z"
         }
     ],
     "roles": [
@@ -298,8 +314,33 @@
           "user_id": "550e8400-e29b-41d4-a716-446655440001", 
           "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa7", 
           "role_id": 3
+        },
+        {
+            "user_id": "550e8400-e29b-41d4-a716-446655440013", 
+            "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa8", 
+            "role_id": 3
+        },
+        {
+            "user_id": "550e8400-e29b-41d4-a716-446655440003",
+            "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            "role_id": 2
+        },
+        {
+            "user_id": "550e8400-e29b-41d4-a716-446655440005",
+            "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa7",
+            "role_id": 2
+        },
+        {
+            "user_id": "550e8400-e29b-41d4-a716-446655440006",
+            "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa8",
+            "role_id": 2
+        },
+        {
+            "user_id": "550e8400-e29b-41d4-a716-446655440008",
+            "school_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+            "role_id": 2
         }
-      ],
+    ],
     "enrollments":
       [
         {
@@ -357,6 +398,10 @@
               },
               {
                 "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0855", 
+                "teacher_id": "550e8400-e29b-41d4-a716-446655440005"
+              },
+              {
+                "course_id": "d290f1ee-6c54-4b01-90e6-d701748f0854",
                 "teacher_id": "550e8400-e29b-41d4-a716-446655440005"
               }
 

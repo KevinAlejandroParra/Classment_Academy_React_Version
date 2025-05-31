@@ -70,148 +70,96 @@ exports.getAdminSchool = asyncHandler(async (req, res) => {
     throw error;
   }
 });
-// Obtener una escuela por ID con sus cursos
+// Obtener una escuela por ID con sus cursos y administrador
 exports.getSchoolById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  console.log('ID recibido:', id);
+
   const school = await School.findByPk(id, {
+    attributes: [
+      'school_id',
+      'school_name',
+      'school_description',
+      'school_phone',
+      'school_address',
+      'school_image',
+      'school_email'
+    ],
     include: [
-      { 
-        model: Course, 
-        as: 'courses',
-        attributes: ['course_id', 'course_name', 'course_description'],
-        include: [{
-          model: User,
-          as: 'teachers',
-          attributes: ['user_id', 'user_name', 'user_lastname', 'user_email']
-        }]
-      },
       {
         model: User,
         as: 'users',
         through: {
-          where: { role_id: 4 }, 
+          where: { role_id: 3 }, // Only admin
           attributes: ['role_id']
         },
-        attributes: ['user_id', 'user_name', 'user_lastname', 'user_email']
+        attributes: ['user_id', 'user_name', 'user_lastname', 'user_email'],
+        required: false
+      },
+      {
+        model: Course,
+        as: 'courses',
+        attributes: ['course_id', 'course_name', 'course_description'],
+        include: [
+          {
+            model: User,
+            as: 'teachers',
+            through: { attributes: [] },
+            attributes: ['user_id', 'user_name', 'user_lastname', 'user_email'],
+            required: false
+          }
+        ]
       }
     ]
   });
-  
+
   if (!school) {
-    const error = new Error('Escuela no encontrada');
-    error.statusCode = 404;
-    throw error;
+    return res.status(404).json({
+      success: false,
+      message: "Escuela no encontrada"
+    });
   }
 
-  try {
-    console.log('Buscando escuela con ID:', id);
-    
-    // Primero verificar si la escuela existe
-    const schoolExists = await School.findByPk(id);
-    if (!schoolExists) {
-      console.log('Escuela no encontrada');
-      return res.status(404).json({
-        success: false,
-        message: 'Escuela no encontrada'
-      });
-    }
+  // Find the administrator (role 3)
+  const adminUser = (school.users && school.users.length > 0)
+    ? {
+        user_id: school.users[0].user_id,
+        user_name: school.users[0].user_name,
+        user_lastname: school.users[0].user_lastname,
+        user_email: school.users[0].user_email
+      }
+    : null;
 
+  // Format courses with teacher if available
+  const formattedCourses = school.courses
+    ? school.courses.map(course => ({
+        course_id: course.course_id,
+        course_name: course.course_name,
+        course_description: course.course_description,
+        teacher: (course.teachers && course.teachers.length > 0)
+          ? {
+              user_id: course.teachers[0].user_id,
+              user_name: course.teachers[0].user_name,
+              user_lastname: course.teachers[0].user_lastname,
+              user_email: course.teachers[0].user_email
+            }
+          : undefined
+      }))
+    : [];
 
-    console.log('Escuela encontrada, buscando detalles...');
-
-    // Obtener la escuela con sus relaciones
-    const school = await School.findByPk(id, {
-      include: [
-        { 
-          model: Course, 
-          as: 'courses',
-          attributes: ['course_id', 'course_name', 'course_description'],
-          required: false,
-          include: [{
-            model: User,
-            as: 'teachers',
-            through: {
-              attributes: []
-            },
-            attributes: ['user_id', 'user_name', 'user_lastname', 'user_email'],
-            required: false
-          }]
-        },
-        {
-          model: User,
-          as: 'users',
-          through: {
-            where: { role_id: 4 },
-            attributes: ['role_id']
-          },
-          attributes: ['user_id', 'user_name', 'user_lastname', 'user_email'],
-          required: false
-        }
-      ]
-    });
-
-    if (!school) {
-      console.log('Error al cargar detalles de la escuela');
-      return res.status(500).json({
-        success: false,
-        message: 'Error al cargar los detalles de la escuela'
-      });
-    }
-
-    console.log('Detalles de la escuela cargados, formateando respuesta...');
-
-    // Formatear la respuesta
-    const formattedSchool = {
+  return res.status(200).json({
+    success: true,
+    data: {
       school_id: school.school_id,
       school_name: school.school_name,
       school_description: school.school_description,
-      school_phone: school.school_phone ? school.school_phone.toString() : '',
+      school_phone: school.school_phone,
       school_address: school.school_address,
       school_image: school.school_image,
       school_email: school.school_email,
-      coordinators: school.users ? school.users.map(user => ({
-        user_id: user.user_id,
-        user_name: user.user_name,
-        user_lastname: user.user_lastname,
-        user_email: user.user_email
-      })) : [],
-      courses: school.courses ? school.courses.map(course => {
-        const courseData = {
-          course_id: course.course_id,
-          course_name: course.course_name,
-          course_description: course.course_description,
-          course_duration: course.course_duration
-        };
-
-        if (course.teachers && course.teachers.length > 0) {
-          const teacher = course.teachers[0];
-          courseData.teacher = {
-            user_id: teacher.user_id,
-            user_name: teacher.user_name,
-            user_lastname: teacher.user_lastname,
-            user_email: teacher.user_email
-          };
-        }
-
-        return courseData;
-      }) : []
-    };
-
-    console.log('Respuesta formateada, enviando...');
-    
-    return res.status(200).json({
-      success: true,
-      data: formattedSchool
-    });
-  } catch (error) {
-    console.error('Error en getSchoolById:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Error al obtener los detalles de la escuela',
-      error: error.message
-    });
-  }
+      administrator: adminUser,
+      courses: formattedCourses
+    }
+  });
 });
 
 // Crear una nueva escuela
@@ -321,19 +269,31 @@ exports.deleteSchool = asyncHandler(async (req, res) => {
   });
 });
 
-// Obtener escuelas del admin
+// Obtener escuelas del coordinador
 exports.getCoordinatorSchools = asyncHandler(async (req, res) => {
   const coordinator_id = req.user.user_id;
 
+  // Buscar escuelas donde el usuario es coordinador (role_id: 3)
+  const userSchools = await UserSchoolRole.findAll({
+    where: {
+      user_id: coordinator_id,
+      role_id: 3
+    }
+  });
+
+  const schoolIds = userSchools.map(us => us.school_id);
+
+  if (!schoolIds.length) {
+    return res.status(200).json({
+      success: true,
+      data: [],
+      message: "El coordinador no tiene escuelas asignadas"
+    });
+  }
+
   const schools = await School.findAll({
-    include: [
-      {
-        model: User,
-        as: "users",
-        where: { user_id: coordinator_id },
-        attributes: ["user_id", "user_name", "user_lastname", "user_email"]
-      }
-    ]
+    where: { school_id: schoolIds },
+    attributes: ["school_id", "school_name"]
   });
 
   return res.status(200).json({

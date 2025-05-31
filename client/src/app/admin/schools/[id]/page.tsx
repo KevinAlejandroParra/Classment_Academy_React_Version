@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { motion } from "framer-motion"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
@@ -19,33 +19,38 @@ interface School {
   school_phone: string
   school_address: string
   school_image: string
-  coordinators: [{
+  administrator: {
     user_id: string
     user_name: string
     user_lastname: string
     user_email: string
-  }]
+  }
   courses: Array<{
     course_id: string
     course_name: string
     course_description: string
+    teacher?: {
+      user_id: string
+      user_name: string
+      user_lastname: string
+      user_email: string
+    }
   }>
 }
 
-interface Props {
-  params: {
-    id: string
-  }
-}
-
-const SchoolDetailsPage = ({ params }: Props) => {
+const SchoolDetailsPage = () => {
   const router = useRouter()
+  const pathname = usePathname()
   const [school, setSchool] = useState<School | null>(null)
   const [loading, setLoading] = useState(true)
 
+  // Extract school ID from the URL path
+  const schoolId = pathname.split("/").pop() || ""
+
   useEffect(() => {
     fetchSchoolDetails()
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [schoolId])
 
   const fetchSchoolDetails = async () => {
     try {
@@ -54,8 +59,7 @@ const SchoolDetailsPage = ({ params }: Props) => {
         router.push("/login")
         return
       }
-
-      const response = await fetch(`http://localhost:5000/api/schools/get-school`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/schools/${schoolId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -147,19 +151,19 @@ const SchoolDetailsPage = ({ params }: Props) => {
             </div>
 
             <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-white mb-4">Información del Coordinador</h3>
+              <h3 className="text-xl font-semibold text-white mb-4">Información del Administrador</h3>
               <div className="space-y-2 text-gray-300">
-                {school.coordinators && school.coordinators[0] ? (
+                {school.administrator ? (
                   <>
                     <p>
-                      <strong>Nombre:</strong> {school.coordinators[0].user_name} {school.coordinators[0].user_lastname}
+                      <strong>Nombre:</strong> {school.administrator.user_name} {school.administrator.user_lastname}
                     </p>
                     <p>
-                      <strong>Email:</strong> {school.coordinators[0].user_email}
+                      <strong>Email:</strong> {school.administrator.user_email}
                     </p>
                   </>
                 ) : (
-                  <p>No hay coordinador asignado</p>
+                  <p>No hay administrador asignado</p>
                 )}
               </div>
             </div>
@@ -176,6 +180,11 @@ const SchoolDetailsPage = ({ params }: Props) => {
                   >
                     <h4 className="text-lg font-semibold text-white">{course.course_name}</h4>
                     <p className="text-gray-400 mt-2">{course.course_description}</p>
+                    {course.teacher && (
+                      <div className="mt-2 text-gray-300 text-sm">
+                        <strong>Profesor:</strong> {course.teacher.user_name} {course.teacher.user_lastname} ({course.teacher.user_email})
+                      </div>
+                    )}
                   </div>
                 ))
               ) : (
@@ -189,4 +198,4 @@ const SchoolDetailsPage = ({ params }: Props) => {
   )
 }
 
-export default SchoolDetailsPage 
+export default SchoolDetailsPage

@@ -47,25 +47,20 @@ const SchoolsPage = () => {
         return
       }
 
-      console.log("Fetching schools...")
-      const response = await fetch(`http://localhost:5000/api/my-schools`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/schools/get-school`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         credentials: "include",
       })
-      console.log("Response status:", response.status)
-      
+
       if (!response.ok) {
         const errorData = await response.json()
-        console.error("Server error:", errorData)
         throw new Error(errorData.message || "Error al cargar las escuelas")
       }
 
       const data = await response.json()
-      console.log("Schools data:", data)
-
       if (!data.success) {
         throw new Error(data.message || "Error al cargar las escuelas")
       }
@@ -74,7 +69,6 @@ const SchoolsPage = () => {
       setError(null)
       setLoading(false)
     } catch (error: any) {
-      console.error("Error details:", error)
       setError(error.message || "Error al cargar las escuelas")
       Swal.fire({
         icon: "error",
@@ -139,58 +133,71 @@ const SchoolsPage = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {schools.map((school) => (
-              <motion.div
-                key={school.school_id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="backdrop-blur-xl bg-black/10 p-6 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)] cursor-pointer hover:border-[rgb(var(--primary-rgb))] transition-colors"
-                onClick={() => router.push(`/admin/schools/${school.school_id}`)}
-              >
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="bg-[rgb(var(--primary-rgb))] p-4 rounded-lg">
-                    {school.school_image ? (
-                      <img
-                        src={school.school_image}
-                        alt={school.school_name}
-                        className="w-8 h-8 object-cover rounded"
-                      />
-                    ) : (
-                      <FontAwesomeIcon icon={faSchool} className="text-2xl text-black" />
-                    )}
+            {schools.map((school) => {
+              const imageUrl = school.school_image
+                ? `${process.env.NEXT_PUBLIC_API_URL}${school.school_image}`
+                : null;
+
+              const coordinator = school.users && school.users.length > 0 ? school.users[0] : null;
+
+              return (
+                <motion.div
+                  key={school.school_id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="backdrop-blur-xl bg-black/10 p-6 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)] cursor-pointer hover:border-[rgb(var(--primary-rgb))] transition-colors"
+                  onClick={() => router.push(`/admin/schools/${school.school_id}`)}
+                >
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="bg-[rgb(var(--primary-rgb))] rounded-lg">
+                      {imageUrl ? (
+                        <img
+                          src={imageUrl}
+                          alt={school.school_name}
+                          className="w-16 h-16 object-cover rounded"
+                        />
+                      ) : (
+                        <FontAwesomeIcon icon={faSchool} className="text-2xl text-black" />
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold text-white">{school.school_name}</h3>
+                      <p className="text-gray-400 text-sm">{school.school_description}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-white">{school.school_name}</h3>
-                    <p className="text-gray-400 text-sm">{school.school_description}</p>
+                  <div className="text-gray-300 space-y-2">
+                    <p>
+                      <strong>Coordinador:</strong>{" "}
+                      {coordinator
+                        ? `${coordinator.user_name} ${coordinator.user_lastname}`
+                        : "No asignado"}
+                    </p>
+                    <p>
+                      <strong>Email coordinador:</strong>{" "}
+                      {coordinator ? coordinator.user_email : "No asignado"}
+                    </p>
+                    <p>
+                      <strong>Email escuela:</strong> {school.school_email}
+                    </p>
+                    <p>
+                      <strong>Teléfono:</strong> {school.school_phone}
+                    </p>
+                    <p>
+                      <strong>Dirección:</strong> {school.school_address}
+                    </p>
                   </div>
-                </div>
-                <div className="text-gray-300 space-y-2">
-                  <p>
-                    <strong>Coordinador:</strong> {school.users && school.users[0] ? 
-                      `${school.users[0].user_name} ${school.users[0].user_lastname}` : 
-                      'No asignado'}
-                  </p>
-                  <p>
-                    <strong>Email:</strong> {school.school_email}
-                  </p>
-                  <p>
-                    <strong>Teléfono:</strong> {school.school_phone}
-                  </p>
-                  <p>
-                    <strong>Dirección:</strong> {school.school_address}
-                  </p>
-                </div>
-                <div className="mt-4 flex justify-end">
-                  <motion.div
-                    whileHover={{ x: 5 }}
-                    className="text-[rgb(var(--primary-rgb))] flex items-center gap-2"
-                  >
-                    Ver detalles
-                    <FontAwesomeIcon icon={faArrowRight} />
-                  </motion.div>
-                </div>
-              </motion.div>
-            ))}
+                  <div className="mt-4 flex justify-end">
+                    <motion.div
+                      whileHover={{ x: 5 }}
+                      className="text-[rgb(var(--primary-rgb))] flex items-center gap-2"
+                    >
+                      Ver detalles
+                      <FontAwesomeIcon icon={faArrowRight} />
+                    </motion.div>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         )}
       </main>
@@ -198,4 +205,4 @@ const SchoolsPage = () => {
   )
 }
 
-export default SchoolsPage 
+export default SchoolsPage

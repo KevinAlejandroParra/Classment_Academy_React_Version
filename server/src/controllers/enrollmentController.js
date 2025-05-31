@@ -111,23 +111,7 @@ class EnrollmentController {
         }
     }
 
-    static calculateEndDate(planType) {
-        const endDate = new Date();
-        switch(planType) {
-            case 'anual':
-                endDate.setFullYear(endDate.getFullYear() + 1);
-                break;
-            case 'semestral':
-                endDate.setMonth(endDate.getMonth() + 6);
-                break;
-            case 'trimestral':
-                endDate.setMonth(endDate.getMonth() + 3);
-                break;
-            default: // mensual
-                endDate.setMonth(endDate.getMonth() + 1);
-        }
-        return endDate;
-    }
+    
 
     // Método para obtener matrículas por usuario
     static getEnrollmentsByUser = asyncHandler(async (req, res) => {
@@ -247,9 +231,7 @@ class EnrollmentController {
                 enrollment_id: uuidv4(),
                 user_id: studentId,
                 course_id: courseId,
-                plan_type: 'mensual', // Plan por defecto
                 start_date: new Date(),
-                end_date: EnrollmentController.calculateEndDate('mensual'),
                 status: 'active',
                 progress: 0
             });
@@ -267,8 +249,6 @@ class EnrollmentController {
                             school_name: course.school.school_name 
                         }
                     },
-                    start_date: enrollment.start_date,
-                    end_date: enrollment.end_date
                 },
                 message: 'Inscripción al curso exitosa'
             });

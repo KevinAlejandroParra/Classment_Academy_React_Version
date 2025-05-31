@@ -7,8 +7,7 @@ const paymentRoutes = require("./routes/paymentRoutes.js");
 const userRoutes = require("./routes/user.routes.js");
 const schoolRoutes = require("./routes/school.routes.js");
 const courseRoutes = require("./routes/course.routes.js");
-const teacherRoutes = require("./routes/teacher.js");
-const profeRoutes = require("./routes/profe.routes.js");
+const teacherRoutes = require("./routes/teacher.routes.js");
 const classRoutes = require("./routes/classRoutes.js")
 const attendanceRoutes = require("./routes/attendanceRoutes.js")
 const errorHandler = require("./middleware/errorHandler.js");
@@ -49,10 +48,9 @@ app.use('/api', userRoutes);
 // Rutas que pueden requerir autenticación
 app.use("/api/auth", userRoutes);
 app.use('/api/courseteacher', courseTeacherRoutes);
-app.use('/api/teachers', profeRoutes);
+app.use('/api/teachers', teacherRoutes);
 app.use('/api/enrollments', enrollmentRoutes);
 app.use('/api/attendance', attendanceRoutes);
-app.use('/api/teacher', teacherRoutes);
 
 
 // Manejo de rutas no encontradas

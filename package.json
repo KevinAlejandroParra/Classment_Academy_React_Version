@@ -24,6 +24,7 @@
         "dotenv": "^16.5.0",
         "mercadopago": "^2.5.0",
         "morgan": "^1.10.0",
-        "nodemailer": "^7.0.3"
+        "nodemailer": "^7.0.3",
+        "sena-a11y": "^1.1.0"
     }
 }

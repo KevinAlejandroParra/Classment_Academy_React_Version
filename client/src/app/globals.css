@@ -8,6 +8,7 @@
   --surface-1: 255, 255, 255; /* Light card */
   --surface-2: 245, 222, 179; /* Light accent (wheat/gold) */
   --highlight-rgb: 255, 255, 0; /* Nuevo color para sombras luminosas */
+  --warning-rgb: 153, 27, 27; 
 }
 
 .dark {
@@ -17,6 +18,7 @@
   --surface-1: 24, 24, 24;    /* Dark card */
   --surface-2: 60, 50, 10;    /* Dark accent */
   --highlight-rgb: 255, 255, 0; /* Nuevo color para sombras luminosas */
+  --warning-rgb: 252, 165, 165; 
 }
 
 body {

@@ -188,7 +188,7 @@ export function PromotionBanner() {
           <div className="flex items-start space-x-4">
             <div className="text-2xl">⚠️</div>
             <div>
-              <h3 className="font-bold text-lg text-red-800 dark:text-red-300 mb-2">
+              <h3 className="font-bold text-lg  text-[rgb(var(--warning-rgb))] mb-2">
                 Información Importante
               </h3>
               <p className="text-red-700 dark:text-red-400 leading-relaxed">

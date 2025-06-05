@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
+        pass: process.env.EMAIL_PASSWORD,
     }
 });
 
@@ -78,6 +78,23 @@ class UserController {
             if (parseInt(userJSON.role_id) === 3) {
                 userJSON.role_id = 1; // estudiante
                 userJSON.pending_admin = true;
+
+                // Enviar correo de bienvenida
+                const mailOptions = {
+                    from: process.env.EMAIL_USER,
+                    to: userJSON.user_email,
+                    subject: "Bienvenido a Classment Members",
+                    html: `<p>Estimado ${userJSON.user_name},</p>
+                           <p>Bienvenido a la comunidad de administradores de Classment Academy.</p>
+                           <p>Por favor, diligencie el documento adjunto en el siguiente enlace y envíelo a nuestro correo classmentacademy@gmail.com junto con el documento de identidad del encargado del establecimiento para validar la veracidad de la escuela:</p>
+                           <a href="https://drive.google.com/file/d/1WzUiGglRUROxnUKtwOk5N7Q7Wd6CE87_/view?usp=sharing">Contrato de Administrador</a>
+                           <p>Una vez que se complete el proceso, nuestro equipo se pondrá en contacto contigo para finalizar la validación de tu cuenta.</p>
+                           <p>Atentamente,<br>El equipo de Classment Academy</p>`
+                };
+                console .log(process.env.EMAIL_USER);
+                console .log(userJSON.user_email);
+
+                await transporter.sendMail(mailOptions);
             }
 
             // Validaciones adicionales

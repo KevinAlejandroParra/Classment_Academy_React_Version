@@ -2,8 +2,39 @@ const express = require('express');
 const router = express.Router();
 const schoolController = require('../controllers/schoolController');
 const { verifyToken, checkRole } = require('../middleware/auth');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
+// Configuración de multer para escuelas
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const folder = path.join(__dirname, "..", "..", "public", "images", "schools");
+    if (!fs.existsSync(folder)) {
+      fs.mkdirSync(folder, { recursive: true });
+    }
+    cb(null, folder);
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+    const fileName = `school-${Date.now()}${ext}`;
+    cb(null, fileName);
+  },
+});
 
+const fileFilter = (req, file, cb) => {
+  const allowed = /jpeg|jpg|png|gif/;
+  const isValid = allowed.test(file.mimetype);
+  isValid ? cb(null, true) : cb(new Error("Tipo de archivo no permitido"), false);
+};
+
+const upload = multer({ 
+  storage, 
+  fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB
+  }
+});
 
 /**
  * @swagger
@@ -21,35 +52,10 @@ const { verifyToken, checkRole } = require('../middleware/auth');
  *         description: Error interno del servidor
  */
 router.get('/', schoolController.getAllSchools);
-router.use(verifyToken);
 
-router.get('/get-school/', schoolController.getAdminSchool);
+router.get('/get-school/', verifyToken, schoolController.getAdminSchool);
 
 router.get('/:id', verifyToken, schoolController.getSchoolById);
-
-
-/**
- * @swagger
- * /school/{id}:
- *   get:
- *     description: Obtiene los detalles de una escuela por su ID (ruta pública)
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: El ID de la escuela a obtener
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Detalles de la escuela
- *       404:
- *         description: Escuela no encontrada
- *       500:
- *         description: Error interno del servidor
- */
-router.use(verifyToken);
-
 
 /**
  * @swagger
@@ -58,112 +64,112 @@ router.use(verifyToken);
  *     description: Crea una nueva escuela (solo coordinadores y administradores)
  *     security:
  *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *                 description: El nombre de la escuela
- *               location:
- *                 type: string
- *                 description: La ubicación de la escuela
+ *     consumes:
+ *       - multipart/form-data
+ *     parameters:
+ *       - in: formData
+ *         name: school_image
+ *         type: file
+ *         description: Imagen de la escuela
+ *       - in: formData
+ *         name: school_name
+ *         type: string
+ *         required: true
+ *       - in: formData
+ *         name: school_description
+ *         type: string
+ *         required: true
+ *       - in: formData
+ *         name: school_phone
+ *         type: string
+ *         required: true
+ *       - in: formData
+ *         name: school_address
+ *         type: string
+ *         required: true
+ *       - in: formData
+ *         name: school_email
+ *         type: string
+ *         required: true
+ *       - in: formData
+ *         name: teacher_id
+ *         type: string
+ *         required: true
  *     responses:
  *       201:
  *         description: Escuela creada con éxito
  *       403:
- *         description: No autorizado para crear escuelas (solo coordinadores o administradores)
+ *         description: No autorizado para crear escuelas
  *       500:
  *         description: Error interno del servidor
  */
-
-
-router.post('/', checkRole([3, 4]), schoolController.createSchool);
+router.post('/', verifyToken, checkRole([3, 4]), upload.single('school_image'), schoolController.createSchool);
 
 /**
  * @swagger
  * /school/{id}:
  *   put:
- *     description: Actualiza los detalles de una escuela por su ID (solo coordinadores y administradores)
+ *     description: Actualiza una escuela (solo coordinadores y administradores)
  *     security:
  *       - bearerAuth: []
+ *     consumes:
+ *       - multipart/form-data
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: El ID de la escuela a actualizar
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *                 description: El nuevo nombre de la escuela
- *               location:
- *                 type: string
- *                 description: La nueva ubicación de la escuela
+ *         type: string
+ *       - in: formData
+ *         name: school_image
+ *         type: file
+ *         description: Imagen de la escuela
+ *       - in: formData
+ *         name: school_name
+ *         type: string
+ *       - in: formData
+ *         name: school_description
+ *         type: string
+ *       - in: formData
+ *         name: school_phone
+ *         type: string
+ *       - in: formData
+ *         name: school_address
+ *         type: string
+ *       - in: formData
+ *         name: school_email
+ *         type: string
  *     responses:
  *       200:
  *         description: Escuela actualizada con éxito
  *       403:
- *         description: No autorizado para actualizar escuelas (solo coordinadores o administradores)
- *       404:
- *         description: Escuela no encontrada
+ *         description: No autorizado para actualizar escuelas
  *       500:
  *         description: Error interno del servidor
  */
-router.put('/:id', checkRole([3, 4]), schoolController.updateSchool);
+router.put('/:id', verifyToken, checkRole([3, 4]), upload.single('school_image'), schoolController.updateSchool);
 
 /**
  * @swagger
  * /school/{id}:
  *   delete:
- *     description: Elimina una escuela por su ID (solo administradores)
+ *     description: Elimina una escuela (solo administradores)
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: El ID de la escuela a eliminar
- *         schema:
- *           type: integer
+ *         type: string
  *     responses:
  *       200:
  *         description: Escuela eliminada con éxito
  *       403:
- *         description: No autorizado para eliminar escuelas (solo coordinadores o administradores)
- *       404:
- *         description: Escuela no encontrada
+ *         description: No autorizado para eliminar escuelas
  *       500:
  *         description: Error interno del servidor
  */
-router.delete('/:id', checkRole([3]), schoolController.deleteSchool);
+router.delete('/:id', verifyToken, checkRole([3]), schoolController.deleteSchool);
 
-/**
- * @swagger
- * /school/coordinator/schools:
- *   get:
- *     description: Obtiene todas las escuelas gestionadas por el coordinador (solo coordinadores)
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Lista de escuelas gestionadas por el coordinador
- *       403:
- *         description: No autorizado para ver escuelas del coordinador (solo coordinadores)
- *       500:
- *         description: Error interno del servidor
- */
-
-router.get('/coordinator/schools', checkRole([4]), schoolController.getCoordinatorSchools);
+router.get('/coordinator/schools', verifyToken, checkRole([4]), schoolController.getCoordinatorSchools);
 
 module.exports = router;

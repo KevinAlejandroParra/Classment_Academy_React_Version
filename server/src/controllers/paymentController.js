@@ -6,7 +6,6 @@ const crypto = require("crypto");
 const dotenv = require("dotenv");
 const nodemailer = require("nodemailer");
 
-// Configuración de credenciales
 const client = new MercadoPagoConfig({
     accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN || "APP_USR-2745143215161147-042900-26e96cb52a1945424150974e22420851-2410996615",
 });
@@ -14,7 +13,6 @@ const client = new MercadoPagoConfig({
 const preferenceClient = new Preference(client);
 const paymentClient = new MPPayment(client);
 
-// Configure nodemailer transporter
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -45,8 +43,6 @@ class PaymentController {
         try {
             const { courseId, amount, description } = req.body;
             const userId = req.user.user_id;
-
-            // Validaciones básicas
             if (!courseId || !amount) {
                 return res.status(400).json({
                     success: false,
@@ -77,7 +73,6 @@ class PaymentController {
                 });
             }
 
-            // Verificar si ya existe una inscripción activa
             const existingEnrollment = await Enrollment.findOne({
                 where: {
                     user_id: userId,
@@ -97,7 +92,6 @@ class PaymentController {
             const courseTitle = course.course_name || "Curso";
             const paymentDescription = description || `Inscripción al curso ${courseTitle}`;
 
-            // Crear preferencia con Mercado Pago
             const preference = {
                 items: [
                     {
@@ -123,7 +117,6 @@ class PaymentController {
                 }
             };
 
-            // Guardar registro de pago pendiente
             await Payment.create({
                 payment_id: paymentId,
                 user_id: userId,
@@ -168,7 +161,6 @@ class PaymentController {
             
             console.log("Webhook recibido:", JSON.stringify(body));
             
-            // Validar la acción del webhook
             if (!body.data || !body.data.id) {
                 return res.status(400).json({
                     success: false,
@@ -176,7 +168,6 @@ class PaymentController {
                 });
             }
 
-            // Obtener detalles del pago desde Mercado Pago
             const paymentId = body.data.id;
             const payment = await paymentClient.get({ id: Number(paymentId) });
             
@@ -185,7 +176,6 @@ class PaymentController {
             }
             
             
-            // Buscar el pago en nuestra base de datos mediante external_reference
             if (!payment.external_reference) {
                 console.error("External reference no encontrado en la respuesta de MercadoPago");
                 return res.status(400).json({ success: false, message: "Referencia externa no encontrada" });
@@ -200,7 +190,6 @@ class PaymentController {
                 return res.status(404).json({ success: false, message: "Pago no registrado en sistema" });
             }
             
-            // Actualizar estado del pago en nuestra base de datos
             const paymentStatus = payment.status === "approved" ? "completed" : 
                                   payment.status === "rejected" ? "failed" : 
                                   payment.status === "in_process" ? "pending" : "pending";
@@ -213,7 +202,6 @@ class PaymentController {
                 updated_at: new Date()
             });
             
-            // Obtener información del usuario y curso para el correo
             const user = await User.findByPk(dbPayment.user_id);
             const course = await Course.findByPk(dbPayment.course_id);
             
@@ -245,9 +233,7 @@ class PaymentController {
             } else {
                 console.warn("[EMAIL] Usuario o curso no encontrados para enviar correo.");
             }
-            // Si el pago es exitoso, crear la inscripción
             if (paymentStatus === "completed") {
-                // Verificar si ya existe una inscripción
                 const existingEnrollment = await Enrollment.findOne({
                     where: {
                         user_id: dbPayment.user_id,
@@ -256,7 +242,6 @@ class PaymentController {
                 });
                 
                 if (!existingEnrollment) {
-                    // Crear nueva inscripción
                     await Enrollment.create({
                         enrollment_id: uuidv4(),
                         user_id: dbPayment.user_id,
@@ -270,17 +255,13 @@ class PaymentController {
                     
 
                 } else if (existingEnrollment.status !== "active") {
-                    // Actualizar inscripción existente si no está activa
                     await existingEnrollment.update({
                         status: "active",
                         payment_id: dbPayment.payment_id,
                     });
-                    
-                    console.log("Inscripción actualizada para el usuario:", dbPayment.user_id);
-                }
+                    }
             }
             
-            // Responder al webhook con éxito
             return res.status(200).json({ success: true, message: "Notificación procesada correctamente" });
             
         } catch (error) {
@@ -326,7 +307,6 @@ class PaymentController {
         try {
             const { paymentId } = req.params;
 
-            // Buscar el pago en nuestra base de datos
             const payment = await Payment.findOne({
                 where: { payment_id: paymentId },
             });
@@ -338,7 +318,6 @@ class PaymentController {
                 });
             }
 
-            // Si el pago está pendiente y tiene ID de Mercado Pago, verificar estado actual
             if (payment.status === "pending" && payment.mp_payment_id) {
                 try {
                     const mpPayment = await paymentClient.get({ id: Number(payment.mp_payment_id) });
@@ -356,7 +335,6 @@ class PaymentController {
                                 updated_at: new Date()
                             });
                             
-                            // Si se confirma el pago, crear inscripción
                             if (newStatus === "completed") {
                                 const existingEnrollment = await Enrollment.findOne({
                                     where: {
@@ -381,11 +359,9 @@ class PaymentController {
                     }
                 } catch (mpError) {
                     console.error("Error al consultar estado en MercadoPago:", mpError);
-                    // Continuar con el estado actual
                 }
             }
 
-            // Verificar si existe una inscripción activa
             let enrollment = null;
             if (payment.status === "completed") {
                 enrollment = await Enrollment.findOne({
@@ -404,7 +380,6 @@ class PaymentController {
                 });
             }
 
-            // Responder con el estado del pago
             return res.status(200).json({
                 success: true,
                 data: {
@@ -440,7 +415,6 @@ class PaymentController {
         try {
             const { payment_id, collection_id, external_reference } = req.query;
 
-            // Validar parámetros mínimos
             if (!external_reference) {
                 console.error("Falta external_reference en la URL de éxito");
                 return res.redirect(
@@ -448,15 +422,12 @@ class PaymentController {
                 );
             }
 
-            // Buscar el pago en nuestra base de datos
             const payment = await Payment.findOne({ where: { payment_id: external_reference } });
             if (!payment) {
                 return res.redirect(
                     `${process.env.FRONTEND_URL}/payment/failure?error=payment_not_found`
                 );
             }
-
-            // Verificar estado con MercadoPago si es necesario
             const mercadoPagoId = payment_id || collection_id;
             if (mercadoPagoId && payment.status !== "completed") {
                 try {
@@ -471,9 +442,7 @@ class PaymentController {
                             mp_status_detail: mpPayment.status_detail,
                             updated_at: new Date()
                         });
-                        
-                        // Crear inscripción si no existe
-                        const existingEnrollment = await Enrollment.findOne({
+                            const existingEnrollment = await Enrollment.findOne({
                             where: {
                                 user_id: payment.user_id,
                                 course_id: payment.course_id,
@@ -492,7 +461,6 @@ class PaymentController {
                             });
                         }
                     } else if (mpPayment && mpPayment.status === "rejected") {
-                        // Actualizar como fallido
                         await payment.update({
                             status: "failed",
                             mp_payment_id: mercadoPagoId,
@@ -507,11 +475,9 @@ class PaymentController {
                     }
                 } catch (mpError) {
                     console.error("Error al verificar pago con MercadoPago:", mpError);
-                    // Continuar con la redirección normal
                 }
             }
 
-            // Redirigir al frontend con el ID de pago
             return res.redirect(
                 `${process.env.FRONTEND_URL}/payment/success?external_reference=${external_reference}`
             );
@@ -526,7 +492,6 @@ class PaymentController {
             const { external_reference } = req.query;
             
             if (external_reference) {
-                // Buscar y actualizar el pago como fallido
                 const payment = await Payment.findOne({ where: { payment_id: external_reference } });
                 if (payment && payment.status === "pending") {
                     await payment.update({

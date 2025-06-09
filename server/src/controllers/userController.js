@@ -701,11 +701,52 @@ class UserController {
         }
     }
 
-    static async getUserSchools(req, res) {
-        try {
-            const userId = req.user.user_id;
+static async getUserSchools(req, res) {
+    if (!req.user) {
+        const error = new Error('User not authenticated');
+        error.statusCode = 401;
+        throw error;
+    }
 
-            // 1. Verificar que el usuario existe
+    const userId = req.user.user_id;
+    const roleId = req.user.role_id;
+
+    try {
+        // For administrators (role_id 3), find schools where they have admin role
+        if (roleId === 3) {
+            const userSchoolRoles = await UserSchoolRole.findAll({
+                where: {
+                    user_id: userId,
+                    role_id: 3
+                },
+                include: [{
+                    model: School,
+                    as: 'school',
+                    include: [{
+                        model: Course,
+                        as: "courses",
+                        attributes: ["course_id", "course_name"],
+                        required: false,
+                    }]
+                }]
+            });
+
+            const schools = userSchoolRoles.map(usr => {
+                const school = usr.school.get({ plain: true });
+                school.user_role_id = usr.role_id;
+                return school;
+            });
+
+            schools.sort((a, b) => a.school_name.localeCompare(b.school_name));
+
+            return res.status(200).json({
+                success: true,
+                data: schools,
+                message: "Admin schools retrieved successfully"
+            });
+
+        } else {
+            // For other roles, maintain existing logic
             const user = await User.findByPk(userId, {
                 attributes: ["user_id", "role_id"],
             });
@@ -713,13 +754,13 @@ class UserController {
             if (!user) {
                 return res.status(404).json({
                     success: false,
-                    message: "Usuario no encontrado para obtener escuelas",
+                    message: "User not found",
                 });
             }
 
             let schools = [];
 
-            // obtener escuelas a través de cursos matriculados
+            // Get schools through enrolled courses for students
             if (user.role_id === 1) {
                 const enrollmentRecords = await Enrollment.findAll({
                     where: {
@@ -734,7 +775,7 @@ class UserController {
                             include: [
                                 {
                                     model: School,
-                                    as: "school", 
+                                    as: "school",
                                     attributes: [
                                         "school_id",
                                         "school_name",
@@ -749,22 +790,19 @@ class UserController {
                     ],
                 });
 
-                // Mapear escuelas únicas
                 const schoolsMap = new Map();
 
                 enrollmentRecords.forEach((enrollment) => {
                     const course = enrollment.course;
-                    if (course && course.school) {
+                    if (course?.school) {
                         const school = course.school;
                         if (!schoolsMap.has(school.school_id)) {
                             const plainSchool = school.get ? school.get({ plain: true }) : school;
-                          
                             schoolsMap.set(school.school_id, {
-                              ...plainSchool,
-                              enrollments: []
+                                ...plainSchool,
+                                enrollments: []
                             });
-                          }
-                          
+                        }
 
                         schoolsMap.get(school.school_id).enrollments.push({
                             enrollment_id: enrollment.enrollment_id,
@@ -776,18 +814,10 @@ class UserController {
                     }
                 });
 
-                schools = Array.from(schoolsMap.values()).map((school) => {
-                    const plainSchool = school.get ? school.get({ plain: true }) : school;
-                    return {
-                      ...plainSchool,
-                      enrollments: school.enrollments || []
-                    };
-                  });
-                  
+                schools = Array.from(schoolsMap.values());
             }
-            // Lógica para profesores, coordinadores y administradores
-            else if ([2, 3 ].includes(user.role_id)) {
-                // 2: profesor, 3: administrador,
+            // Logic for teachers and coordinators
+            else if ([2, 4].includes(user.role_id)) {
                 const userSchoolRoles = await UserSchoolRole.findAll({
                     where: { user_id: userId },
                     include: [
@@ -801,7 +831,6 @@ class UserController {
                                 "school_email",
                                 "school_phone",
                                 "school_description"
-                                
                             ],
                             include: [
                                 {
@@ -818,37 +847,28 @@ class UserController {
 
                 schools = userSchoolRoles.map((usr) => {
                     const school = usr.school.get({ plain: true });
-                    school.user_role_id = usr.role_id; // Rol específico en esta escuela
+                    school.user_role_id = usr.role_id;
                     return school;
                 });
             }
 
-            // 4. Ordenar escuelas alfabéticamente
             schools.sort((a, b) => a.school_name.localeCompare(b.school_name));
 
-            // Convertir a objetos puros (sin dataValues, etc.)
             return res.status(200).json({
                 success: true,
-                data: schools.map(school => {
-                  const plainSchool = school.get ? school.get({ plain: true }) : school;
-                  if (plainSchool.enrollments && Array.isArray(plainSchool.enrollments)) {
-                    plainSchool.enrollments = plainSchool.enrollments.map(enr => ({ ...enr }));
-                  }
-                  return plainSchool;
-                }),
-                message: "Escuelas del usuario obtenidas correctamente"
-              });
-              
-        } catch (error) {
-            console.error("Error en getUserSchools:", error);
-            return res.status(500).json({
-                success: false,
-                message: "Error al obtener las escuelas del usuario",
-                error: error.message
+                data: schools,
+                message: "Schools retrieved successfully"
             });
         }
+    } catch (error) {
+        console.error("Error in getUserSchools:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Error retrieving user schools",
+            error: error.message
+        });
     }
-    
+}
     // Obtener todos los coordinadores
     static async getCoordinators(req, res) {
         try {

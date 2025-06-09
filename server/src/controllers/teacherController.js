@@ -395,22 +395,39 @@ exports.assignTeacherToCourse = asyncHandler(async (req, res) => {
 // Obtener todos los profesores de una escuela
 exports.getTeachersBySchool = asyncHandler(async (req, res) => {
   const { school_id } = req.params;
+  const user_id = req.user.user_id;
 
-  // Verificar que el usuario que hace la petición es admin de la escuela
+  // Verificar que el usuario existe y tiene el rol correcto
+  const user = await User.findByPk(user_id);
+  if (!user) {
+    const error = new Error('Usuario no encontrado');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  // Verificar que el usuario es admin (role_id: 3)
+  if (user.role_id !== 3) {
+    const error = new Error('Solo los administradores pueden gestionar profesores');
+    error.statusCode = 403;
+    throw error;
+  }
+
+  // Verificar que el usuario es admin de la escuela específica
   const adminSchoolRole = await UserSchoolRole.findOne({
     where: {
-      user_id: req.user.user_id,
+      user_id: user_id,
       school_id: school_id,
       role_id: 3 // rol de admin
     }
   });
 
   if (!adminSchoolRole) {
-    const error = new Error('No tienes permisos para ver los profesores de esta escuela');
+    const error = new Error('No tienes permisos para gestionar los profesores de esta escuela');
     error.statusCode = 403;
     throw error;
   }
 
+  // Obtener los profesores de la escuela
   const teachers = await UserSchoolRole.findAll({
     where: {
       school_id: school_id,
@@ -419,7 +436,7 @@ exports.getTeachersBySchool = asyncHandler(async (req, res) => {
     include: [{
       model: User,
       as: 'user',
-      attributes: ['user_id', 'user_name', 'user_lastname', 'user_email', 'user_phone']
+      attributes: ['user_id', 'user_name', 'user_lastname', 'user_email', 'user_phone', 'user_state']
     }]
   });
 
@@ -431,7 +448,10 @@ exports.getTeachersBySchool = asyncHandler(async (req, res) => {
 
   return res.status(200).json({
     success: true,
-    data: teachers.map(tsr => tsr.user),
+    data: teachers.map(tsr => ({
+      ...tsr.user.get({ plain: true }),
+      school_role_id: tsr.role_id
+    })),
     courses,
     message: "Profesores y cursos de la escuela obtenidos correctamente"
   });

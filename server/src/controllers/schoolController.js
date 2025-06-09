@@ -89,7 +89,7 @@ exports.getSchoolById = asyncHandler(async (req, res) => {
         model: User,
         as: 'users',
         through: {
-          where: { role_id: 3 }, // Only admin
+          where: { role_id: 3 }, // Solo los administradores
           attributes: ['role_id']
         },
         attributes: ['user_id', 'user_name', 'user_lastname', 'user_email'],
@@ -119,7 +119,7 @@ exports.getSchoolById = asyncHandler(async (req, res) => {
     });
   }
 
-  // Find the administrator (role 3)
+  
   const adminUser = (school.users && school.users.length > 0)
     ? {
         user_id: school.users[0].user_id,
@@ -129,7 +129,7 @@ exports.getSchoolById = asyncHandler(async (req, res) => {
       }
     : null;
 
-  // Format courses with teacher if available
+
   const formattedCourses = school.courses
     ? school.courses.map(course => ({
         course_id: course.course_id,
@@ -164,7 +164,13 @@ exports.getSchoolById = asyncHandler(async (req, res) => {
 
 // Crear una nueva escuela
 exports.createSchool = asyncHandler(async (req, res) => {
-  const { school_name, school_description, school_phone, school_address, school_image, school_email } = req.body;
+    const { school_name, school_description, school_phone, school_address, school_email } = req.body;
+  if (!school_name || !school_description || !school_phone || !school_address || !school_email) {
+    const error = new Error("Todos los campos son requeridos");
+    error.statusCode = 400;
+    throw error;
+  }
+
   const user_id = req.user.user_id;
   const role_id = req.user.role_id;
 
@@ -173,6 +179,11 @@ exports.createSchool = asyncHandler(async (req, res) => {
     const error = new Error('Solo los administradores y coordinadores pueden crear escuelas');
     error.statusCode = 403;
     throw error;
+  }
+
+  let school_image = null;
+  if (req.file) {
+    school_image = `/images/schools/${req.file.filename}`;
   }
 
   // Crear la escuela
@@ -185,14 +196,12 @@ exports.createSchool = asyncHandler(async (req, res) => {
     school_email
   });
 
-  // Si es coordinador, crear la relación en user_school_roles
-  if (role_id === 4) {
-    await UserSchoolRole.create({
-      user_id: user_id,
-      school_id: school.school_id,
-      role_id: role_id
-    });
-  }
+  // Crear la relación en user_school_roles para el administrador
+  await UserSchoolRole.create({
+    user_id: user_id,
+    school_id: school.school_id,
+    role_id: role_id 
+  });
 
   return res.status(201).json({
     success: true,
@@ -200,7 +209,6 @@ exports.createSchool = asyncHandler(async (req, res) => {
     message: "Escuela creada exitosamente"
   });
 });
-
 // Actualizar una escuela existente
 exports.updateSchool = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -208,7 +216,6 @@ exports.updateSchool = asyncHandler(async (req, res) => {
   const role_id = req.user.role_id;
   const updateData = req.body;
 
-  // Si no es admin, verificar que sea el coordinador de la escuela
   if (role_id !== 3) {
     const userSchool = await UserSchoolRole.findOne({
       where: {
@@ -232,7 +239,15 @@ exports.updateSchool = asyncHandler(async (req, res) => {
     throw error;
   }
 
-  await school.update(updateData);
+  let school_image = school.school_image;
+  if (req.file) {
+    school_image = `/images/schools/${req.file.filename}`;
+  }
+
+  await school.update({
+    ...updateData,
+    school_image
+  });
 
   return res.status(200).json({
     success: true,

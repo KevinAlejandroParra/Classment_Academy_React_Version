@@ -38,7 +38,7 @@ interface School {
   school_name: string;
 }
 
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_URL}`;
 
 const getImageUrl = (url: string | null | undefined): string => {
   if (!url) return "/placeholder.svg";

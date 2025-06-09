@@ -57,6 +57,14 @@ export default function CoursesSchoolsListPage() {
     );
   }
 
+  if (schools.length === 0) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-white text-xl">No tienes ninguna escuela, por favor regístrala en tu panel de control.</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
       <Sidebar />
@@ -96,4 +104,4 @@ export default function CoursesSchoolsListPage() {
       </div>
     </div>
   );
-} 
+}

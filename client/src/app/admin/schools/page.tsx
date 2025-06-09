@@ -129,7 +129,7 @@ const SchoolsPage = () => {
           </div>
         ) : schools.length === 0 ? (
           <div className="text-center text-white">
-            <h2 className="text-2xl mb-4">No hay escuelas registradas</h2>
+            <h2 className="text-2xl mb-4">No hay escuelas registradas, porfavor registra tu escuela en el panel de control</h2>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -153,50 +153,95 @@ const TeachersPage = () => {
       try {
         const token = localStorage.getItem("token")
         if (!token) {
+          Swal.fire({
+            icon: "error",
+            title: "Error de Autenticación",
+            text: "Por favor, inicia sesión para continuar",
+            background: "#1a1a1a",
+            color: "#ffffff",
+            iconColor: "rgb(var(--primary-rgb))",
+            confirmButtonColor: "rgb(var(--primary-rgb))",
+          })
           router.push("/login")
           return
         }
 
-        const response = await fetch("http://localhost:5000/api/auth/me", {
+        console.log("Verificando autenticación...")
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         })
 
+        console.log("Respuesta de autenticación:", response.status)
         const data = await response.json()
-        if (!response.ok) throw new Error(data.message)
+        console.log("Datos de usuario:", data)
+
+        if (!response.ok) {
+          throw new Error(data.message || "Error de autenticación")
+        }
+
+        if (!data.user) {
+          throw new Error("No se encontró información del usuario")
+        }
 
         if (data.user.role_id !== 3) {
+          Swal.fire({
+            icon: "error",
+            title: "Acceso Denegado",
+            text: "Solo los administradores pueden acceder a esta sección",
+            background: "#1a1a1a",
+            color: "#ffffff",
+            iconColor: "rgb(var(--primary-rgb))",
+            confirmButtonColor: "rgb(var(--primary-rgb))",
+          })
           router.push("/")
           return
         }
 
         setUser(data.user)
+        console.log("Usuario autenticado:", data.user)
 
-        // Obtener las escuelas del admin
-        const schoolResponse = await fetch(`http://localhost:5000/api/schools/`, {
+        console.log("Obteniendo escuelas del usuario...")
+        const schoolResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/my-schools`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         })
 
-        if (schoolResponse.ok) {
-          const schoolData = await schoolResponse.json()
-          setSchools(schoolData.data || [])
+        console.log("Respuesta de escuelas:", schoolResponse.status)
+        if (!schoolResponse.ok) {
+          const errorData = await schoolResponse.json()
+          throw new Error(errorData.message || "Error al cargar las escuelas")
         }
 
+        const schoolData = await schoolResponse.json()
+        console.log("Escuelas cargadas:", schoolData)
+        
+        if (!schoolData.data || schoolData.data.length === 0) {
+          Swal.fire({
+            icon: "info",
+            title: "Sin Escuelas",
+            text: "No tienes escuelas asignadas para gestionar",
+            background: "#1a1a1a",
+            color: "#ffffff",
+            iconColor: "rgb(var(--primary-rgb))",
+            confirmButtonColor: "rgb(var(--primary-rgb))",
+          })
+        }
+
+        setSchools(schoolData.data || [])
         setIsLoading(false)
-      } catch (error) {
-        console.error("Error de autenticación:", error)
+      } catch (error: any) {
+        console.error("Error en checkAuth:", error)
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: "Ha ocurrido un error al cargar tus datos",
-          confirmButtonText: "Intentar de nuevo",
+          text: error.message || "Ha ocurrido un error al cargar los datos",
           background: "#1a1a1a",
           color: "#ffffff",
-          iconColor: "#f87171",
-          confirmButtonColor: "#3085d6",
+          iconColor: "rgb(var(--primary-rgb))",
+          confirmButtonColor: "rgb(var(--primary-rgb))",
         })
         router.push("/login")
       }
@@ -220,61 +265,53 @@ const TeachersPage = () => {
     try {
       const token = localStorage.getItem("token")
       if (!token) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Sesión expirada. Por favor, inicia sesión nuevamente.",
+          background: "#1a1a1a",
+          color: "#ffffff",
+          iconColor: "rgb(var(--primary-rgb))",
+          confirmButtonColor: "rgb(var(--primary-rgb))",
+        })
         router.push("/login")
         return
       }
 
-      // Validaciones en el frontend
-      if (
-        !newTeacher.user_name ||
-        !newTeacher.user_lastname ||
-        !newTeacher.user_email ||
-        !newTeacher.user_password ||
-        !newTeacher.user_phone ||
-        !newTeacher.user_birth ||
-        !newTeacher.user_document ||
-        !newTeacher.user_document_type ||
-        !newTeacher.school_id
-      ) {
+      if (!newTeacher.user_name || !newTeacher.user_lastname || !newTeacher.user_email || 
+          !newTeacher.user_password || !newTeacher.user_phone || !newTeacher.user_birth || 
+          !newTeacher.user_document || !newTeacher.user_document_type || !newTeacher.school_id) {
         throw new Error("Todos los campos son requeridos")
       }
 
-      // Validación de nombre y apellido (solo letras)
       const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/
       if (!nameRegex.test(newTeacher.user_name) || !nameRegex.test(newTeacher.user_lastname)) {
         throw new Error("El nombre y apellido solo pueden contener letras")
       }
 
-      // Validación de teléfono (solo números)
       const phoneRegex = /^\d+$/
       if (!phoneRegex.test(newTeacher.user_phone)) {
         throw new Error("El teléfono solo puede contener números")
       }
 
-      // Validación de documento (solo números)
       if (!phoneRegex.test(newTeacher.user_document)) {
         throw new Error("El documento solo puede contener números")
       }
 
-      // Validación de contraseña
       if (newTeacher.user_password.length < 8) {
         throw new Error("La contraseña debe tener al menos 8 caracteres")
       }
 
-      // Asegurar que la fecha esté en formato YYYY-MM-DD
       const formattedDate = new Date(newTeacher.user_birth).toISOString().split("T")[0]
-
       showToast("info", "Creando profesor...")
 
-      // Añadir justo antes del fetch
       const teacherData = {
         ...newTeacher,
         user_birth: formattedDate,
         role_id: 2,
       }
-      console.log("Datos que se envían al servidor:", teacherData)
 
-      const response = await fetch("http://localhost:5000/api/users", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -284,10 +321,8 @@ const TeachersPage = () => {
       })
 
       const responseData = await response.json()
-      console.log("Respuesta completa del servidor:", responseData)
 
       if (!response.ok) {
-        console.log("Error al crear profesor:", responseData)
         throw new Error(responseData.message || "Error al crear profesor")
       }
 
@@ -295,7 +330,10 @@ const TeachersPage = () => {
         icon: "success",
         title: "Éxito",
         text: "Profesor creado correctamente",
-        confirmButtonColor: "#3085d6",
+        background: "#1a1a1a",
+        color: "#ffffff",
+        iconColor: "rgb(var(--primary-rgb))",
+        confirmButtonColor: "rgb(var(--primary-rgb))",
       })
 
       setShowTeacherModal(false)
@@ -313,24 +351,13 @@ const TeachersPage = () => {
         role_id: 2,
       })
 
-      // Actualizar lista de profesores
-      const schoolTeachersResponse = await fetch(`http://localhost:5000/api/teachers/school/${newTeacher.school_id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-
-      if (schoolTeachersResponse.ok) {
-        const teachersData = await schoolTeachersResponse.json()
-        setTeachers(teachersData.data || [])
-      }
+      await handleSchoolSelect(newTeacher.school_id)
     } catch (error: any) {
       console.error("Error al crear profesor:", error)
       showErrorAlert(error.message || "Ha ocurrido un error al crear el profesor")
     } finally {
       setIsSubmitting(false)
     }
-    
   }
 
   const handleAssignTeacher = async (e: React.FormEvent) => {
@@ -346,14 +373,7 @@ const TeachersPage = () => {
         throw new Error("Por favor selecciona un profesor y un curso")
       }
 
-      // Depuración: mostrar los datos que se envían
-      console.log("Asignando profesor:", {
-        teacher_id: selectedTeacher.user_id,
-        course_id: selectedTeacher.course_id,
-        school_id: selectedSchool.school_id,
-      });
-
-      const response = await fetch("http://localhost:5000/api/courseteacher/assign", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/courseteacher/assign`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -374,7 +394,6 @@ const TeachersPage = () => {
       setShowAssignModal(false)
       setSelectedTeacher(null)
 
-      // Actualizar la lista de profesores
       await handleSchoolSelect(selectedSchool.school_id)
     } catch (error: any) {
       console.error("Error al asignar profesor:", error)
@@ -385,29 +404,48 @@ const TeachersPage = () => {
   const handleSchoolSelect = async (schoolId: string) => {
     try {
       const token = localStorage.getItem("token")
-      if (!token) return
+      if (!token) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Sesión expirada. Por favor, inicia sesión nuevamente.",
+          background: "#1a1a1a",
+          color: "#ffffff",
+          iconColor: "rgb(var(--primary-rgb))",
+          confirmButtonColor: "rgb(var(--primary-rgb))",
+        })
+        router.push("/login")
+        return
+      }
 
-      const response = await fetch(`http://localhost:5000/api/teachers/school/${schoolId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/teachers/school/${schoolId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
 
-      // Log the response status and data
-      console.log("Response status:", response.status);
-      const data = await response.json();
-      console.log("Data received from API:", data); // Log the data received
-
-      if (response.ok) {
-        setTeachers(data.data || [])
-        // Guardar los cursos junto con la escuela seleccionada
-        const schoolObj = schools.find((s) => s.school_id === schoolId)
-        setSelectedSchool({ ...schoolObj, courses: data.courses || [] })
-      } else {
-        throw new Error(data.message || "Error al cargar los profesores");
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || "Error al cargar los profesores")
       }
-    } catch (error) {
+
+      const data = await response.json()
+      console.log("Profesores cargados:", data)
+
+      setTeachers(data.data || [])
+      const schoolObj = schools.find((s) => s.school_id === schoolId)
+      setSelectedSchool({ ...schoolObj, courses: data.courses || [] })
+    } catch (error: any) {
       console.error("Error al cargar profesores:", error)
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "Ha ocurrido un error al cargar los profesores",
+        background: "#1a1a1a",
+        color: "#ffffff",
+        iconColor: "rgb(var(--primary-rgb))",
+        confirmButtonColor: "rgb(var(--primary-rgb))",
+      })
     }
   }
 

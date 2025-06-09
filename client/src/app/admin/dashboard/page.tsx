@@ -1,14 +1,13 @@
 "use client"
 import { useState, useEffect } from "react"
+import type React from "react"
+
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
-  faUserGraduate,
   faSchool,
-  faClipboardCheck,
   faChartBar,
-  faSignOut,
   faPlus,
   faHome,
   faUser,
@@ -30,7 +29,6 @@ const containerVariants = {
     },
   },
 }
-
 const itemVariants = {
   hidden: { y: 20, opacity: 0 },
   visible: {
@@ -43,30 +41,30 @@ const itemVariants = {
     },
   },
 }
-
 const buttonHover = {
   scale: 1.02,
   transition: { type: "spring", stiffness: 400, damping: 10 },
 }
-
 const buttonTap = {
   scale: 0.98,
 }
-
 const AdminDashboard = () => {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [schools, setSchools] = useState<any[]>([])
   const [showSchoolModal, setShowSchoolModal] = useState(false)
+  const [showEditSchoolModal, setShowEditSchoolModal] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [selectedImage, setSelectedImage] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [editingSchool, setEditingSchool] = useState<any>(null)
   const [newSchool, setNewSchool] = useState({
     school_name: "",
     school_description: "",
-    school_image: "",
     school_phone: "",
     school_address: "",
     school_email: "",
-    teacher_id: ""
+    teacher_id: "",
   })
   const [showCourseModal, setShowCourseModal] = useState(false)
   const [selectedSchool, setSelectedSchool] = useState<any>(null)
@@ -76,7 +74,7 @@ const AdminDashboard = () => {
     course_price: "",
     course_places: "",
     course_age: "",
-    course_image: ""
+    course_image: "",
   })
 
   useEffect(() => {
@@ -88,7 +86,6 @@ const AdminDashboard = () => {
           return
         }
 
-        // 1. Get user info
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -103,14 +100,11 @@ const AdminDashboard = () => {
         }
         setUser(data.user)
 
-        // 2. Get admin's schools
-
         if (!token) {
           router.push("/login")
           return
         }
-        console.log("TOKEN ENVIADO:", token); // Debug: check token value
-
+      
         const schoolResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/schools/get-school`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -127,13 +121,13 @@ const AdminDashboard = () => {
       } catch (error) {
         console.error("Error de autenticación:", error)
         Swal.fire({
-          icon: 'error',
-          title: 'Error',
+          icon: "error",
+          title: "Error",
           background: "rgb(var(--background-rgb))",
           color: "#ffffff",
           iconColor: "rgb(var(--primary-rgb))",
           confirmButtonColor: "rgb(var(--primary-rgb))",
-          text: 'Ha ocurrido un error al cargar tus datos',
+          text: "Ha ocurrido un error al cargar tus datos",
         })
         router.push("/login")
       }
@@ -142,83 +136,139 @@ const AdminDashboard = () => {
     checkAuth()
   }, [router])
 
-  const handleCreateSchool = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      const token = localStorage.getItem("token")
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/schools/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-        credentials: "include",
-        body: JSON.stringify({
-          ...newSchool,
-          teacher_id: user.user_id,
-        }),
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        setSchools([...schools, data.data])
-        setShowSchoolModal(false)
-        setNewSchool({
-          school_name: "",
-          school_description: "",
-          school_image: "",
-          school_phone: "",
-          school_address: "",
-          school_email: "",
-          teacher_id: ""
-        })
-
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (!file.type.startsWith("image/")) {
         Swal.fire({
-          icon: 'success',
-          title: '¡Éxito!',
-          text: 'Escuela creada correctamente',
+          icon: "error",
+          title: "Error",
+          text: "Por favor selecciona un archivo de imagen válido",
           background: "#1a1a1a",
           color: "#ffffff",
           iconColor: "rgb(var(--primary-rgb))",
           confirmButtonColor: "rgb(var(--primary-rgb))",
-          customClass: {
-            popup: "border border-[rgba(var(--primary-rgb),0.3)] rounded-xl",
-            title: "text-white",
-            htmlContainer: "text-gray-300",
-          },
         })
-      } else {
-        throw new Error(data.message || "Error al crear la escuela")
+        return
       }
-    } catch (error: any) {
-      console.error("Error al crear escuela:", error)
 
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: error.message || 'Ha ocurrido un error al crear la escuela',
-        confirmButtonColor: '#3085d6',
-        background: "#1a1a1a",
-        color: "#ffffff"
-      })
+      if (file.size > 5 * 1024 * 1024) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "La imagen no puede ser mayor a 5MB",
+          background: "#1a1a1a",
+          color: "#ffffff",
+          iconColor: "rgb(var(--primary-rgb))",
+          confirmButtonColor: "rgb(var(--primary-rgb))",
+        })
+        return
+      }
+
+      setSelectedImage(file)
+
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string)
+      }
+      reader.readAsDataURL(file)
     }
   }
+
+  const removeSelectedImage = () => {
+    setSelectedImage(null)
+    setImagePreview(null)
+    const fileInput = document.getElementById("school-image") as HTMLInputElement
+    if (fileInput) {
+      fileInput.value = ""
+    }
+  }
+
+  const handleCreateSchool = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/login");
+        return;
+      }
+  
+      const formData = new FormData();
+      formData.append("school_name", newSchool.school_name);
+      formData.append("school_description", newSchool.school_description);
+      formData.append("school_phone", newSchool.school_phone);
+      formData.append("school_address", newSchool.school_address);
+      formData.append("school_email", newSchool.school_email);
+      formData.append("teacher_id", user.user_id);
+      
+      if (selectedImage) {
+        formData.append("school_image", selectedImage);
+      }
+  
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/schools/`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        throw new Error(data.message || "Error al crear la escuela");
+      }
+  
+      setSchools([...schools, data.data]);
+      setShowSchoolModal(false);
+      setNewSchool({
+        school_name: "",
+        school_description: "",
+        school_phone: "",
+        school_address: "",
+        school_email: "",
+        teacher_id: "",
+      });
+      setSelectedImage(null);
+      setImagePreview(null);
+  
+      Swal.fire({
+        icon: "success",
+        title: "¡Éxito!",
+        text: "Escuela creada correctamente",
+        background: "#1a1a1a",
+        color: "#ffffff",
+        iconColor: "rgb(var(--primary-rgb))",
+        confirmButtonColor: "rgb(var(--primary-rgb))",
+      });
+    } catch (error: any) {
+      console.error("Error al crear escuela:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "Ha ocurrido un error al crear la escuela",
+        background: "#1a1a1a",
+        color: "#ffffff",
+        iconColor: "rgb(var(--primary-rgb))",
+        confirmButtonColor: "rgb(var(--primary-rgb))",
+      });
+    }
+  };
 
   const handleDeleteSchool = async (schoolId: string) => {
     try {
       const result = await Swal.fire({
-        title: '¿Estás seguro?',
+        title: "¿Estás seguro?",
         text: "Esta acción no se puede deshacer",
-        icon: 'warning',
+        icon: "warning",
         showCancelButton: true,
         background: "#1a1a1a",
         color: "#ffffff",
         iconColor: "rgb(var(--primary-rgb))",
-        confirmButtonColor: 'rgb(var(--primary-rgb))',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar'
+        confirmButtonColor: "rgb(var(--primary-rgb))",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar",
       })
 
       if (result.isConfirmed) {
@@ -229,15 +279,15 @@ const AdminDashboard = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          credentials: "include"
+          credentials: "include",
         })
 
         if (response.ok) {
-          setSchools(schools.filter(school => school.school_id !== schoolId))
+          setSchools(schools.filter((school) => school.school_id !== schoolId))
           Swal.fire({
-            icon: 'success',
-            title: '¡Éxito!',
-            text: 'Escuela eliminada correctamente',
+            icon: "success",
+            title: "¡Éxito!",
+            text: "Escuela eliminada correctamente",
             background: "#1a1a1a",
             color: "#ffffff",
             iconColor: "rgb(var(--primary-rgb))",
@@ -251,29 +301,29 @@ const AdminDashboard = () => {
     } catch (error: any) {
       console.error("Error al eliminar escuela:", error)
       Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: error.message || 'Ha ocurrido un error al eliminar la escuela',
-        confirmButtonColor: '#3085d6',
+        icon: "error",
+        title: "Error",
+        text: error.message || "Ha ocurrido un error al eliminar la escuela",
+        confirmButtonColor: "#3085d6",
         background: "#1a1a1a",
-        color: "#ffffff"
+        color: "#ffffff",
       })
     }
   }
 
   const handleLogout = () => {
     Swal.fire({
-      title: '¿Estás seguro?',
+      title: "¿Estás seguro?",
       text: "¿Deseas cerrar sesión?",
-      icon: 'question',
+      icon: "question",
       background: "#1a1a1a",
       color: "#ffffff",
       iconColor: "rgb(var(--primary-rgb))",
       showCancelButton: true,
-      confirmButtonColor: 'rgb(var(--primary-rgb))',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, cerrar sesión',
-      cancelButtonText: 'Cancelar'
+      confirmButtonColor: "rgb(var(--primary-rgb))",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, cerrar sesión",
+      cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
         localStorage.removeItem("token")
@@ -294,7 +344,7 @@ const AdminDashboard = () => {
         },
         body: JSON.stringify({
           school_id: selectedSchool.school_id,
-          ...newCourse
+          ...newCourse,
         }),
       })
 
@@ -306,13 +356,13 @@ const AdminDashboard = () => {
           course_price: "",
           course_places: "",
           course_age: "",
-          course_image: ""
+          course_image: "",
         })
 
         Swal.fire({
-          icon: 'success',
-          title: '¡Éxito!',
-          text: 'Curso creado correctamente',
+          icon: "success",
+          title: "¡Éxito!",
+          text: "Curso creado correctamente",
           background: "#1a1a1a",
           color: "#ffffff",
           iconColor: "rgb(var(--primary-rgb))",
@@ -328,9 +378,9 @@ const AdminDashboard = () => {
         console.error("Error al crear curso:", errorData.message)
 
         Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: errorData.message || 'Ha ocurrido un error al crear el curso',
+          icon: "error",
+          title: "Error",
+          text: errorData.message || "Ha ocurrido un error al crear el curso",
           background: "#1a1a1a",
           color: "#ffffff",
           iconColor: "rgb(var(--primary-rgb))",
@@ -346,9 +396,9 @@ const AdminDashboard = () => {
       console.error("Error al crear curso:", error)
 
       Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Ha ocurrido un error al crear el curso',
+        icon: "error",
+        title: "Error",
+        text: "Ha ocurrido un error al crear el curso",
         background: "#1a1a1a",
         color: "#ffffff",
         iconColor: "rgb(var(--primary-rgb))",
@@ -362,6 +412,79 @@ const AdminDashboard = () => {
     }
   }
 
+  const handleEditSchool = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        router.push("/login");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("school_name", editingSchool.school_name);
+      formData.append("school_description", editingSchool.school_description);
+      formData.append("school_phone", editingSchool.school_phone);
+      formData.append("school_address", editingSchool.school_address);
+      formData.append("school_email", editingSchool.school_email);
+      
+      if (selectedImage) {
+        formData.append("school_image", selectedImage);
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/schools/${editingSchool.school_id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Error al actualizar la escuela");
+      }
+
+      // Actualizar la lista de escuelas
+      setSchools(schools.map(school => 
+        school.school_id === editingSchool.school_id ? data.data : school
+      ));
+      
+      setShowEditSchoolModal(false);
+      setEditingSchool(null);
+      setSelectedImage(null);
+      setImagePreview(null);
+
+      Swal.fire({
+        icon: "success",
+        title: "¡Éxito!",
+        text: "Escuela actualizada correctamente",
+        background: "#1a1a1a",
+        color: "#ffffff",
+        iconColor: "rgb(var(--primary-rgb))",
+        confirmButtonColor: "rgb(var(--primary-rgb))",
+      });
+    } catch (error: any) {
+      console.error("Error al actualizar escuela:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "Ha ocurrido un error al actualizar la escuela",
+        background: "#1a1a1a",
+        color: "#ffffff",
+        iconColor: "rgb(var(--primary-rgb))",
+        confirmButtonColor: "rgb(var(--primary-rgb))",
+      });
+    }
+  };
+
+  const openEditModal = (school: any) => {
+    setEditingSchool(school);
+    setImagePreview(school.school_image ? `${process.env.NEXT_PUBLIC_API_URL}${school.school_image}` : null);
+    setShowEditSchoolModal(true);
+  };
+
   const menuItems = [
     {
       title: "Gestión de Escuelas",
@@ -374,6 +497,26 @@ const AdminDashboard = () => {
       icon: faUserGear,
       description: "Administrar profesores, crear nuevos y asignarlos a cursos",
       path: "/admin/teachers",
+      onClick: () => {
+        if (user.role_id !== 3) {
+          Swal.fire({
+            icon: "error",
+            title: "Acceso Denegado",
+            text: "No tienes permisos para gestionar los profesores de esta escuela",
+            background: "#1a1a1a",
+            color: "#ffffff",
+            iconColor: "rgb(var(--primary-rgb))",
+            confirmButtonColor: "rgb(var(--primary-rgb))",
+            customClass: {
+              popup: "border border-[rgba(var(--primary-rgb),0.3)] rounded-xl",
+              title: "text-white",
+              htmlContainer: "text-gray-300",
+            },
+          });
+          return;
+        }
+        router.push("/admin/teachers");
+      }
     },
     {
       title: "Gestión de Cursos",
@@ -394,21 +537,14 @@ const AdminDashboard = () => {
   if (!user) return null
 
   return (
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      className="min-h-screen w-full relative overflow-hidden bg-black"
-    >
+    <motion.div initial="hidden" animate="visible" className="min-h-screen w-full relative overflow-hidden bg-black">
       <Particles />
-      
+
       {/* Header */}
       <div className="fixed top-0 left-0 right-0 bg-black/50 backdrop-blur-md z-40 border-b border-[rgba(var(--primary-rgb),0.2)]">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <Link
-              href="/"
-              className="p-2 rounded-full bg-[rgb(var(--primary-rgb))] text-black shadow-lg"
-            >
+            <Link href="/" className="p-2 rounded-full bg-[rgb(var(--primary-rgb))] text-black shadow-lg">
               <FontAwesomeIcon icon={faHome} className="w-5 h-5" />
             </Link>
             <h1 className="text-2xl font-bold text-white">Panel de Administración</h1>
@@ -420,13 +556,14 @@ const AdminDashboard = () => {
             whileTap={buttonTap}
           >
             <FontAwesomeIcon icon={faUser} />
-            <span>{user?.user_name} {user?.user_lastname}</span>
+            <span>
+              {user?.user_name} {user?.user_lastname}
+            </span>
           </motion.button>
         </div>
       </div>
 
       <main className="container mx-auto px-4 pt-24 pb-8">
-        {/* Sección de Escuelas */}
         <motion.div
           variants={containerVariants}
           className="backdrop-blur-xl bg-black/10 p-6 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)] mb-8"
@@ -443,7 +580,7 @@ const AdminDashboard = () => {
               Nueva Escuela
             </motion.button>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {schools.map((school) => (
               <motion.div
@@ -460,7 +597,7 @@ const AdminDashboard = () => {
                     <p className="text-gray-400 text-sm line-clamp-2">{school.school_description}</p>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-1 gap-2 text-gray-300 text-sm mb-4">
                   <div className="flex items-center gap-2">
                     <FontAwesomeIcon icon={faUser} className="text-[rgb(var(--primary-rgb))]" />
@@ -475,21 +612,10 @@ const AdminDashboard = () => {
                     <span>Dirección: {school.school_address}</span>
                   </div>
                 </div>
-                
+
                 <div className="flex justify-end gap-2">
                   <motion.button
-                    onClick={() => {
-                      setSelectedSchool(school)
-                      setShowCourseModal(true)
-                    }}
-                    className="p-2 bg-[rgba(var(--primary-rgb),0.1)] text-[rgb(var(--primary-rgb))] rounded-lg hover:bg-[rgba(var(--primary-rgb),0.2)] transition-colors"
-                    whileHover={buttonHover}
-                    whileTap={buttonTap}
-                  >
-                    <FontAwesomeIcon icon={faPlus} />
-                  </motion.button>
-                  <motion.button
-                    onClick={() => router.push(`/admin/schools/${school.school_id}`)}
+                    onClick={() => openEditModal(school)}
                     className="p-2 bg-[rgba(var(--primary-rgb),0.1)] text-[rgb(var(--primary-rgb))] rounded-lg hover:bg-[rgba(var(--primary-rgb),0.2)] transition-colors"
                     whileHover={buttonHover}
                     whileTap={buttonTap}
@@ -511,17 +637,14 @@ const AdminDashboard = () => {
         </motion.div>
 
         {/* Menú de Opciones */}
-        <motion.div
-          variants={containerVariants}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
+        <motion.div variants={containerVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {menuItems.map((item, index) => (
             <motion.div
               key={index}
               variants={itemVariants}
               whileHover={{ y: -5 }}
               className="backdrop-blur-xl bg-black/10 p-6 rounded-2xl shadow-2xl border-2 border-[rgba(var(--primary-rgb),0.4)] cursor-pointer"
-              onClick={() => router.push(item.path)}
+              onClick={item.onClick || (() => router.push(item.path))}
             >
               <div className="flex items-center gap-4 mb-4">
                 <div className="bg-[rgb(var(--primary-rgb))] p-4 rounded-lg">
@@ -535,176 +658,244 @@ const AdminDashboard = () => {
             </motion.div>
           ))}
         </motion.div>
-
-        {/* Modal para crear escuela */}
-        {showSchoolModal && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-black/90 backdrop-blur-xl rounded-2xl p-8 w-full max-w-md border-2 border-[rgba(var(--primary-rgb),0.4)]"
-            >
-              <h2 className="text-2xl font-semibold text-white mb-6">Crear Nueva Escuela</h2>
-              <form onSubmit={handleCreateSchool} className="space-y-4">
-                <div>
-                  <label className="block text-gray-300 mb-2">Nombre de la Escuela</label>
-                  <input
-                    type="text"
-                    value={newSchool.school_name}
-                    onChange={(e) => setNewSchool({ ...newSchool, school_name: e.target.value })}
-                    className="w-full p-3 bg-black/50 border border-[rgba(var(--primary-rgb),0.3)] rounded-lg text-white focus:outline-none focus:border-[rgb(var(--primary-rgb))] transition-all"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-300 mb-2">Descripción</label>
-                  <textarea
-                    value={newSchool.school_description}
-                    onChange={(e) => setNewSchool({ ...newSchool, school_description: e.target.value })}
-                    className="w-full p-3 bg-black/50 border border-[rgba(var(--primary-rgb),0.3)] rounded-lg text-white focus:outline-none focus:border-[rgb(var(--primary-rgb))] transition-all"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-300 mb-2">Teléfono</label>
-                  <input
-                    type="text"
-                    value={newSchool.school_phone}
-                    onChange={(e) => setNewSchool({ ...newSchool, school_phone: e.target.value })}
-                    className="w-full p-3 bg-black/50 border border-[rgba(var(--primary-rgb),0.3)] rounded-lg text-white focus:outline-none focus:border-[rgb(var(--primary-rgb))] transition-all"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-300 mb-2">Dirección</label>
-                  <textarea
-                    value={newSchool.school_address}
-                    onChange={(e) => setNewSchool({ ...newSchool, school_address: e.target.value })}
-                    className="w-full p-3 bg-black/50 border border-[rgba(var(--primary-rgb),0.3)] rounded-lg text-white focus:outline-none focus:border-[rgb(var(--primary-rgb))] transition-all"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-300 mb-2">Email</label>
-                  <input
-                    type="email"
-                    value={newSchool.school_email}
-                    onChange={(e) => setNewSchool({ ...newSchool, school_email: e.target.value })}
-                    className="w-full p-3 bg-black/50 border border-[rgba(var(--primary-rgb),0.3)] rounded-lg text-white focus:outline-none focus:border-[rgb(var(--primary-rgb))] transition-all"
-                    required
-                  />
-                </div>
-                <div className="flex justify-end gap-4 pt-4">
-                  <motion.button
-                    type="button"
-                    onClick={() => setShowSchoolModal(false)}
-                    className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
-                    whileHover={buttonHover}
-                    whileTap={buttonTap}
-                  >
-                    Cancelar
-                  </motion.button>
-                  <motion.button
-                    type="submit"
-                    className="px-4 py-2 bg-[rgb(var(--primary-rgb))] text-black rounded-lg hover:bg-[rgba(var(--primary-rgb),0.9)] transition-colors"
-                    whileHover={buttonHover}
-                    whileTap={buttonTap}
-                  >
-                    Crear Escuela
-                  </motion.button>
-                </div>
-              </form>
-            </motion.div>
+  {showSchoolModal && (
+  <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 overflow-y-auto">
+    <motion.div
+      initial={{ scale: 0.9, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      className="bg-gray-800/90 rounded-xl p-6 w-full max-w-md my-8 border border-gray-700"
+    >
+      <h2 className="text-2xl font-bold text-[rgb(var(--primary-rgb))] mb-6">
+        Nueva Escuela
+      </h2>
+      <form onSubmit={handleCreateSchool} className="space-y-4">
+        <div>
+          <label className="block text-gray-300 mb-2 text-sm font-medium">
+            Imagen de la Escuela
+          </label>
+          <div className="flex flex-col items-center gap-3">
+            {imagePreview && (
+              <div className="relative w-full h-48 rounded-xl overflow-hidden border border-gray-700">
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="w-full h-full object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={removeSelectedImage}
+                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 transition-colors"
+                >
+                  ×
+                </button>
+              </div>
+            )}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageSelect}
+              className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[rgb(var(--primary-rgb))] file:text-black hover:file:bg-[rgba(var(--primary-rgb),0.8)]"
+            />
+            <p className="text-gray-400 text-xs">Formatos: JPG, PNG, GIF. Máx. 5MB.</p>
           </div>
-        )}
+        </div>
 
-        {/* Modal para crear curso */}
-        {showCourseModal && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+        <div>
+          <label className="block text-gray-300 mb-2 text-sm font-medium">Nombre</label>
+          <input
+            type="text"
+            value={newSchool.school_name}
+            onChange={(e) => setNewSchool({ ...newSchool, school_name: e.target.value })}
+            required
+            className="w-full p-3 bg-gray-700/50 text-white rounded-lg border border-gray-600 focus:border-[rgb(var(--primary-rgb))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--primary-rgb),0.5)]"
+          />
+        </div>
+
+        <div>
+          <label className="block text-gray-300 mb-2 text-sm font-medium">Descripción</label>
+          <textarea
+            value={newSchool.school_description}
+            onChange={(e) => setNewSchool({ ...newSchool, school_description: e.target.value })}
+            required
+            rows={3}
+            className="w-full p-3 bg-gray-700/50 text-white rounded-lg border border-gray-600 focus:border-[rgb(var(--primary-rgb))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--primary-rgb),0.5)]"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-gray-300 mb-2 text-sm font-medium">Teléfono</label>
+            <input
+              type="text"
+              value={newSchool.school_phone}
+              onChange={(e) => setNewSchool({ ...newSchool, school_phone: e.target.value })}
+              required
+              className="w-full p-3 bg-gray-700/50 text-white rounded-lg border border-gray-600 focus:border-[rgb(var(--primary-rgb))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--primary-rgb),0.5)]"
+            />
+          </div>
+          <div>
+            <label className="block text-gray-300 mb-2 text-sm font-medium">Email</label>
+            <input
+              type="email"
+              value={newSchool.school_email}
+              onChange={(e) => setNewSchool({ ...newSchool, school_email: e.target.value })}
+              required
+              className="w-full p-3 bg-gray-700/50 text-white rounded-lg border border-gray-600 focus:border-[rgb(var(--primary-rgb))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--primary-rgb),0.5)]"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-gray-300 mb-2 text-sm font-medium">Dirección</label>
+          <textarea
+            value={newSchool.school_address}
+            onChange={(e) => setNewSchool({ ...newSchool, school_address: e.target.value })}
+            required
+            rows={2}
+            className="w-full p-3 bg-gray-700/50 text-white rounded-lg border border-gray-600 focus:border-[rgb(var(--primary-rgb))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--primary-rgb),0.5)]"
+          />
+        </div>
+
+        <div className="flex justify-end gap-3 mt-6">
+          <button
+            type="button"
+            onClick={() => {
+              setShowSchoolModal(false);
+              setSelectedImage(null);
+              setImagePreview(null);
+            }}
+            className="px-4 py-2.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            className="px-4 py-2.5 bg-[rgb(var(--primary-rgb))] hover:bg-[rgba(var(--primary-rgb),0.8)] text-black rounded-lg text-sm font-medium transition-colors"
+          >
+            Crear Escuela
+          </button>
+        </div>
+      </form>
+    </motion.div>
+  </div>
+)}
+        {showEditSchoolModal && editingSchool && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 overflow-y-auto">
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-black/90 backdrop-blur-xl rounded-2xl p-8 w-full max-w-md border-2 border-[rgba(var(--primary-rgb),0.4)]"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="bg-gray-800/90 rounded-xl p-6 w-full max-w-md my-8 border border-gray-700"
             >
-              <h2 className="text-2xl font-semibold text-white mb-6">Crear Nuevo Curso</h2>
-              <form onSubmit={handleCreateCourse} className="space-y-4">
+              <h2 className="text-2xl font-bold text-[rgb(var(--primary-rgb))] mb-6">
+                Editar Escuela
+              </h2>
+              <form onSubmit={handleEditSchool} className="space-y-4">
                 <div>
-                  <label className="block text-gray-300 mb-2">Nombre del Curso</label>
+                  <label className="block text-gray-300 mb-2 text-sm font-medium">
+                    Imagen de la Escuela
+                  </label>
+                  <div className="flex flex-col items-center gap-3">
+                    {imagePreview && (
+                      <div className="relative w-full h-48 rounded-xl overflow-hidden border border-gray-700">
+                        <img
+                          src={imagePreview}
+                          alt="Preview"
+                          className="w-full h-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={removeSelectedImage}
+                          className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 transition-colors"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageSelect}
+                      className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[rgb(var(--primary-rgb))] file:text-black hover:file:bg-[rgba(var(--primary-rgb),0.8)]"
+                    />
+                    <p className="text-gray-400 text-xs">Formatos: JPG, PNG, GIF. Máx. 5MB.</p>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-gray-300 mb-2 text-sm font-medium">Nombre</label>
                   <input
                     type="text"
-                    value={newCourse.course_name}
-                    onChange={(e) => setNewCourse({ ...newCourse, course_name: e.target.value })}
-                    className="w-full p-3 bg-black/50 border border-[rgba(var(--primary-rgb),0.3)] rounded-lg text-white focus:outline-none focus:border-[rgb(var(--primary-rgb))] transition-all"
+                    value={editingSchool.school_name}
+                    onChange={(e) => setEditingSchool({ ...editingSchool, school_name: e.target.value })}
                     required
+                    className="w-full p-3 bg-gray-700/50 text-white rounded-lg border border-gray-600 focus:border-[rgb(var(--primary-rgb))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--primary-rgb),0.5)]"
                   />
                 </div>
+
                 <div>
-                  <label className="block text-gray-300 mb-2">Descripción</label>
+                  <label className="block text-gray-300 mb-2 text-sm font-medium">Descripción</label>
                   <textarea
-                    value={newCourse.course_description}
-                    onChange={(e) => setNewCourse({ ...newCourse, course_description: e.target.value })}
-                    className="w-full p-3 bg-black/50 border border-[rgba(var(--primary-rgb),0.3)] rounded-lg text-white focus:outline-none focus:border-[rgb(var(--primary-rgb))] transition-all"
+                    value={editingSchool.school_description}
+                    onChange={(e) => setEditingSchool({ ...editingSchool, school_description: e.target.value })}
                     required
+                    rows={3}
+                    className="w-full p-3 bg-gray-700/50 text-white rounded-lg border border-gray-600 focus:border-[rgb(var(--primary-rgb))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--primary-rgb),0.5)]"
                   />
                 </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-gray-300 mb-2 text-sm font-medium">Teléfono</label>
+                    <input
+                      type="text"
+                      value={editingSchool.school_phone}
+                      onChange={(e) => setEditingSchool({ ...editingSchool, school_phone: e.target.value })}
+                      required
+                      className="w-full p-3 bg-gray-700/50 text-white rounded-lg border border-gray-600 focus:border-[rgb(var(--primary-rgb))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--primary-rgb),0.5)]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-300 mb-2 text-sm font-medium">Email</label>
+                    <input
+                      type="email"
+                      value={editingSchool.school_email}
+                      onChange={(e) => setEditingSchool({ ...editingSchool, school_email: e.target.value })}
+                      required
+                      className="w-full p-3 bg-gray-700/50 text-white rounded-lg border border-gray-600 focus:border-[rgb(var(--primary-rgb))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--primary-rgb),0.5)]"
+                    />
+                  </div>
+                </div>
+
                 <div>
-                  <label className="block text-gray-300 mb-2">Precio</label>
-                  <input
-                    type="number"
-                    value={newCourse.course_price}
-                    onChange={(e) => setNewCourse({ ...newCourse, course_price: e.target.value })}
-                    className="w-full p-3 bg-black/50 border border-[rgba(var(--primary-rgb),0.3)] rounded-lg text-white focus:outline-none focus:border-[rgb(var(--primary-rgb))] transition-all"
+                  <label className="block text-gray-300 mb-2 text-sm font-medium">Dirección</label>
+                  <textarea
+                    value={editingSchool.school_address}
+                    onChange={(e) => setEditingSchool({ ...editingSchool, school_address: e.target.value })}
                     required
+                    rows={2}
+                    className="w-full p-3 bg-gray-700/50 text-white rounded-lg border border-gray-600 focus:border-[rgb(var(--primary-rgb))] focus:outline-none focus:ring-2 focus:ring-[rgba(var(--primary-rgb),0.5)]"
                   />
                 </div>
-                <div>
-                  <label className="block text-gray-300 mb-2">Plazas</label>
-                  <input
-                    type="number"
-                    value={newCourse.course_places}
-                    onChange={(e) => setNewCourse({ ...newCourse, course_places: e.target.value })}
-                    className="w-full p-3 bg-black/50 border border-[rgba(var(--primary-rgb),0.3)] rounded-lg text-white focus:outline-none focus:border-[rgb(var(--primary-rgb))] transition-all"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-300 mb-2">Edad</label>
-                  <input
-                    type="number"
-                    value={newCourse.course_age}
-                    onChange={(e) => setNewCourse({ ...newCourse, course_age: e.target.value })}
-                    className="w-full p-3 bg-black/50 border border-[rgba(var(--primary-rgb),0.3)] rounded-lg text-white focus:outline-none focus:border-[rgb(var(--primary-rgb))] transition-all"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-300 mb-2">URL de la Imagen</label>
-                  <input
-                    type="text"
-                    value={newCourse.course_image}
-                    onChange={(e) => setNewCourse({ ...newCourse, course_image: e.target.value })}
-                    className="w-full p-3 bg-black/50 border border-[rgba(var(--primary-rgb),0.3)] rounded-lg text-white focus:outline-none focus:border-[rgb(var(--primary-rgb))] transition-all"
-                    required
-                  />
-                </div>
-                <div className="flex justify-end gap-4 pt-4">
-                  <motion.button
+
+                <div className="flex justify-end gap-3 mt-6">
+                  <button
                     type="button"
-                    onClick={() => setShowCourseModal(false)}
-                    className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
-                    whileHover={buttonHover}
-                    whileTap={buttonTap}
+                    onClick={() => {
+                      setShowEditSchoolModal(false);
+                      setEditingSchool(null);
+                      setSelectedImage(null);
+                      setImagePreview(null);
+                    }}
+                    className="px-4 py-2.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors"
                   >
                     Cancelar
-                  </motion.button>
-                  <motion.button
+                  </button>
+                  <button
                     type="submit"
-                    className="px-4 py-2 bg-[rgb(var(--primary-rgb))] text-black rounded-lg hover:bg-[rgba(var(--primary-rgb),0.9)] transition-colors"
-                    whileHover={buttonHover}
-                    whileTap={buttonTap}
+                    className="px-4 py-2.5 bg-[rgb(var(--primary-rgb))] hover:bg-[rgba(var(--primary-rgb),0.8)] text-black rounded-lg text-sm font-medium transition-colors"
                   >
-                    Crear Curso
-                  </motion.button>
+                    Actualizar Escuela
+                  </button>
                 </div>
               </form>
             </motion.div>

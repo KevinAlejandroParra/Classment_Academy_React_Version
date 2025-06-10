@@ -30,7 +30,6 @@ interface CourseCardProps {
 }
 
 export default function CourseCard({ course }: CourseCardProps) {
-  // Function to format price
   const formatPrice = (price: string) => {
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
@@ -48,7 +47,7 @@ export default function CourseCard({ course }: CourseCardProps) {
       <div className="relative h-48 w-full">
         {course.course_image ? (
           <Image
-            src={course.course_image}
+            src={`${process.env.NEXT_PUBLIC_API_URL}${course.course_image}`}
             alt={course.course_name}
             fill
             className="object-cover"

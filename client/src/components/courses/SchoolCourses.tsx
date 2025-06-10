@@ -52,7 +52,7 @@ export default function SchoolCourses({ school, courses }: SchoolCoursesProps) {
         <div className="relative h-16 w-16 rounded-full overflow-hidden border-2 border-[rgb(var(--primary-rgb))]">
           {school.school_image ? (
             <Image
-              src={school.school_image}
+              src={`${process.env.NEXT_PUBLIC_API_URL}${school.school_image}`}
               alt={school.school_name}
               fill
               className="object-cover"

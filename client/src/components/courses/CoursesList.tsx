@@ -40,7 +40,6 @@ export default function CoursesList() {
           return
         }
 
-        // Fetch both schools and courses
         const [schoolsRes, coursesRes] = await Promise.all([
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/schools/`, {
             headers: {
@@ -92,7 +91,6 @@ export default function CoursesList() {
     )
   }
 
-  // Group courses by school
   const coursesBySchool = schools.map(school => ({
     school,
     courses: courses.filter(course => course.school.school_id === school.school_id)

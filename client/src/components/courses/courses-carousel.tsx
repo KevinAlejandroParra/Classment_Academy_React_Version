@@ -8,7 +8,6 @@ import Image from "next/image"
 import { motion } from "framer-motion"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
-// Importar estilos de Swiper
 import "swiper/css"
 import "swiper/css/effect-coverflow"
 import "swiper/css/pagination"
@@ -20,12 +19,13 @@ interface Curso {
   course_description: string
   course_price: number
   course_image: string
+  course_state: string
   school: {
     school_name: string
   }
 }
 
-const API_BASE_URL = "http://localhost:5000"
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
 
 export function CoursesCarousel() {
   const [cursos, setCursos] = useState<Curso[]>([])
@@ -148,7 +148,6 @@ export function CoursesCarousel() {
       return url
     }
 
-    // Si es una ruta relativa, la combinamos con la URL base del servidor
     return `${API_BASE_URL}${url.startsWith("/") ? "" : "/"}${url}`
   }
 
@@ -244,12 +243,9 @@ export function CoursesCarousel() {
                 disableOnInteraction: false,
                 pauseOnMouseEnter: true,
               }}
-              // Corregir el error de TypeScript en la configuración de navegación
               onSwiper={(swiper) => {
                 swiperRef.current = swiper
-                // Actualizar la navegación después de que Swiper se inicialice
                 if (swiper.params.navigation && typeof swiper.params.navigation !== "boolean") {
-                  // Asegurarse de que navigation sea un objeto antes de asignar propiedades
                   swiper.params.navigation.prevEl = navigationPrevRef.current
                   swiper.params.navigation.nextEl = navigationNextRef.current
                   swiper.navigation.init()
@@ -279,8 +275,13 @@ export function CoursesCarousel() {
                         src={getImageUrl(curso.course_image) || "/placeholder.svg"}
                         alt={curso.course_name}
                         fill
-                        className="object-cover"
+                        className={`object-cover ${curso.course_state === 'inactive' ? 'blur-sm' : ''}`}
                       />
+                      {curso.course_state === 'inactive' && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                          <span className="text-2xl font-bold text-white">Próximamente</span>
+                        </div>
+                      )}
                       <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black to-transparent"></div>
                     </figure>
                     <div className="card-body p-6">
@@ -299,9 +300,13 @@ export function CoursesCarousel() {
                       <div className="card-actions justify-end pt-2 pb-2">
                         <Link
                           href={`courses/${curso.course_id}`}
-                          className="inline-flex items-center justify-center rounded-full bg-[rgb(var(--primary-rgb))] text-black font-bold py-2 px-4 min-w-[120px] text-sm transition-transform hover:scale-105 hover:shadow-lg"
+                          className={`inline-flex items-center justify-center rounded-full ${
+                            curso.course_state === 'inactive' 
+                              ? 'bg-gray-500 cursor-not-allowed' 
+                              : 'bg-[rgb(var(--primary-rgb))] hover:scale-105 hover:shadow-lg'
+                          } text-black font-bold py-2 px-4 min-w-[120px] text-sm transition-transform`}
                         >
-                          Ver Curso
+                          {curso.course_state === 'inactive' ? 'No Disponible' : 'Ver Curso'}
                         </Link>
                       </div>
                     </div>

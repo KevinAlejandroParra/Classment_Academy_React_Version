@@ -44,6 +44,7 @@ interface Course {
   course_places: number
   course_age: number
   course_image: string
+  course_state: string
   school: {
     school_id: string
     school_name: string
@@ -166,45 +167,56 @@ export default function CourseDetail() {
   const [enrollError, setEnrollError] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [schoolAdmin, setSchoolAdmin] = useState<SchoolAdmin | null>(null)
+  const [upcomingClasses, setUpcomingClasses] = useState<any[]>([])
+  const [loadingClasses, setLoadingClasses] = useState(true)
 
   useEffect(() => {
     const fetchCourseDetails = async () => {
       try {
-        const coursesResponse = await fetch("http://localhost:5000/api/courses/")
-        const coursesData = await coursesResponse.json()
+        setLoading(true)
+        setError(null)
+
+        // Fetch course details directly by ID
+        const courseResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/courses/${courseId}`)
+        const courseData = await courseResponse.json()
         
-        if (coursesData.success) {
-          const courseFound = coursesData.data.find((c: Course) => c.course_id === courseId)
-          if (courseFound) {
-            setCourse(courseFound)
-            
-            // Buscar información de la escuela para obtener el administrador
-            const schoolsResponse = await fetch("http://localhost:5000/api/schools/")
-            const schoolsData = await schoolsResponse.json()
-            
-            if (schoolsData.success) {
-              const schoolFound = schoolsData.data.find((s: any) => s.school_id === courseFound.school.school_id);
-              if (schoolFound && schoolFound.users && schoolFound.users.length > 0) {
-                // Buscar el administrador (role_id = 3)
-                const admin = schoolFound.users.find((user: SchoolAdmin) => 
-                  user.UserSchoolRol && user.UserSchoolRol.role_id === 3
-                );
-                if (admin) {
-                  setSchoolAdmin(admin);
-                }
-              }
-            }
-          } else {
-            setError("Curso no encontrado")
-          }
-        } else {
-          setError("Error al cargar el curso")
+        if (!courseData.success) {
+          throw new Error(courseData.message || "Error al cargar el curso")
         }
-      } catch (err) {
-        setError("Error de conexión al servidor")
-        console.error(err)
+        
+        setCourse(courseData.data)
+        
+        // Buscar información de la escuela para obtener el administrador
+        const schoolsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/schools/`)
+        const schoolsData = await schoolsResponse.json()
+        
+        if (schoolsData.success) {
+          const schoolFound = schoolsData.data.find((s: any) => s.school_id === courseData.data.school.school_id);
+          if (schoolFound && schoolFound.users && schoolFound.users.length > 0) {
+            // Buscar el administrador (role_id = 3)
+            const admin = schoolFound.users.find((user: SchoolAdmin) => 
+              user.UserSchoolRol && user.UserSchoolRol.role_id === 3
+            );
+            if (admin) {
+              setSchoolAdmin(admin);
+            }
+          }
+        }
+
+        const classesResponse = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/class/course/${courseId}/upcoming`
+        )
+        const classesData = await classesResponse.json()
+        
+        if (classesData.success) {
+          setUpcomingClasses(classesData.data)
+        }
+      } catch (err: any) {
+        console.error("Error:", err)
+        setError(err.message || "Error al cargar los datos")
       } finally {
         setLoading(false)
+        setLoadingClasses(false)
       }
     }
 
@@ -231,6 +243,19 @@ export default function CourseDetail() {
       router.push('/login?redirect=' + encodeURIComponent(`/courses/${courseId}`))
       return
     }
+
+    if (course?.course_state === 'inactive') {
+      Swal.fire({
+        title: 'Curso no disponible',
+        text: 'Este curso se encuentra actualmente inactivo. Por favor, intenta más tarde.',
+        icon: 'info',
+        background: "#1a1a1a",
+        color: "#ffffff",
+        iconColor: "rgb(var(--primary-rgb))",
+        confirmButtonColor: "rgb(var(--primary-rgb))",
+      })
+      return
+    }
     
     setIsModalOpen(true)
   }
@@ -249,7 +274,7 @@ export default function CourseDetail() {
       }
       
       if (course) {
-        const response = await fetch(`http://localhost:5000/api/payments/create`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/payments/create`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -270,9 +295,9 @@ export default function CourseDetail() {
           throw new Error(data.message || "Error al procesar el pago");
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error completo:', error);
-      setEnrollError(error.message);
+      setEnrollError(error.message || "Error al procesar el pago");
       
       Swal.fire({
         title: 'Error en el pago',
@@ -431,10 +456,10 @@ export default function CourseDetail() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
-              className="bg-[rgba(var(--foreground-rgb),0.03)] border border-[rgba(var(--foreground-rgb),0.1)] rounded-xl p-6"
+              className="bg-[rgba(var(--foreground-rgb),0.03)] border border-[rgba(var(--foreground-rgb),0.1)] rounded-xl p-6 mb-8"
             >
-              <h2 className="text-xl font-semibold mb-4">Información del Curso</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <h2 className="text-xl font-semibold mb-6">Detalles del Curso</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-full bg-[rgba(var(--primary-rgb),0.2)] flex items-center justify-center">
                     <FontAwesomeIcon icon={faMoneyBillWave} className="h-5 w-5 text-[rgb(var(--primary-rgb))]" />
@@ -460,11 +485,69 @@ export default function CourseDetail() {
                     <FontAwesomeIcon icon={faCalendarAlt} className="h-5 w-5 text-[rgb(var(--primary-rgb))]" />
                   </div>
                   <div>
-                    <p className="text-sm opacity-70">Edad Mínima</p>
+                    <p className="text-sm opacity-70">Edad Recomendada</p>
                     <p className="font-semibold">{course.course_age} años</p>
                   </div>
                 </div>
               </div>
+            </motion.div>
+
+            {/* Clases Programadas Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="bg-[rgba(var(--foreground-rgb),0.03)] border border-[rgba(var(--foreground-rgb),0.1)] rounded-xl p-6 mb-8"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-semibold">Clases Programadas</h2>
+                <Link
+                  href={`/courses/${courseId}/classes`}
+                  className="button-secondary flex items-center justify-center gap-2"
+                >
+                  <FontAwesomeIcon icon={faCalendarAlt} className="h-4 w-4" />
+                  Ver todas las clases
+                </Link>
+              </div>
+
+              {loadingClasses ? (
+                <div className="flex justify-center items-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[rgb(var(--primary-rgb))]"></div>
+                </div>
+              ) : upcomingClasses.length === 0 ? (
+                <div className="text-center py-8">
+                  <FontAwesomeIcon icon={faCalendarAlt} className="text-4xl text-[rgb(var(--primary-rgb))] mb-4" />
+                  <p className="text-[rgb(var(--foreground-rgb))] opacity-70">No hay clases programadas por el momento</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {upcomingClasses.slice(0, 3).map((classItem) => (
+                    <motion.div
+                      key={classItem.class_id}
+                      whileHover={{ y: -5 }}
+                      className="bg-[rgba(var(--foreground-rgb),0.05)] border border-[rgba(var(--foreground-rgb),0.1)] rounded-lg p-4"
+                    >
+                      <h3 className="font-semibold mb-2">{classItem.class_title}</h3>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center gap-2">
+                          <FontAwesomeIcon icon={faCalendarAlt} className="text-[rgb(var(--primary-rgb))]" />
+                          <span>{new Date(classItem.class_date).toLocaleDateString('es-ES', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <FontAwesomeIcon icon={faUser} className="text-[rgb(var(--primary-rgb))]" />
+                          <span>Profesor: {classItem.teacher.user_name} {classItem.teacher.user_lastname}</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
             </motion.div>
           </motion.div>
           
@@ -473,26 +556,34 @@ export default function CourseDetail() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}
-            className="lg:col-span-1"
+            className="lg:col-span-1 space-y-6"
           >
             {/* Llamada a la acción para inscribirse */}
-            <div className="bg-[rgba(var(--foreground-rgb),0.03)] border border-[rgba(var(--foreground-rgb),0.1)] rounded-xl p-6 mb-6">
+            <div className="bg-[rgba(var(--foreground-rgb),0.03)] border border-[rgba(var(--foreground-rgb),0.1)] rounded-xl p-6">
               <h2 className="text-xl font-semibold mb-4">Inscribirse al curso</h2>
               <p className="mb-6 text-sm opacity-80">
-                Para inscribirte a este curso, primero debes estar inscrito en la escuela. Al hacer clic en el botón, seleccionarás tu plan de inscripción.
+                {course.course_state === 'inactive' 
+                  ? 'Este curso se encuentra actualmente inactivo. Por favor, intenta más tarde.'
+                  : 'Para inscribirte a este curso, primero debes estar inscrito en la escuela. Al hacer clic en el botón, seleccionarás tu plan de inscripción.'}
               </p>
               
               <button
                 onClick={handleOpenEnrollModal}
-                disabled={enrollSuccess}
+                disabled={enrollSuccess || course.course_state === 'inactive'}
                 className={`button-primary w-full flex items-center justify-center gap-2 ${
-                  enrollSuccess ? 'bg-green-500 hover:bg-green-600' : ''
+                  enrollSuccess ? 'bg-green-500 hover:bg-green-600' : 
+                  course.course_state === 'inactive' ? 'bg-gray-500 cursor-not-allowed' : ''
                 }`}
               >
                 {enrollSuccess ? (
                   <>
                     <FontAwesomeIcon icon={faCheckCircle} />
                     <span>¡Inscripción Exitosa!</span>
+                  </>
+                ) : course.course_state === 'inactive' ? (
+                  <>
+                    <FontAwesomeIcon icon={faTimes} />
+                    <span>Curso No Disponible</span>
                   </>
                 ) : (
                   <>
@@ -537,6 +628,57 @@ export default function CourseDetail() {
                 )}
               </AnimatePresence>
             </div>
+
+            {/* Información de la Escuela */}
+            <div className="bg-[rgba(var(--foreground-rgb),0.03)] border border-[rgba(var(--foreground-rgb),0.1)] rounded-xl p-6">
+              <h2 className="text-xl font-semibold mb-6">Información de la Escuela</h2>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-[rgba(var(--primary-rgb),0.2)] flex items-center justify-center">
+                    <FontAwesomeIcon icon={faSchool} className="h-5 w-5 text-[rgb(var(--primary-rgb))]" />
+                  </div>
+                  <div>
+                    <p className="text-sm opacity-70">Escuela</p>
+                    <Link 
+                      href={`/student/schools/${course.school.school_id}`}
+                      className="font-semibold hover:text-[rgb(var(--primary-rgb))] transition-colors"
+                    >
+                      {course.school.school_name}
+                    </Link>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-[rgba(var(--primary-rgb),0.2)] flex items-center justify-center">
+                    <FontAwesomeIcon icon={faMapMarkerAlt} className="h-5 w-5 text-[rgb(var(--primary-rgb))]" />
+                  </div>
+                  <div>
+                    <p className="text-sm opacity-70">Dirección</p>
+                    <p className="font-semibold">{course.school.school_address}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-[rgba(var(--primary-rgb),0.2)] flex items-center justify-center">
+                    <FontAwesomeIcon icon={faPhone} className="h-5 w-5 text-[rgb(var(--primary-rgb))]" />
+                  </div>
+                  <div>
+                    <p className="text-sm opacity-70">Teléfono</p>
+                    <p className="font-semibold">{course.school.school_phone}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-[rgba(var(--primary-rgb),0.2)] flex items-center justify-center">
+                    <FontAwesomeIcon icon={faEnvelope} className="h-5 w-5 text-[rgb(var(--primary-rgb))]" />
+                  </div>
+                  <div>
+                    <p className="text-sm opacity-70">Email</p>
+                    <p className="font-semibold">{course.school.school_email}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
             
             {/* Información del Administrador de la Escuela */}
             {schoolAdmin && (
@@ -544,7 +686,7 @@ export default function CourseDetail() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.6 }}
-                className="bg-[rgba(var(--foreground-rgb),0.03)] border border-[rgba(var(--foreground-rgb),0.1)] rounded-xl p-6 mb-6"
+                className="bg-[rgba(var(--foreground-rgb),0.03)] border border-[rgba(var(--foreground-rgb),0.1)] rounded-xl p-6"
               >
                 <h2 className="text-xl font-semibold mb-4">Administrador de la Escuela</h2>
                 <div className="flex items-start gap-4">
@@ -558,61 +700,6 @@ export default function CourseDetail() {
                 </div>
               </motion.div>
             )}
-            
-            {/* Información de la Escuela */}
-            <div className="bg-[rgba(var(--foreground-rgb),0.03)] border border-[rgba(var(--foreground-rgb),0.1)] rounded-xl p-6">
-              <h2 className="text-xl font-semibold mb-4">Información de Contacto</h2>
-              
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-full bg-[rgba(var(--primary-rgb),0.2)] flex items-center justify-center">
-                    <FontAwesomeIcon icon={faSchool} className="h-4 w-4 text-[rgb(var(--primary-rgb))]" />
-                  </div>
-                  <div>
-                    <p className="text-sm opacity-70">Escuela</p>
-                    <p className="font-medium">{course.school.school_name}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-full bg-[rgba(var(--primary-rgb),0.2)] flex items-center justify-center">
-                    <FontAwesomeIcon icon={faMapMarkerAlt} className="h-4 w-4 text-[rgb(var(--primary-rgb))]" />
-                  </div>
-                  <div>
-                    <p className="text-sm opacity-70">Dirección</p>
-                    <p className="font-medium">{course.school.school_address}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-full bg-[rgba(var(--primary-rgb),0.2)] flex items-center justify-center">
-                    <FontAwesomeIcon icon={faPhone} className="h-4 w-4 text-[rgb(var(--primary-rgb))]" />
-                  </div>
-                  <div>
-                    <p className="text-sm opacity-70">Teléfono</p>
-                    <p className="font-medium">{course.school.school_phone}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-full bg-[rgba(var(--primary-rgb),0.2)] flex items-center justify-center">
-                    <FontAwesomeIcon icon={faEnvelope} className="h-4 w-4 text-[rgb(var(--primary-rgb))]" />
-                  </div>
-                  <div>
-                    <p className="text-sm opacity-70">Email</p>
-                    <p className="font-medium">{course.school.school_email}</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="mt-6">
-                <Link href={`/student/schools/${course.school.school_id}`}>
-                  <button className="button-secondary w-full">
-                    Ver Escuela
-                  </button>
-                </Link>
-              </div>
-            </div>
           </motion.div>
         </div>
       </div>

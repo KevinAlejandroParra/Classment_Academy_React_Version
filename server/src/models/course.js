@@ -38,6 +38,11 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
+            course_state: {
+                type: DataTypes.STRING,
+                allowNull: false,
+                defaultValue: 'active',
+            },
         },
         {
             sequelize,

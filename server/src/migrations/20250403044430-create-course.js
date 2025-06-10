@@ -36,6 +36,11 @@ module.exports = {
                 type: Sequelize.STRING,
                 allowNull: false,
             },
+            course_state: {
+                type: Sequelize.STRING,
+                allowNull: false,
+                defaultValue: 'active',
+            },
             createdAt: {
                 type: Sequelize.DATE,
                 defaultValue: Sequelize.NOW,

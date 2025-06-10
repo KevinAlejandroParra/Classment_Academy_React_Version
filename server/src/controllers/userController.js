@@ -663,7 +663,6 @@ class UserController {
                         const course = tc.course.get({ plain: true });
                         const school = course.school || {};
                         
-                        // Evitar duplicados
                         if (!coursesData.some(c => c.course_id === course.course_id)) {
                             coursesData.push({
                                 course_id: course.course_id,
@@ -712,7 +711,6 @@ static async getUserSchools(req, res) {
     const roleId = req.user.role_id;
 
     try {
-        // For administrators (role_id 3), find schools where they have admin role
         if (roleId === 3) {
             const userSchoolRoles = await UserSchoolRole.findAll({
                 where: {
@@ -746,7 +744,6 @@ static async getUserSchools(req, res) {
             });
 
         } else {
-            // For other roles, maintain existing logic
             const user = await User.findByPk(userId, {
                 attributes: ["user_id", "role_id"],
             });
@@ -760,7 +757,6 @@ static async getUserSchools(req, res) {
 
             let schools = [];
 
-            // Get schools through enrolled courses for students
             if (user.role_id === 1) {
                 const enrollmentRecords = await Enrollment.findAll({
                     where: {

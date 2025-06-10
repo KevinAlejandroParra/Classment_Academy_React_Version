@@ -19,13 +19,12 @@ exports.getCourses = async (req, res) => {
       console.log("No assignments found for this teacher in the CourseTeacher table");
     }
     
-    // Original query
     const courseTeacherRelations = await CourseTeacher.findAll({
       where: { teacher_id: teacherId },
       include: [{
         model: Course,
         as: 'course',
-        attributes: ['course_id', 'course_name', 'course_description']
+        attributes: ['course_id', 'course_name', 'course_description', 'course_state']
       }]
     });
     

@@ -186,4 +186,26 @@ router.put('/:id', checkRole([3, 4]), upload.single('imagen'), courseController.
  */
 router.delete('/:id', checkRole([3, 4]), courseController.deleteCourse);
 
+/**
+ * @swagger
+ * /courses/{id}/toggle-state:
+ *   put:
+ *     description: Activa o desactiva un curso (solo profesores y administradores)
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: El ID del curso a activar/desactivar
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Estado del curso actualizado con éxito
+ *       403:
+ *         description: No autorizado para cambiar el estado del curso
+ */
+router.put('/:id/toggle-state', checkRole([2, 3]), courseController.toggleCourseState);
+
 module.exports = router;

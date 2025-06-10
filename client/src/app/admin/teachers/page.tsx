@@ -166,16 +166,13 @@ const TeachersPage = () => {
           return
         }
 
-        console.log("Verificando autenticación...")
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         })
 
-        console.log("Respuesta de autenticación:", response.status)
         const data = await response.json()
-        console.log("Datos de usuario:", data)
 
         if (!response.ok) {
           throw new Error(data.message || "Error de autenticación")
@@ -200,23 +197,18 @@ const TeachersPage = () => {
         }
 
         setUser(data.user)
-        console.log("Usuario autenticado:", data.user)
-
-        console.log("Obteniendo escuelas del usuario...")
         const schoolResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/my-schools`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         })
 
-        console.log("Respuesta de escuelas:", schoolResponse.status)
         if (!schoolResponse.ok) {
           const errorData = await schoolResponse.json()
           throw new Error(errorData.message || "Error al cargar las escuelas")
         }
 
         const schoolData = await schoolResponse.json()
-        console.log("Escuelas cargadas:", schoolData)
         
         if (!schoolData.data || schoolData.data.length === 0) {
           Swal.fire({
@@ -233,7 +225,6 @@ const TeachersPage = () => {
         setSchools(schoolData.data || [])
         setIsLoading(false)
       } catch (error: any) {
-        console.error("Error en checkAuth:", error)
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -353,7 +344,6 @@ const TeachersPage = () => {
 
       await handleSchoolSelect(newTeacher.school_id)
     } catch (error: any) {
-      console.error("Error al crear profesor:", error)
       showErrorAlert(error.message || "Ha ocurrido un error al crear el profesor")
     } finally {
       setIsSubmitting(false)
@@ -396,7 +386,6 @@ const TeachersPage = () => {
 
       await handleSchoolSelect(selectedSchool.school_id)
     } catch (error: any) {
-      console.error("Error al asignar profesor:", error)
       showErrorAlert(error.message || "Ha ocurrido un error al asignar el profesor")
     }
   }
@@ -430,13 +419,11 @@ const TeachersPage = () => {
       }
 
       const data = await response.json()
-      console.log("Profesores cargados:", data)
 
       setTeachers(data.data || [])
       const schoolObj = schools.find((s) => s.school_id === schoolId)
       setSelectedSchool({ ...schoolObj, courses: data.courses || [] })
     } catch (error: any) {
-      console.error("Error al cargar profesores:", error)
       Swal.fire({
         icon: "error",
         title: "Error",

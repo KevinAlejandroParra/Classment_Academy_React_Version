@@ -228,6 +228,7 @@
             "course_places": 15,
             "course_age": 16,
             "course_image": "/images/cursos/entrenamiento.jpg",
+            "course_state": "active",
             "createdAt": "2025-04-03T12:00:00Z",
             "updatedAt": "2025-04-03T12:00:00Z"
         },
@@ -240,6 +241,7 @@
             "course_places": 20,
             "course_age": 16,
             "course_image": "/images/cursos/entrenamiento-funcional.jpg",
+            "course_state": "active",
             "createdAt": "2025-04-03T12:00:00Z",
             "updatedAt": "2025-04-03T12:00:00Z"
         },
@@ -252,6 +254,7 @@
             "course_places": 15,
             "course_age": 14,
             "course_image": "/images/cursos/defensa_personal.jpg",
+            "course_state": "active",
             "createdAt": "2025-04-03T12:00:00Z",
             "updatedAt": "2025-04-03T12:00:00Z"
         },
@@ -264,6 +267,7 @@
             "course_places": 15,
             "course_age": 18,
             "course_image": "/images/cursos/entrenamiento_fuerza.jpeg",
+            "course_state": "active",
             "createdAt": "2025-04-03T12:00:00Z",
             "updatedAt": "2025-04-03T12:00:00Z"
         },
@@ -276,6 +280,7 @@
             "course_places": 25,
             "course_age": 16,
             "course_image": "/images/cursos/zumba.jpg",
+            "course_state": "active",
             "createdAt": "2025-04-03T12:00:00Z",
             "updatedAt": "2025-04-03T12:00:00Z"
         },
@@ -288,6 +293,7 @@
             "course_places": 15,
             "course_age": 10,
             "course_image": "/images/cursos/taekwondo_ninos.jpg",
+            "course_state": "active",
             "createdAt": "2025-04-03T12:00:00Z",
             "updatedAt": "2025-04-03T12:00:00Z"
         },
@@ -300,6 +306,7 @@
             "course_places": 15,
             "course_age": 16,
             "course_image": "/images/cursos/2.jpg",
+            "course_state": "active",
             "createdAt": "2025-04-03T12:00:00Z",
             "updatedAt": "2025-04-03T12:00:00Z"
         }

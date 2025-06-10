@@ -42,7 +42,6 @@ const SchoolsPage = () => {
     try {
       const token = localStorage.getItem("token")
       if (!token) {
-        console.log("No token found, redirecting to login")
         router.push("/login")
         return
       }

@@ -75,7 +75,7 @@ const SchoolPage = () => {
         }
         setIsLoading(false)
       } catch (error) {
-        console.error("Error:", error)
+         .error("Error:", error)
         router.push("/login")
       }
     }

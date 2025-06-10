@@ -86,7 +86,6 @@ export default function CoursesAdminPage() {
         setSchool(schoolData.data);
         setCourses(coursesData.data || []);
       } catch (error) {
-        console.error("Error:", error);
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -188,7 +187,6 @@ export default function CoursesAdminPage() {
         setPreviewImage(null);
       }
     } catch (error: any) {
-      console.error("Error:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -242,7 +240,6 @@ export default function CoursesAdminPage() {
         }
       }
     } catch (error) {
-      console.error("Error:", error);
       Swal.fire({
         icon: "error",
         title: "Error",

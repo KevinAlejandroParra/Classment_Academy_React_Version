@@ -71,7 +71,6 @@ const SchoolDetailsPage = () => {
       setSchool(data.data)
       setLoading(false)
     } catch (error) {
-      console.error("Error:", error)
       Swal.fire({
         icon: "error",
         title: "Error",

@@ -82,7 +82,6 @@ const Login: React.FC = () => {
         setIsAuthenticated(false)
       }
     } catch (error) {
-      console.error("Error verifying authentication:", error)
       localStorage.removeItem("token")
       setIsAuthenticated(false)
     }
@@ -153,7 +152,6 @@ const Login: React.FC = () => {
       }
     } catch (error: unknown) {
       const err = error as Error
-      console.error("Error en login:", err)
       setError(err.message)
       
       Swal.fire({

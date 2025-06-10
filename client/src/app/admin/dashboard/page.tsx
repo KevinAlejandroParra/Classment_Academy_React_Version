@@ -114,12 +114,10 @@ const AdminDashboard = () => {
           const schoolData = await schoolResponse.json()
           setSchools(schoolData.data || [])
         } else {
-          console.error("Error al obtener escuelas:", await schoolResponse.json())
         }
 
         setIsLoading(false)
       } catch (error) {
-        console.error("Error de autenticación:", error)
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -242,7 +240,6 @@ const AdminDashboard = () => {
         confirmButtonColor: "rgb(var(--primary-rgb))",
       });
     } catch (error: any) {
-      console.error("Error al crear escuela:", error);
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -299,7 +296,6 @@ const AdminDashboard = () => {
         }
       }
     } catch (error: any) {
-      console.error("Error al eliminar escuela:", error)
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -375,7 +371,6 @@ const AdminDashboard = () => {
         })
       } else {
         const errorData = await response.json()
-        console.error("Error al crear curso:", errorData.message)
 
         Swal.fire({
           icon: "error",
@@ -393,7 +388,6 @@ const AdminDashboard = () => {
         })
       }
     } catch (error) {
-      console.error("Error al crear curso:", error)
 
       Swal.fire({
         icon: "error",
@@ -466,7 +460,6 @@ const AdminDashboard = () => {
         confirmButtonColor: "rgb(var(--primary-rgb))",
       });
     } catch (error: any) {
-      console.error("Error al actualizar escuela:", error);
       Swal.fire({
         icon: "error",
         title: "Error",

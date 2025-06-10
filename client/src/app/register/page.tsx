@@ -196,8 +196,6 @@ const Register: React.FC = () => {
     setIsLoading(true)
 
     try {
-      // Log para ver los datos del formulario
-      console.log("Datos del formulario:", formData)
 
       // Validaciones en el frontend
       const requiredFields = [
@@ -221,7 +219,6 @@ const Register: React.FC = () => {
       }
 
       if (missingFields.length > 0) {
-        console.log("Campos faltantes:", missingFields)
         throw new Error("Todos los campos son requeridos")
       }
 
@@ -260,10 +257,9 @@ const Register: React.FC = () => {
         school_id: (formData.role_id === "4" || formData.role_id === "2") ? formData.school_id : undefined
       };
 
-      console.log("Datos a enviar al servidor:", userData)
       showToast("info", "Procesando registro...")
 
-      const response = await fetch("http://localhost:5000/api/register", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

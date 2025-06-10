@@ -30,6 +30,7 @@ interface Course {
   course_name: string
   course_image: string
   students_count: number
+  course_state: string
 }
 
 interface Class {
@@ -131,7 +132,7 @@ export default function TeacherDashboard() {
       try {
         setLoading(true)
         const token = localStorage.getItem("token")
-        const res = await fetch(`http://localhost:5000/api/class/course/${selectedCourse}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/class/course/${selectedCourse}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -400,7 +401,7 @@ export default function TeacherDashboard() {
       const student = students.find(s => s.user_id === studentId)
       const notes = student?.notes || ""
 
-      const res = await fetch("http://localhost:5000/api/attendance", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/attendance`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -462,6 +463,60 @@ export default function TeacherDashboard() {
           : student
       )
     )
+  }
+
+  const handleToggleCourseState = async (courseId: string) => {
+    try {
+      const token = localStorage.getItem("token")
+      if (!token) return
+
+      const course = courses.find(c => c.course_id === courseId)
+      if (!course) return
+
+      const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-rgb')
+      
+      const result = await Swal.fire({
+        icon: 'question',
+        text: course.course_state === 'active' 
+          ? "La desactivación del curso hará que este finalice y se envien los resultados a los estudiantes"
+          : "¿Deseas activar este curso?",
+        background: '#1a1a1a',
+        color: "#ffffff",
+        iconColor: "rgb(var(--primary-rgb))",
+        confirmButtonColor: "rgb(var(--primary-rgb))",
+        showCancelButton: true,
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: course.course_state === 'active' ? 'Sí, desactivar curso' : 'Sí, activar curso',
+        cancelButtonText: 'Cancelar'
+      })
+
+      if (result.isConfirmed) {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/courses/${courseId}/toggle-state`, {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+
+        const data = await res.json()
+
+        if (data.success) {
+          // Actualizar el estado del curso en el estado local
+          setCourses(courses.map(course => 
+            course.course_id === courseId 
+              ? { ...course, course_state: data.data.course_state }
+              : course
+          ))
+
+          showAlert("success", `Curso ${data.data.course_state === 'active' ? 'activado' : 'desactivado'} exitosamente`)
+        } else {
+          showAlert("error", data.message || "Error al cambiar el estado del curso")
+        }
+      }
+    } catch (err) {
+      console.error("Error al cambiar estado del curso:", err)
+      showAlert("error", "Error al cambiar el estado del curso")
+    }
   }
 
   if (loading) {
@@ -605,6 +660,13 @@ export default function TeacherDashboard() {
                         <div>
                           <h3 className="font-bold text-lg">{course.course_name}</h3>
                           <p className="text-sm opacity-70">{course.students_count} estudiantes</p>
+                          <span className={`text-xs px-2 py-1 rounded-full ${
+                            course.course_state === 'active' 
+                              ? 'bg-green-500/10 text-green-500' 
+                              : 'bg-red-500/10 text-red-500'
+                          }`}>
+                            {course.course_state === 'active' ? 'Activo' : 'Inactivo'}
+                          </span>
                         </div>
                       </div>
                       <div className="flex justify-between items-center">
@@ -627,6 +689,19 @@ export default function TeacherDashboard() {
                             className="button-primary text-sm px-3 py-1"
                           >
                             Asistencia
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleToggleCourseState(course.course_id)
+                            }}
+                            className={`text-sm px-3 py-1 rounded ${
+                              course.course_state === 'active'
+                                ? 'bg-red-500/10 text-red-500 hover:bg-red-500/20'
+                                : 'bg-green-500/10 text-green-500 hover:bg-green-500/20'
+                            }`}
+                          >
+                            {course.course_state === 'active' ? 'Desactivar' : 'Activar'}
                           </button>
                         </div>
                       </div>

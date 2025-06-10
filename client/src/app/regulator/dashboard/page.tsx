@@ -59,7 +59,7 @@ const RegulatorDashboard = () => {
           return
         }
 
-        const response = await fetch("http://localhost:5000/api/auth/me", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -86,7 +86,7 @@ const RegulatorDashboard = () => {
 
   const fetchAdministrators = async (token: string) => {
     try {
-      const response = await fetch("http://localhost:5000/api/administrators", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/administrators`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -118,7 +118,7 @@ const RegulatorDashboard = () => {
         return
       }
 
-      const response = await fetch(`http://localhost:5000/api/administrators/${adminId}/toggle-state`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/administrators/${adminId}/toggle-state`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -187,7 +187,7 @@ const RegulatorDashboard = () => {
     setErrorPendingAdmins(null)
     try {
       const token = localStorage.getItem("token")
-      const res = await fetch("http://localhost:5000/api/admin/pending-admins", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/pending-admins`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       const data = await res.json()
@@ -207,7 +207,7 @@ const RegulatorDashboard = () => {
 
   const handleAction = async (userId: string, action: "approve" | "reject") => {
     const token = localStorage.getItem("token")
-    const url = `http://localhost:5000/api/admin/${action}-admin/${userId}`
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/admin/${action}-admin/${userId}`
     try {
       const res = await fetch(url, {
         method: "POST",
@@ -378,7 +378,7 @@ function PendingAdminsBlock() {
     setError(null)
     try {
       const token = localStorage.getItem("token")
-      const res = await fetch("http://localhost:5000/api/admin/pending-admins", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/pending-admins`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       const data = await res.json()
@@ -398,7 +398,7 @@ function PendingAdminsBlock() {
 
   const handleAction = async (userId: string, action: "approve" | "reject") => {
     const token = localStorage.getItem("token")
-    const url = `http://localhost:5000/api/admin/${action}-admin/${userId}`
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/api/admin/${action}-admin/${userId}`
     try {
       const res = await fetch(url, {
         method: "POST",

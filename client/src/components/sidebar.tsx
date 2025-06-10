@@ -43,7 +43,7 @@ export function Sidebar() {
           return
         }
 
-        const response = await fetch("http://localhost:5000/api/auth/me", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

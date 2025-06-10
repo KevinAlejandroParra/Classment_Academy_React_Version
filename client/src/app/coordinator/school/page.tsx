@@ -42,7 +42,7 @@ const SchoolPage = () => {
           return
         }
 
-        const response = await fetch("http://localhost:5000/api/auth/me", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -59,14 +59,14 @@ const SchoolPage = () => {
         setUser(data.user)
         
         // Obtener la escuela del coordinador
-        const schoolResponse = await fetch(`http://localhost:5000/api/schools/coordinator/${data.user.id}`)
+        const schoolResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/schools/coordinator/${data.user.id}`)
         if (schoolResponse.ok) {
           const schoolData = await schoolResponse.json()
           setSchool(schoolData.data)
           
           // Obtener los cursos de la escuela
           if (schoolData.data) {
-            const coursesResponse = await fetch(`http://localhost:5000/api/courses/school/${schoolData.data.school_id}`)
+            const coursesResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/courses/school/${schoolData.data.school_id}`)
             if (coursesResponse.ok) {
               const coursesData = await coursesResponse.json()
               setCourses(coursesData.data)
@@ -87,7 +87,7 @@ const SchoolPage = () => {
     e.preventDefault()
     try {
       const token = localStorage.getItem("token")
-      const response = await fetch("http://localhost:5000/api/courses", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/courses`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

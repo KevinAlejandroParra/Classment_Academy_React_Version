@@ -68,7 +68,7 @@ const SchoolDetailsPage = () => {
         return
       }
 
-      const response = await fetch(`http://localhost:5000/api/schools/${schoolId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/schools/${schoolId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -120,7 +120,7 @@ const SchoolDetailsPage = () => {
       })
 
       if (result.isConfirmed) {
-        const response = await fetch(`http://localhost:5000/api/students/enroll/${schoolId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/students/enroll/${schoolId}`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -176,7 +176,7 @@ const SchoolDetailsPage = () => {
       })
 
       if (result.isConfirmed) {
-        const response = await fetch(`http://localhost:5000/api/enrollments/schools/${schoolId}/courses/${course_id}/enroll`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/enrollments/schools/${schoolId}/courses/${course_id}/enroll`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`,

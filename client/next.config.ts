@@ -11,7 +11,7 @@ const config: NextConfig = {
       },
     ],
     domains: ['localhost'],
-    unoptimized: true, // Desactivar la optimización de imágenes temporalmente
+    unoptimized: true, 
   },
 }
  

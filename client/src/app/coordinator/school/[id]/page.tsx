@@ -91,7 +91,7 @@ const SchoolManagementPage = ({ params }: { params: { id: string } }) => {
           return
         }
 
-        const response = await fetch("http://localhost:5000/api/auth/me", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -108,7 +108,7 @@ const SchoolManagementPage = ({ params }: { params: { id: string } }) => {
         setUser(data.user)
         
         // Obtener la escuela
-        const schoolResponse = await fetch(`http://localhost:5000/api/schools/${params.id}`, {
+        const schoolResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/schools/${params.id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -127,7 +127,7 @@ const SchoolManagementPage = ({ params }: { params: { id: string } }) => {
           })
           
           // Obtener los cursos de la escuela
-          const coursesResponse = await fetch(`http://localhost:5000/api/courses/school/${params.id}`, {
+          const coursesResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/courses/school/${params.id}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -167,7 +167,7 @@ const SchoolManagementPage = ({ params }: { params: { id: string } }) => {
     e.preventDefault()
     try {
       const token = localStorage.getItem("token")
-      const response = await fetch(`http://localhost:5000/api/schools/${params.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/schools/${params.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -221,7 +221,7 @@ const SchoolManagementPage = ({ params }: { params: { id: string } }) => {
     e.preventDefault()
     try {
       const token = localStorage.getItem("token")
-      const response = await fetch("http://localhost:5000/api/courses", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/courses`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -288,7 +288,7 @@ const SchoolManagementPage = ({ params }: { params: { id: string } }) => {
 
     try {
       const token = localStorage.getItem("token")
-      const response = await fetch(`http://localhost:5000/api/courses/${editingCourse.course_id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/courses/${editingCourse.course_id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -363,7 +363,7 @@ const SchoolManagementPage = ({ params }: { params: { id: string } }) => {
 
       if (result.isConfirmed) {
         const token = localStorage.getItem("token")
-        const response = await fetch(`http://localhost:5000/api/courses/${courseId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/courses/${courseId}`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,

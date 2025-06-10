@@ -66,6 +66,5 @@ app.use(errorHandler);
 
 // Iniciar el servidor
 app.listen(5000, () => {
-    console.log(`Servidor corriendo en puerto 5000`);
     console.log(`http://localhost:5000/api-docs`);
 });

@@ -20,8 +20,7 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASSWORD
     }
 });
-console.log("EMAIL_USER:", process.env.EMAIL_USER);
-console.log("EMAIL_PASSWORD exists:", !!process.env.EMAIL_PASSWORD);
+
 
 
 // Function to send email
@@ -34,7 +33,6 @@ const sendEmail = async (to, subject, text) => {
             text
         });
     } catch (error) {
-        console.error("Error sending email:", error);
     }
 };
 
@@ -159,7 +157,6 @@ class PaymentController {
         try {
             const { body } = req;
             
-            console.log("Webhook recibido:", JSON.stringify(body));
             
             if (!body.data || !body.data.id) {
                 return res.status(400).json({
@@ -229,9 +226,7 @@ class PaymentController {
 
                 await sendEmail(user.user_email, subject, text);
 
-                console.log(`[EMAIL] Estado del pago enviado a ${user.user_email} | Estado: ${paymentStatus}`);
             } else {
-                console.warn("[EMAIL] Usuario o curso no encontrados para enviar correo.");
             }
             if (paymentStatus === "completed") {
                 const existingEnrollment = await Enrollment.findOne({

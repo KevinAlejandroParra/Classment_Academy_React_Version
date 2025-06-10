@@ -200,15 +200,14 @@ export default function TeacherDashboard() {
     const fetchAttendance = async () => {
       try {
         const token = localStorage.getItem("token")
-        const res = await fetch(`http://localhost:5000/api/attendance/class/${selectedClass}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/attendance/class/${selectedClass}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         })
         const data = await res.json()
         
-        // Primero, actualizar todos los estudiantes para el curso actual
-        const studentsRes = await fetch(`http://localhost:5000/api/courses/${selectedCourse}/students`, {
+        const studentsRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/courses/${selectedCourse}/students`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -216,7 +215,6 @@ export default function TeacherDashboard() {
         const studentsData = await studentsRes.json()
         
         if (studentsData.success) {
-          // Inicializar todos los estudiantes con estado pendiente
           const updatedStudents = studentsData.data.map((student: Student) => ({
             ...student,
             attendance_status: "pending",
@@ -267,7 +265,7 @@ export default function TeacherDashboard() {
       const token = localStorage.getItem("token")
       if (!token || !selectedCourse) return
 
-      let url = "http://localhost:5000/api/class"
+      let url = `${process.env.NEXT_PUBLIC_API_URL}/api/class`
       let method = "POST"
       let successMessage = "Clase creada exitosamente"
       
@@ -281,7 +279,7 @@ export default function TeacherDashboard() {
       
       // Si estamos en modo de edición, usamos PUT
       if (isEditMode && newClass.class_id) {
-        url = `http://localhost:5000/api/class/${newClass.class_id}`
+        url = `${process.env.NEXT_PUBLIC_API_URL}${newClass.class_id}`
         method = "PUT"
         successMessage = "Clase actualizada exitosamente"
       }
@@ -340,7 +338,7 @@ export default function TeacherDashboard() {
         const token = localStorage.getItem("token")
         if (!token) return
         
-        const res = await fetch(`http://localhost:5000/api/class/${classId}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/class/${classId}`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`

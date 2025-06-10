@@ -65,7 +65,7 @@ const Login: React.FC = () => {
 
   const checkAuthAndRedirect = async (token: string) => {
     try {
-      const response = await fetch("http://localhost:5000/api/auth/me", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -115,7 +115,7 @@ const Login: React.FC = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/login", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -370,5 +370,4 @@ const Login: React.FC = () => {
     </motion.div>
   )
 }
-
 export default Login

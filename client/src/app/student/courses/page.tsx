@@ -69,7 +69,7 @@ const UserEnrollmentsPage = () => {
 
         // 1. Obtenemos datos del usuario
         console.log("Fetching user data...")
-        const userResponse = await fetch("http://localhost:5000/api/auth/me", {
+        const userResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
           headers: { Authorization: `Bearer ${token}` }
         })
 
@@ -117,7 +117,7 @@ const UserEnrollmentsPage = () => {
         // 2. Obtenemos matrículas del usuario
         console.log(`Fetching enrollments for user ID: ${userId}...`)
         const enrollmentsResponse = await fetch(
-          `http://localhost:5000/api/enrollments/user/${userId}`, 
+          `${process.env.NEXT_PUBLIC_API_URL}/api/enrollments/user/${userId}`, 
           { headers: { Authorization: `Bearer ${token}` } }
         )
 

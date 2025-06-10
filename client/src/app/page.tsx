@@ -4,6 +4,7 @@ import { Particles } from "../components/particles"
 import { SchoolsCarousel } from "../components/schools/schools-carousel"
 import { CoursesCarousel } from "../components/courses/courses-carousel"
 import { PromotionBanner } from "../components/PromotionBanner";
+import Footer from "@/components/footer/Footer"
 
 export default function Home() {
   return (
@@ -15,6 +16,8 @@ export default function Home() {
         <SchoolsCarousel />
         <CoursesCarousel />
         <PromotionBanner />
+        <Footer />
+
       </div>
     </main>
   )

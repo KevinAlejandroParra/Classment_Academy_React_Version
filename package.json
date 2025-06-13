@@ -4,7 +4,7 @@
     "scripts": {
         "server": "npm run server --prefix server",
         "client": "npm run dev --prefix client",
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "test": "jest",
         "download": "npm install --prefix server && npm install --prefix client",
         "db:migrate": "npm run db:migrate --prefix server",
         "swagger": "src/swagger.js",
@@ -26,5 +26,9 @@
         "morgan": "^1.10.0",
         "nodemailer": "^7.0.3",
         "sena-a11y": "^1.1.0"
+    },
+    "devDependencies": {
+        "@types/jest": "^29.5.14",
+        "jest": "^30.0.0"
     }
 }
